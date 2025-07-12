@@ -253,25 +253,35 @@ passport.deserializeUser(async (id, done) => {
 
     await loadCredentials(); // Load Stripe, PayPal, Mpesa, Google credentials
 
-    passport.use(new GoogleStrategy({
-      clientID: credentialCache.google.clientId,
-      clientSecret: credentialCache.google.clientSecret,
-      callbackURL: '/api/auth/google/callback',
-    }, async (accessToken, refreshToken, profile, done) => {
+    // Only initialize Google OAuth if credentials are available
+    if (credentialCache.google && credentialCache.google.clientId && credentialCache.google.clientSecret) {
       try {
-        let user = await User.findOne({ email: profile.emails[0].value });
-        if (!user) {
-          user = await User.create({
-            name: profile.displayName,
-            email: profile.emails[0].value,
-            password: Math.random().toString(36).slice(-8)
-          });
-        }
-        return done(null, user);
-      } catch (err) {
-        return done(err, null);
+        passport.use(new GoogleStrategy({
+          clientID: credentialCache.google.clientId,
+          clientSecret: credentialCache.google.clientSecret,
+          callbackURL: '/api/auth/google/callback',
+        }, async (accessToken, refreshToken, profile, done) => {
+          try {
+            let user = await User.findOne({ email: profile.emails[0].value });
+            if (!user) {
+              user = await User.create({
+                name: profile.displayName,
+                email: profile.emails[0].value,
+                password: Math.random().toString(36).slice(-8)
+              });
+            }
+            return done(null, user);
+          } catch (err) {
+            return done(err, null);
+          }
+        }));
+        console.log('✅ Google OAuth strategy initialized');
+      } catch (error) {
+        console.log('⚠️  Failed to initialize Google OAuth strategy:', error.message);
       }
-    }));
+    } else {
+      console.log('⚠️  Google OAuth credentials not configured - Google sign-in disabled');
+    }
 
     server.listen(PORT, () => console.log(`🚀 Server (with Socket.IO) running on port ${PORT}`));
   } catch (err) {

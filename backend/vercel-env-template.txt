@@ -1,0 +1,78 @@
+# ========================================
+# MYSHOPPING CENTER BACKEND - VERCEL DEPLOYMENT
+# ========================================
+
+# ========================================
+# SERVER CONFIGURATION
+# ========================================
+NODE_ENV=production
+PORT=5000
+FRONTEND_URL=https://your-frontend-domain.vercel.app
+
+# ========================================
+# DATABASE CONFIGURATION
+# ========================================
+MONGO_URI=mongodb+srv://your_username:your_password@your_cluster.mongodb.net/myshoppingcenter
+
+# ========================================
+# JWT CONFIGURATION
+# ========================================
+JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_random
+
+# ========================================
+# EMAIL CONFIGURATION (SMTP)
+# ========================================
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password_here
+SMTP_FROM=your_email@gmail.com
+
+# ========================================
+# PAYMENT GATEWAYS
+# ========================================
+
+# Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
+
+# PayPal Configuration
+PAYPAL_CLIENT_ID=your_paypal_client_id_here
+PAYPAL_CLIENT_SECRET=your_paypal_client_secret_here
+
+# M-Pesa Configuration (for mobile money payments)
+MPESA_CONSUMER_KEY=your_mpesa_consumer_key_here
+MPESA_CONSUMER_SECRET=your_mpesa_consumer_secret_here
+MPESA_SHORTCODE=your_mpesa_shortcode_here
+MPESA_PASSKEY=your_mpesa_passkey_here
+
+# ========================================
+# GOOGLE OAUTH CONFIGURATION
+# ========================================
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
+# ========================================
+# SECURITY CONFIGURATION
+# ========================================
+# Rate limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# File upload limits
+MAX_FILE_SIZE=5242880
+MAX_FILES=5
+
+# ========================================
+# PRODUCTION CONFIGURATION
+# ========================================
+DEBUG=false
+
+# ========================================
+# VERCEL-SPECIFIC NOTES
+# ========================================
+# 1. Add these variables in Vercel Dashboard > Project Settings > Environment Variables
+# 2. Vercel automatically sets PORT, so you can omit it
+# 3. For serverless functions, some variables might need different handling
+# 4. File uploads work differently on Vercel - consider using external storage
+# 5. Socket.IO might need special configuration for serverless deployment 
