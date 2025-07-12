@@ -185,30 +185,33 @@ app.get('/uploads/:filename', (req, res) => {
   const filename = req.params.filename;
   const filePath = path.join(__dirname, '../uploads', filename);
   
-  // Use wildcard CORS for images to avoid cross-origin issues
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
-  res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
+  // Use fs to read and serve the file directly with proper headers
+  const fs = require('fs');
   
-  // Set proper content type for images
-  const ext = path.extname(filename).toLowerCase();
-  if (ext === '.jpg' || ext === '.jpeg') {
-    res.header('Content-Type', 'image/jpeg');
-  } else if (ext === '.png') {
-    res.header('Content-Type', 'image/png');
-  } else if (ext === '.gif') {
-    res.header('Content-Type', 'image/gif');
-  } else if (ext === '.webp') {
-    res.header('Content-Type', 'image/webp');
+  if (fs.existsSync(filePath)) {
+    const ext = path.extname(filename).toLowerCase();
+    let contentType = 'image/jpeg'; // default
+    
+    if (ext === '.png') contentType = 'image/png';
+    else if (ext === '.gif') contentType = 'image/gif';
+    else if (ext === '.webp') contentType = 'image/webp';
+    
+    // Set headers for cross-origin access
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
+    res.header('Content-Type', contentType);
+    res.header('Cache-Control', 'public, max-age=31536000');
+    
+    // Stream the file directly
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+    
+    console.log('Image served successfully:', filename);
+  } else {
+    console.error('Image not found:', filePath);
+    res.status(404).json({ error: 'File not found' });
   }
-  
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      console.error('Error serving file:', err);
-      res.status(404).json({ error: 'File not found' });
-    }
-  });
 });
 
 app.get('/', (req, res) => {
@@ -255,6 +258,35 @@ app.get('/api/test-products', async (req, res) => {
   } catch (error) {
     console.error('Error in /api/test-products:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Alternative image serving route without CORS restrictions
+app.get('/api/images/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, '../uploads', filename);
+  console.log('Serving image via API route:', filename);
+  
+  const fs = require('fs');
+  
+  if (fs.existsSync(filePath)) {
+    const ext = path.extname(filename).toLowerCase();
+    let contentType = 'image/jpeg'; // default
+    
+    if (ext === '.png') contentType = 'image/png';
+    else if (ext === '.gif') contentType = 'image/gif';
+    else if (ext === '.webp') contentType = 'image/webp';
+    
+    res.header('Content-Type', contentType);
+    res.header('Cache-Control', 'public, max-age=31536000');
+    
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+    
+    console.log('API image served successfully:', filename);
+  } else {
+    console.error('API image not found:', filePath);
+    res.status(404).json({ error: 'Image not found', filename });
   }
 });
 

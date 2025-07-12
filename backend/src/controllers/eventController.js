@@ -38,7 +38,7 @@ exports.createEvent = async (req, res) => {
       // Force HTTPS in production to prevent mixed content
       const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
       const baseUrl = `${protocol}://${req.get('host')}`;
-      imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+      imageUrl = `${baseUrl}/api/images/${req.file.filename}`;
     }
     const event = new Event({
       ...req.body,
@@ -60,7 +60,7 @@ exports.updateEvent = async (req, res) => {
       // Force HTTPS in production to prevent mixed content
       const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
       const baseUrl = `${protocol}://${req.get('host')}`;
-      imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+      imageUrl = `${baseUrl}/api/images/${req.file.filename}`;
     }
     const updateData = {
       ...req.body,

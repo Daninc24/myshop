@@ -88,7 +88,8 @@ const createProduct = async (req, res) => {
       const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
       const baseUrl = `${protocol}://${req.get('host')}`;
       imageUrls = req.files.map(file => {
-        const url = `${baseUrl}/uploads/${file.filename}`;
+        // Use the API route for images to avoid CORS issues
+        const url = `${baseUrl}/api/images/${file.filename}`;
         console.log('Generated URL:', url);
         return url;
       });
@@ -141,7 +142,7 @@ const updateProduct = async (req, res) => {
       // Force HTTPS in production to prevent mixed content
       const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
       const baseUrl = `${protocol}://${req.get('host')}`;
-      imageUrls = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
+      imageUrls = req.files.map(file => `${baseUrl}/api/images/${file.filename}`);
     }
 
     const updateData = { 
