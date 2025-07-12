@@ -7,7 +7,7 @@ import { UserIcon } from '@heroicons/react/24/solid';
 
 
 const Profile = () => {
-  const { user, setUser, testAuth } = useAuth();
+  const { user, setUser } = useAuth();
   const { success, error } = useToast();
   const [profile, setProfile] = useState({ name: '', email: '' });
   const [editing, setEditing] = useState(false);
@@ -110,26 +110,6 @@ const Profile = () => {
             <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
               Profile
             </h3>
-            
-            {/* Debug Section */}
-            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-              <h4 className="text-sm font-medium text-yellow-800 mb-2">Debug Information</h4>
-              <div className="text-sm text-yellow-700 space-y-1">
-                <p>User: {user ? JSON.stringify(user) : 'Not logged in'}</p>
-                <p>API URL: {import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com/api'}</p>
-                <p>With Credentials: {axios.defaults.withCredentials ? 'Yes' : 'No'}</p>
-                <button 
-                  onClick={async () => {
-                    const result = await testAuth();
-                    console.log('Auth test result:', result);
-                    alert(JSON.stringify(result, null, 2));
-                  }}
-                  className="mt-2 px-3 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700"
-                >
-                  Test Authentication
-                </button>
-              </div>
-            </div>
 
             <form onSubmit={handleProfileSave} className="space-y-4 bg-white p-6 rounded shadow">
               <div className="flex items-center mb-4">
@@ -191,28 +171,19 @@ const Profile = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {orders.map(order => (
+                    {orders.map((order) => (
                       <tr key={order._id}>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm">#{order._id.slice(-6)}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm">{new Date(order.createdAt).toLocaleDateString()}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm">
-                          {order.localAmount && order.currency && order.currency !== 'USD' ? (
-                            <>
-                              <span>{formatCurrency(order.localAmount, order.currency)} </span>
-                              <span className="text-xs text-gray-500">/ {formatCurrency(order.usdAmount || order.totalAmount, 'USD')}</span>
-                            </>
-                          ) : (
-                            <span>{formatCurrency(order.usdAmount || order.totalAmount, 'USD')}</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm">{order.status}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order._id}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.status}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(order.total, 'USD')}</td>
                       </tr>
                     ))}
                   </tbody>

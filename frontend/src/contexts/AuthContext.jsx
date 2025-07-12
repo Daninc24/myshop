@@ -28,15 +28,9 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      console.log('Checking authentication...');
-      console.log('API base URL:', axios.defaults.baseURL);
-      console.log('With credentials:', axios.defaults.withCredentials);
-      
       const response = await axios.get('/auth/profile');
-      console.log('Auth check successful:', response.data);
       setUser(response.data.user);
     } catch (error) {
-      console.error('Auth check failed:', error.response?.status, error.response?.data);
       setUser(null);
     } finally {
       setLoading(false);
@@ -45,13 +39,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      console.log('Attempting login...');
       const response = await axios.post('/auth/login', { email, password });
-      console.log('Login successful:', response.data);
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
-      console.error('Login failed:', error.response?.status, error.response?.data);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Login failed' 
@@ -89,18 +80,6 @@ export const AuthProvider = ({ children }) => {
     window.location.href = (import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com/api') + '/auth/google';
   };
 
-  const testAuth = async () => {
-    try {
-      console.log('Testing authentication...');
-      const response = await axios.get('/test-auth');
-      console.log('Auth test result:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Auth test failed:', error);
-      return { error: error.message };
-    }
-  };
-
   const value = {
     user,
     loading,
@@ -114,8 +93,7 @@ export const AuthProvider = ({ children }) => {
     isWarehouseManager: user?.role === 'warehouse_manager',
     isManagerOrAdmin: user?.role === 'admin' || user?.role === 'manager' || user?.role === 'warehouse_manager',
     isShopkeeperOrAdmin: user?.role === 'shopkeeper' || user?.role === 'admin',
-    loginWithGoogle,
-    testAuth
+    loginWithGoogle
   };
 
   return (

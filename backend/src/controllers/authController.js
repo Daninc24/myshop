@@ -3,10 +3,6 @@ const User = require('../models/User');
 
 // Generate JWT token
 const generateToken = (userId) => {
-  console.log('=== JWT TOKEN GENERATION ===');
-  // JWT_SECRET validation removed for security
-  console.log('User ID:', userId);
-  
   if (!process.env.JWT_SECRET) {
     throw new Error('JWT_SECRET is not configured');
   }
