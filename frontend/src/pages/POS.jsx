@@ -750,6 +750,16 @@ const POS = () => {
         <button className="px-3 py-2 bg-indigo-600 text-white rounded" onClick={() => { setZReportModal(true); fetchZReport(); }}>
           Z-Report (Daily Summary)
         </button>
+        {/* Add Product Button for Admin and Warehouse Manager */}
+        {(user?.role === 'admin' || isWarehouseManager) && (
+          <button 
+            className="px-3 py-2 bg-green-600 text-white rounded flex items-center gap-2 hover:bg-green-700 transition-colors" 
+            onClick={() => setShowAddProduct(true)}
+          >
+            <PlusIcon className="h-4 w-4" />
+            Add Product
+          </button>
+        )}
         {selectedCustomer && (
           <div className="ml-2 p-2 bg-gray-100 rounded">
             <span className="font-medium">Customer:</span> {selectedCustomer.name} ({selectedCustomer.phone})
@@ -952,23 +962,11 @@ const POS = () => {
           )}
         </div>
       )}
-      {/* Add Product Button for Warehouse Manager */}
-      {isWarehouseManager && (
-        <div className="mb-4 flex justify-end">
-          <button
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-            onClick={() => setShowAddProduct(true)}
-          >
-            <PlusIcon className="h-5 w-5" />
-            Add Product
-          </button>
-        </div>
-      )}
-      {/* Add Product Modal for Warehouse Manager */}
-      {isWarehouseManager && showAddProduct && (
+      {/* Add Product Modal for Admin and Warehouse Manager */}
+      {(user?.role === 'admin' || isWarehouseManager) && showAddProduct && (
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
           <div className="flex justify-between items-center mb-2">
-            <span className="font-bold text-blue-900">Add New Product (Warehouse Manager)</span>
+            <span className="font-bold text-blue-900">Add New Product ({user?.role === 'admin' ? 'Admin' : 'Warehouse Manager'})</span>
             <button className="text-blue-600 hover:text-red-600" onClick={() => setShowAddProduct(false)}>&times;</button>
           </div>
           <form onSubmit={handleAddProductSubmit} className="space-y-4">

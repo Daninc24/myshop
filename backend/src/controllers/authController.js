@@ -4,8 +4,7 @@ const User = require('../models/User');
 // Generate JWT token
 const generateToken = (userId) => {
   console.log('=== JWT TOKEN GENERATION ===');
-  console.log('JWT_SECRET set:', !!process.env.JWT_SECRET);
-  console.log('JWT_SECRET length:', process.env.JWT_SECRET?.length);
+  // JWT_SECRET validation removed for security
   console.log('User ID:', userId);
   
   if (!process.env.JWT_SECRET) {

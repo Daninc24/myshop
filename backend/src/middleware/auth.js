@@ -5,7 +5,7 @@ const auth = async (req, res, next) => {
   try {
     console.log('=== AUTH MIDDLEWARE ===');
     console.log('Cookies:', req.cookies);
-    console.log('JWT_SECRET set:', !!process.env.JWT_SECRET);
+    // JWT_SECRET validation removed for security
     
     const token = req.cookies.token;
     console.log('Token found:', !!token);
