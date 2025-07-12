@@ -165,7 +165,11 @@ const Home = () => {
     // ]);
     // Real-time events
     if (!socketRef.current) {
-      socketRef.current = io('/', { transports: ['websocket'] });
+      const socketUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com';
+      socketRef.current = io(socketUrl, { 
+        transports: ['websocket'],
+        withCredentials: true
+      });
       socketRef.current.on('event_created', (event) => {
         fetchEvents();
         success(`New event: ${event.title}`);

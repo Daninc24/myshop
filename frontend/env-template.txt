@@ -1,0 +1,10 @@
+# Frontend Environment Variables for Vercel Deployment
+
+# API Base URL - Point to your Render backend
+VITE_API_URL=https://myshop-hhfv.onrender.com/api
+
+# PayPal Client ID (optional)
+VITE_PAYPAL_CLIENT_ID=your_paypal_client_id_here
+
+# Stripe Publishable Key (optional)
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here 
