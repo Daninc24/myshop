@@ -440,7 +440,18 @@ const POS = () => {
       // Refresh products
       const productsResponse = await axios.get('/products');
       console.log('Refreshed products:', productsResponse.data);
-      setProducts(productsResponse.data.products || productsResponse.data || []);
+      
+      // Debug image URLs
+      const products = productsResponse.data.products || productsResponse.data || [];
+      products.forEach((product, index) => {
+        console.log(`Product ${index + 1}:`, {
+          title: product.title,
+          images: product.images,
+          imageUrls: product.images?.map(img => img)
+        });
+      });
+      
+      setProducts(products);
     } catch (error) {
       console.error('Error creating product:', error);
       setAddProductError(error.response?.data?.message || error.message || 'Failed to add product');

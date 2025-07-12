@@ -171,32 +171,46 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/adverts', advertsRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
 
+// Handle OPTIONS requests for image uploads
+app.options('/uploads/:filename', (req, res) => {
+  const origin = req.headers.origin;
+  if (origin) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
+  res.status(200).end();
+});
+
 // Serve uploaded files with CORS
 app.get('/uploads/:filename', (req, res) => {
   const filename = req.params.filename;
   const filePath = path.join(__dirname, '../uploads', filename);
-  const allowedOrigins = [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
-    'http://localhost:5174',
-    'https://myshoppingcenters-8knn.vercel.app',
-    'https://myshoppingcenters.vercel.app',
-    'https://myshoppingcenter.vercel.app',
-    'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
-    'https://myshop-git-main-daniel-mailus-projects.vercel.app',
-    'https://myshop-git-main-daniel-mailus-projects.vercel.app'
-  ];
   const origin = req.headers.origin;
   
-  // Check if origin is allowed (including wildcard for vercel.app)
-  const isAllowed = allowedOrigins.includes(origin) || 
-                   (origin && origin.endsWith('.vercel.app'));
-  
-  if (isAllowed) {
+  // Always set CORS headers for image requests
+  if (origin) {
     res.header('Access-Control-Allow-Origin', origin);
   }
   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
   res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
+  
+  // Set proper content type for images
+  const ext = path.extname(filename).toLowerCase();
+  if (ext === '.jpg' || ext === '.jpeg') {
+    res.header('Content-Type', 'image/jpeg');
+  } else if (ext === '.png') {
+    res.header('Content-Type', 'image/png');
+  } else if (ext === '.gif') {
+    res.header('Content-Type', 'image/gif');
+  } else if (ext === '.webp') {
+    res.header('Content-Type', 'image/webp');
+  }
+  
   res.sendFile(filePath, (err) => {
     if (err) {
       console.error('Error serving file:', err);
@@ -250,6 +264,27 @@ app.get('/api/test-products', async (req, res) => {
     console.error('Error in /api/test-products:', error);
     res.status(500).json({ error: error.message });
   }
+});
+
+// Test image serving
+app.get('/test-image/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, '../uploads', filename);
+  console.log('Testing image access:', filename);
+  console.log('File path:', filePath);
+  
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
+  
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error('Error serving test image:', err);
+      res.status(404).json({ error: 'Test image not found', filename });
+    } else {
+      console.log('Test image served successfully:', filename);
+    }
+  });
 });
 
 app.use('*', (req, res) => {
