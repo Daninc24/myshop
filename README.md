@@ -5,6 +5,9 @@ Built with a React frontend and a Node.js/Express backend.
 
 ---
 
+to access the shop click this link https://myshop-git-main-daniel-mailus-projects.vercel.app/pos
+the project is hosted on vercel for frontend and render for the backend
+
 
 
 ## Features
