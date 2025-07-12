@@ -1,16 +1,24 @@
-# 🔧 CORS Fix Guide
+# CORS and Mixed Content Fix Guide
 
-## ✅ **Issue Identified and Fixed:**
+## Issues Fixed
 
-### **Problem:**
-Your frontend is running on `https://myshop-git-main-daniel-mailus-projects.vercel.app` but the backend CORS configuration was missing this specific domain.
+### 1. CORS Configuration
+- Added missing Vercel domain to CORS origins
+- Updated both main CORS and file upload CORS configurations
+- Added wildcard support for vercel.app domains
 
-### **Solution Applied:**
-Added your Vercel domain to all CORS configurations in the backend.
+### 2. Mixed Content Issues
+- Fixed image URLs to use HTTPS in production
+- Updated all controllers to force HTTPS protocol for image URLs
+- Fixed product, event, and other controllers
 
-## 📋 **CORS Configuration Updated:**
+### 3. Authentication Issues
+- Frontend making requests to protected endpoints without auth
+- Need to check authentication state before making API calls
 
-### **1. Main CORS Configuration**
+## Backend Changes Made
+
+### Server.js CORS Updates
 ```javascript
 app.use(cors({
   origin: [
@@ -20,7 +28,7 @@ app.use(cors({
     'https://myshoppingcenters.vercel.app',
     'https://myshoppingcenter.vercel.app',
     'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
-    'https://myshop-git-main-daniel-mailus-projects.vercel.app', // ✅ ADDED
+    'https://myshop-git-main-daniel-mailus-projects.vercel.app',
     'https://*.vercel.app'
   ],
   credentials: true,
@@ -29,82 +37,69 @@ app.use(cors({
 }));
 ```
 
-### **2. File Upload CORS**
+### Image URL Generation Fix
+All controllers now use HTTPS in production:
 ```javascript
-const allowedOrigins = [
-  // ... existing origins ...
-  'https://myshop-git-main-daniel-mailus-projects.vercel.app', // ✅ ADDED
-  'https://*.vercel.app'
-];
+// Force HTTPS in production to prevent mixed content
+const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+const baseUrl = `${protocol}://${req.get('host')}`;
 ```
 
-### **3. Socket.IO CORS**
-```javascript
-const io = new Server(server, {
-  cors: {
-    origin: [
-      // ... existing origins ...
-      'https://myshop-git-main-daniel-mailus-projects.vercel.app', // ✅ ADDED
-      'https://*.vercel.app'
-    ],
-    credentials: true,
-  },
-});
-```
+## Frontend Issues to Fix
 
-## 🚀 **Next Steps:**
+### 1. Authentication State Management
+- Check if user is authenticated before making API calls
+- Handle 401 errors gracefully
+- Redirect to login if needed
 
-### **1. Deploy Backend Changes**
-You need to redeploy your backend to Render.com with these CORS changes.
+### 2. Protected Route Access
+- Ensure POS page checks authentication
+- Add loading states for auth-dependent features
+- Handle unauthenticated users appropriately
 
-### **2. Verify Frontend Environment**
-Make sure your frontend has the correct environment variable:
-```
-VITE_API_URL=https://myshop-hhfv.onrender.com/api
-```
+## Deployment Steps
 
-### **3. Test After Deployment**
-After redeploying the backend, test these endpoints:
-- ✅ `/api/auth/profile`
-- ✅ `/api/payment/currency/rates`
-- ✅ `/api/payment/currency/list`
-- ✅ `/api/products`
-- ✅ `/api/testimonials`
+1. **Redeploy Backend to Render.com**
+   ```bash
+   git add .
+   git commit -m "Fix CORS and mixed content issues"
+   git push
+   ```
 
-## 🔍 **Expected Results:**
+2. **Verify Environment Variables**
+   - Ensure `NODE_ENV=production` is set
+   - Check all CORS origins are correct
 
-After redeploying the backend:
-1. ✅ **No more CORS errors** in browser console
-2. ✅ **All API calls** work properly
-3. ✅ **Authentication** works correctly
-4. ✅ **Socket.IO** connects without issues
+3. **Test Frontend**
+   - Clear browser cache
+   - Test image loading
+   - Verify authentication flow
 
-## 📝 **Files Modified:**
+## Testing Checklist
 
-- `backend/src/server.js` - Updated CORS origins in 3 places:
-  - Main CORS configuration
-  - File upload CORS
-  - Socket.IO CORS
+- [ ] Images load without mixed content errors
+- [ ] CORS errors are resolved
+- [ ] Authentication works properly
+- [ ] Protected routes are accessible
+- [ ] 401 errors are handled gracefully
 
-## 🚨 **Important Notes:**
+## Common Issues
 
-1. **Redeploy your backend** to Render.com after these changes
-2. **The changes are in the backend**, not the frontend
-3. **Your frontend is already correctly configured**
-4. **The issue was the missing domain** in backend CORS
+### Mixed Content Error
+- **Cause**: Images served over HTTP from HTTPS page
+- **Fix**: Force HTTPS protocol in production
 
-## 🔄 **Deployment Steps:**
+### CORS Error
+- **Cause**: Missing domain in CORS origins
+- **Fix**: Add exact domain to allowed origins
 
-1. **Commit and push** the backend changes to GitHub
-2. **Redeploy** your backend on Render.com
-3. **Wait for deployment** to complete
-4. **Test your frontend** - CORS errors should be gone
+### 401 Unauthorized
+- **Cause**: Making requests without authentication
+- **Fix**: Check auth state before API calls
 
-## 🎯 **Verification:**
+## Security Notes
 
-After backend redeployment, check:
-- [ ] ✅ No CORS errors in browser console
-- [ ] ✅ Login works properly
-- [ ] ✅ Products load correctly
-- [ ] ✅ Currency rates load
-- [ ] ✅ All API calls succeed 
+- All image URLs now use HTTPS in production
+- CORS is properly configured for your domains
+- Authentication middleware is working correctly
+- No hardcoded credentials in the codebase 

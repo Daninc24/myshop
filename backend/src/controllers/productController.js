@@ -84,7 +84,9 @@ const createProduct = async (req, res) => {
     let imageUrls = [];
     if (req.files && req.files.length > 0) {
       console.log('Processing uploaded files...');
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      // Force HTTPS in production to prevent mixed content
+      const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+      const baseUrl = `${protocol}://${req.get('host')}`;
       imageUrls = req.files.map(file => {
         const url = `${baseUrl}/uploads/${file.filename}`;
         console.log('Generated URL:', url);
@@ -136,7 +138,9 @@ const updateProduct = async (req, res) => {
     // Handle image uploads
     let imageUrls = [];
     if (req.files && req.files.length > 0) {
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      // Force HTTPS in production to prevent mixed content
+      const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+      const baseUrl = `${protocol}://${req.get('host')}`;
       imageUrls = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
     }
 

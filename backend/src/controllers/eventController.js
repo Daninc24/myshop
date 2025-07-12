@@ -35,7 +35,9 @@ exports.createEvent = async (req, res) => {
   try {
     let imageUrl = '';
     if (req.file) {
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      // Force HTTPS in production to prevent mixed content
+      const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+      const baseUrl = `${protocol}://${req.get('host')}`;
       imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
     }
     const event = new Event({
@@ -55,7 +57,9 @@ exports.updateEvent = async (req, res) => {
   try {
     let imageUrl = '';
     if (req.file) {
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      // Force HTTPS in production to prevent mixed content
+      const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+      const baseUrl = `${protocol}://${req.get('host')}`;
       imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
     }
     const updateData = {

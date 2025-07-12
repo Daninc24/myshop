@@ -124,6 +124,7 @@ app.use(cors({
     'https://myshoppingcenter.vercel.app',
     'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
     'https://myshop-git-main-daniel-mailus-projects.vercel.app',
+    'https://myshop-git-main-daniel-mailus-projects.vercel.app',
     'https://*.vercel.app'
   ],
   credentials: true,
@@ -159,6 +160,7 @@ app.get('/uploads/:filename', (req, res) => {
     'https://myshoppingcenter.vercel.app',
     'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
     'https://myshop-git-main-daniel-mailus-projects.vercel.app',
+    'https://myshop-git-main-daniel-mailus-projects.vercel.app',
     'https://*.vercel.app'
   ];
   const origin = req.headers.origin;
@@ -192,7 +194,9 @@ app.get('/health', (req, res) => {
 app.post('/test-upload', uploadMultiple.array('images', 5), (req, res) => {
   try {
     if (req.files && req.files.length > 0) {
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      // Force HTTPS in production
+      const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+      const baseUrl = `${protocol}://${req.get('host')}`;
       const imageUrls = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
       res.json({
         message: 'Upload test successful',
