@@ -277,6 +277,10 @@ app.get('/api/images/:filename', (req, res) => {
     else if (ext === '.gif') contentType = 'image/gif';
     else if (ext === '.webp') contentType = 'image/webp';
     
+    // Set CORS headers to allow all origins
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
     res.header('Content-Type', contentType);
     res.header('Cache-Control', 'public, max-age=31536000');
     
@@ -288,6 +292,14 @@ app.get('/api/images/:filename', (req, res) => {
     console.error('API image not found:', filePath);
     res.status(404).json({ error: 'Image not found', filename });
   }
+});
+
+// Handle OPTIONS for API images
+app.options('/api/images/:filename', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
+  res.status(200).end();
 });
 
 // Test image serving with different approach

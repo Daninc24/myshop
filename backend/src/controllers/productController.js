@@ -84,14 +84,31 @@ const createProduct = async (req, res) => {
     let imageUrls = [];
     if (req.files && req.files.length > 0) {
       console.log('Processing uploaded files...');
-      // Force HTTPS in production to prevent mixed content
-      const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
-      const baseUrl = `${protocol}://${req.get('host')}`;
+      
+      // Convert images to base64 to avoid CORS issues
+      const fs = require('fs');
       imageUrls = req.files.map(file => {
-        // Use the API route for images to avoid CORS issues
-        const url = `${baseUrl}/api/images/${file.filename}`;
-        console.log('Generated URL:', url);
-        return url;
+        const filePath = file.path;
+        const ext = file.originalname.split('.').pop().toLowerCase();
+        let mimeType = 'image/jpeg';
+        
+        if (ext === 'png') mimeType = 'image/png';
+        else if (ext === 'gif') mimeType = 'image/gif';
+        else if (ext === 'webp') mimeType = 'image/webp';
+        
+        try {
+          const imageBuffer = fs.readFileSync(filePath);
+          const base64Image = imageBuffer.toString('base64');
+          const dataUrl = `data:${mimeType};base64,${base64Image}`;
+          console.log('Generated base64 URL for:', file.originalname);
+          return dataUrl;
+        } catch (error) {
+          console.error('Error converting image to base64:', error);
+          // Fallback to regular URL
+          const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+          const baseUrl = `${protocol}://${req.get('host')}`;
+          return `${baseUrl}/api/images/${file.filename}`;
+        }
       });
     }
     console.log('Final image URLs:', imageUrls);
