@@ -39,11 +39,11 @@ const register = async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
-    // Set token in HttpOnly cookie
+    // Set token in HttpOnly cookie with more permissive settings
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'none', // Allow cross-site cookies
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
@@ -81,11 +81,11 @@ const login = async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
-    // Set token in HttpOnly cookie
+    // Set token in HttpOnly cookie with more permissive settings
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'none', // Allow cross-site cookies
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
@@ -122,7 +122,11 @@ const getProfile = async (req, res) => {
 // Logout
 const logout = async (req, res) => {
   try {
-    res.clearCookie('token');
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none'
+    });
     res.json({ message: 'Logged out successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

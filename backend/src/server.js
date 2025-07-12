@@ -52,7 +52,8 @@ const io = new Server(server, {
         'https://myshoppingcenter.vercel.app',
         'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
         'https://myshop-git-main-daniel-mailus-projects.vercel.app',
-        'https://myshop-git-main-daniel-mailus-projects.vercel.app'
+        'https://myshop-hhfv.vercel.app',
+        'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app'
       ];
       
       // Allow requests with no origin
@@ -137,7 +138,8 @@ app.use(cors({
       'https://myshoppingcenter.vercel.app',
       'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
       'https://myshop-git-main-daniel-mailus-projects.vercel.app',
-      'https://myshop-git-main-daniel-mailus-projects.vercel.app'
+      'https://myshop-hhfv.vercel.app',
+      'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app'
     ];
     
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -152,7 +154,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cookie']
 }));
 
 // === ROUTES ===
@@ -225,6 +227,36 @@ app.get('/health', (req, res) => {
     uptime: process.uptime(),
     requestId: req.id,
   });
+});
+
+// Test authentication endpoint
+app.get('/api/test-auth', (req, res) => {
+  console.log('=== TEST AUTH ENDPOINT ===');
+  console.log('Cookies:', req.cookies);
+  console.log('Headers:', req.headers);
+  
+  const token = req.cookies.token;
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      res.json({
+        authenticated: true,
+        userId: decoded.userId,
+        tokenLength: token.length
+      });
+    } catch (error) {
+      res.json({
+        authenticated: false,
+        error: 'Invalid token',
+        tokenLength: token.length
+      });
+    }
+  } else {
+    res.json({
+      authenticated: false,
+      error: 'No token found'
+    });
+  }
 });
 
 app.post('/test-upload', uploadMultiple.array('images', 5), (req, res) => {
