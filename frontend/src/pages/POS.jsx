@@ -449,6 +449,18 @@ const POS = () => {
           images: product.images,
           imageUrls: product.images?.map(img => img)
         });
+        
+        // Test each image URL
+        if (product.images && product.images.length > 0) {
+          product.images.forEach((imgUrl, imgIndex) => {
+            console.log(`Testing image ${imgIndex + 1} for product ${index + 1}:`, imgUrl);
+            // Create a test image element to see if it loads
+            const testImg = new Image();
+            testImg.onload = () => console.log(`✅ Image loaded successfully: ${imgUrl}`);
+            testImg.onerror = () => console.log(`❌ Image failed to load: ${imgUrl}`);
+            testImg.src = imgUrl;
+          });
+        }
       });
       
       setProducts(products);
