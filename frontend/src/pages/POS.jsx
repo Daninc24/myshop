@@ -101,16 +101,22 @@ const POS = () => {
       setUsersLoading(true);
       axios.get('/users')
         .then(res => setAllUsers(res.data.users || []))
-        .catch(() => setAllUsers([]))
+        .catch((error) => {
+          console.log('Users fetch error:', error.response?.status);
+          setAllUsers([]);
+        })
         .finally(() => setUsersLoading(false));
     }
   }, [user]);
 
   useEffect(() => {
-    // Fetch products
+    // Fetch products - this is a public endpoint
     axios.get('/products')
       .then(res => setProducts(res.data.products || res.data || []))
-      .catch(() => setProducts([]));
+      .catch((error) => {
+        console.log('Products fetch error:', error.response?.status);
+        setProducts([]);
+      });
   }, []);
 
   const filteredProducts = products.filter(p =>
@@ -411,6 +417,7 @@ const POS = () => {
     }
     setAddProductLoading(true);
     try {
+      console.log('Submitting product with images:', addProductImages.length);
       const submitData = new FormData();
       submitData.append('title', addProductForm.title);
       submitData.append('description', addProductForm.description);
@@ -418,18 +425,24 @@ const POS = () => {
       submitData.append('category', addProductForm.category);
       submitData.append('stock', addProductForm.stock);
       addProductImages.forEach(file => submitData.append('images', file));
-      await axios.post('/products', submitData, {
+      
+      const response = await axios.post('/products', submitData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+      
+      console.log('Product created successfully:', response.data);
       setShowAddProduct(false);
       setAddProductForm({ title: '', description: '', price: '', category: '', stock: '' });
       setAddProductImages([]);
       setAddProductPreviews([]);
       setAddProductError('');
+      
       // Refresh products
-      axios.get('/products')
-        .then(res => setProducts(res.data.products || res.data || []));
+      const productsResponse = await axios.get('/products');
+      console.log('Refreshed products:', productsResponse.data);
+      setProducts(productsResponse.data.products || productsResponse.data || []);
     } catch (error) {
+      console.error('Error creating product:', error);
       setAddProductError(error.response?.data?.message || error.message || 'Failed to add product');
     } finally {
       setAddProductLoading(false);
