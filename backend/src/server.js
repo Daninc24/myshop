@@ -50,6 +50,7 @@ const io = new Server(server, {
       'https://myshoppingcenters.vercel.app',
       'https://myshoppingcenter.vercel.app',
       'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
+      'https://myshop-git-main-daniel-mailus-projects.vercel.app',
       'https://*.vercel.app'
     ],
     credentials: true,
@@ -122,6 +123,7 @@ app.use(cors({
     'https://myshoppingcenters.vercel.app',
     'https://myshoppingcenter.vercel.app',
     'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
+    'https://myshop-git-main-daniel-mailus-projects.vercel.app',
     'https://*.vercel.app'
   ],
   credentials: true,
@@ -156,6 +158,7 @@ app.get('/uploads/:filename', (req, res) => {
     'https://myshoppingcenters.vercel.app',
     'https://myshoppingcenter.vercel.app',
     'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
+    'https://myshop-git-main-daniel-mailus-projects.vercel.app',
     'https://*.vercel.app'
   ];
   const origin = req.headers.origin;
