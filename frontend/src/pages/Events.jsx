@@ -29,7 +29,7 @@ const Events = () => {
     fetchAndSetEvents();
     // Setup Socket.IO for real-time updates
     if (!socketRef.current) {
-      socketRef.current = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshoppingcenters.onrender.com', { 
+      socketRef.current = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com', { 
         transports: ['websocket'],
         withCredentials: true
       });

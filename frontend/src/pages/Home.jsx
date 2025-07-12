@@ -21,7 +21,7 @@ import { Helmet } from 'react-helmet';
 const getAdvertImageUrl = (image) => {
   if (!image) return '';
   if (image.startsWith('/uploads')) {
-    return `https://myshoppingcenters.onrender.com${image}`;
+    return `https://myshop-hhfv.onrender.com${image}`;
   }
   return image;
 };
@@ -142,7 +142,7 @@ const Home = () => {
     fetchBestSelling();
     fetchEvents();
     fetchAdverts();
-    axios.get('/api/testimonials')
+    axios.get('/testimonials')
       .then(res => setTestimonials(res.data.testimonials || []))
       .catch(() => setTestimonials([]));
     // Simulate fetching testimonials

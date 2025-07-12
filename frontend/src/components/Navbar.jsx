@@ -20,7 +20,7 @@ const Navbar = () => {
   useEffect(() => {
     if (!user) return;
     if (socketRef.current) return;
-    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshoppingcenters.onrender.com', {
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com', {
       withCredentials: true,
       transports: ['websocket'],
     });
@@ -36,7 +36,7 @@ const Navbar = () => {
   }, [user]);
 
   useEffect(() => {
-    axios.get(import.meta.env.VITE_API_URL + '/payment/currency/list')
+    axios.get('/payment/currency/list')
       .then(res => setCurrencies(res.data.currencies))
       .catch(() => setCurrencies(['USD']));
   }, []);
