@@ -185,7 +185,6 @@ const Home = () => {
   const handleNextBanner = () => setBannerIndex((prev) => (prev + 1) % banners.length);
 
   useEffect(() => {
-    fetchProducts();
     fetchNewArrivals();
     fetchBestSelling();
     fetchEvents();
