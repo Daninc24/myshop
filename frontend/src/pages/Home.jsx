@@ -156,6 +156,8 @@ const Home = () => {
   const [testimonials, setTestimonials] = useState([]);
   const searchInputRef = useRef();
   const [search, setSearch] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dealCountdown, setDealCountdown] = useState(3600); // 1 hour in seconds
   const [recentlyViewed, setRecentlyViewed] = useState([]);
@@ -318,12 +320,48 @@ const Home = () => {
     }
   };
 
-  // Fetch products when search or category changes
+  // Debounced search effect for fetching products
   useEffect(() => {
     setLoading(true);
-    fetchProducts(search, selectedCategory);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchProducts(search, selectedCategory);
+    }, 300);
+    return () => clearTimeout(searchTimeoutRef.current);
     // eslint-disable-next-line
   }, [search, selectedCategory]);
+
+  // Autocomplete: fetch suggestions as user types
+  useEffect(() => {
+    if (!search) {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+    const fetchSuggestions = async () => {
+      try {
+        const res = await axios.get('/products', { params: { search } });
+        setSearchSuggestions((res.data || []).slice(0, 8));
+        setShowSuggestions(true);
+      } catch {
+        setSearchSuggestions([]);
+        setShowSuggestions(false);
+      }
+    };
+    const timeout = setTimeout(fetchSuggestions, 200);
+    return () => clearTimeout(timeout);
+  }, [search]);
+
+  // Hide suggestions on click outside
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (searchInputRef.current && !searchInputRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   // Add a sample flash deals array (could be improved to fetch from backend)
   const flashDeals = products.filter(p => p.isDeal || p.price < 20).slice(0, 6);
@@ -400,22 +438,43 @@ const Home = () => {
           }
         `}</script>
       </Helmet>
-      {/* Top Search Bar (always visible, sticky on mobile) */}
-      <div className="w-full bg-white shadow sticky top-0 z-30 px-2 py-2 md:hidden flex items-center gap-2">
-        <MagnifyingGlassIcon className="h-6 w-6 text-orange-600 ml-2" />
-        <input
-          ref={searchInputRef}
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search for products, brands, categories..."
-          className="flex-1 px-4 py-2 bg-transparent outline-none text-base text-gray-900"
-        />
-        {search && (
-          <button onClick={() => setSearch('')} className="text-gray-400 hover:text-orange-600 px-2">
-            <XMarkIcon className="h-5 w-5" />
-          </button>
-        )}
+      {/* Search Bar with Autocomplete */}
+      <div className="max-w-3xl mx-auto px-4 pt-8 relative z-20">
+        <div className="relative" ref={searchInputRef}>
+          <input
+            type="text"
+            className="w-full rounded-full border border-gray-300 px-5 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-sm"
+            placeholder="Search for products, brands, or categories..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onFocus={() => search && setShowSuggestions(true)}
+            autoComplete="off"
+          />
+          <MagnifyingGlassIcon className="w-6 h-6 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+          {/* Autocomplete Suggestions Dropdown */}
+          {showSuggestions && searchSuggestions.length > 0 && (
+            <ul className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-72 overflow-y-auto">
+              {searchSuggestions.map(suggestion => (
+                <li
+                  key={suggestion._id}
+                  className="px-4 py-2 hover:bg-orange-100 cursor-pointer flex items-center gap-2"
+                  onClick={() => {
+                    setSearch(suggestion.title || suggestion.name);
+                    setShowSuggestions(false);
+                  }}
+                >
+                  {suggestion.images && suggestion.images[0] && (
+                    <img src={suggestion.images[0]} alt="" className="w-8 h-8 object-cover rounded mr-2" />
+                  )}
+                  <span>{suggestion.title || suggestion.name}</span>
+                  {suggestion.category && (
+                    <span className="ml-auto text-xs text-gray-400">{suggestion.category}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
       {/* Hero Section with Search (desktop only) */}
       <section className="relative w-full h-[350px] md:h-[420px] flex items-center justify-center mb-8 bg-gradient-to-br from-orange-100 to-orange-200 hidden md:flex">
