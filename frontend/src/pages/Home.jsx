@@ -184,6 +184,26 @@ const Home = () => {
   const handlePrevBanner = () => setBannerIndex((prev) => (prev - 1 + banners.length) % banners.length);
   const handleNextBanner = () => setBannerIndex((prev) => (prev + 1) % banners.length);
 
+  // Fetch new arrivals
+  const fetchNewArrivals = async () => {
+    try {
+      const response = await axios.get('/products');
+      setNewArrivals((response.data || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4));
+    } catch (err) {
+      setNewArrivals([]);
+    }
+  };
+
+  // Fetch best selling
+  const fetchBestSelling = async () => {
+    try {
+      const response = await axios.get('/products/best-selling');
+      setBestSelling(response.data || []);
+    } catch (err) {
+      setBestSelling([]);
+    }
+  };
+
   useEffect(() => {
     fetchNewArrivals();
     fetchBestSelling();
