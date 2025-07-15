@@ -80,6 +80,18 @@ const advertTemplates = [
   },
 ];
 
+const getProductTitle = (productField, products) => {
+  if (!productField) return '';
+  if (typeof productField === 'string') {
+    const found = products.find(p => p._id === productField);
+    return found ? found.title : productField;
+  }
+  if (typeof productField === 'object') {
+    return productField.title || productField.name || productField._id || '';
+  }
+  return '';
+};
+
 const AdminAdverts = () => {
   const [adverts, setAdverts] = useState([]);
   const [products, setProducts] = useState([]);
@@ -236,7 +248,7 @@ const AdminAdverts = () => {
                 title: advert.title,
                 message: advert.message,
                 image: advert.image,
-                product: products.find(p => p._id === advert.product)?.title || advert.product,
+                product: getProductTitle(advert.product, products),
                 productId: advert.product,
               })}
             </div>
@@ -258,7 +270,7 @@ const AdminAdverts = () => {
             <h2 className="text-2xl font-bold mb-2">{selectedAdvert.title}</h2>
             {selectedAdvert.image && <img src={selectedAdvert.image} alt="Advert" className="w-full h-48 object-cover rounded mb-3" />}
             <div className="mb-2 text-gray-700">{selectedAdvert.message}</div>
-            <div className="mb-2 text-sm text-gray-500">Product: {products.find(p => p._id === selectedAdvert.product)?.title || selectedAdvert.product}</div>
+            <div className="mb-2 text-sm text-gray-500">Product: {getProductTitle(selectedAdvert.product, products)}</div>
             <div className="mb-2 text-sm text-gray-500">Start: {selectedAdvert.startDate ? new Date(selectedAdvert.startDate).toLocaleDateString() : '-'}</div>
             <div className="mb-2 text-sm text-gray-500">End: {selectedAdvert.endDate ? new Date(selectedAdvert.endDate).toLocaleDateString() : '-'}</div>
             <div className="mb-2 text-sm text-gray-500">Active: {selectedAdvert.active ? 'Yes' : 'No'}</div>
