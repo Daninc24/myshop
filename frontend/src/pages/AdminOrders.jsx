@@ -62,62 +62,39 @@ const AdminOrders = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="card max-w-7xl mx-auto mt-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
+        <h1 className="text-3xl font-heading font-bold text-secondary">Order Management</h1>
         <div className="text-sm text-gray-600">
           Welcome, {user?.name}
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">All Orders</h2>
+      <div className="bg-surface rounded-2xl shadow-soft overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <h2 className="text-xl font-semibold text-secondary">All Orders</h2>
         </div>
-        
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="w-full text-sm rounded-2xl">
+            <thead className="bg-primary-light text-primary-dark">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Order ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Items
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Shipping Address
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="p-3 font-semibold text-left">Order ID</th>
+                <th className="font-semibold text-left">Customer</th>
+                <th className="font-semibold text-left">Items</th>
+                <th className="font-semibold text-left">Total</th>
+                <th className="font-semibold text-left">Shipping Address</th>
+                <th className="font-semibold text-left">Status</th>
+                <th className="font-semibold text-left">Date</th>
+                <th className="font-semibold text-left">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-surface">
               {orders.map((order) => (
-                <tr key={order._id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    #{order._id.slice(-6)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {order.userId.name}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {order.items.length} item(s)
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <tr key={order._id} className="border-t border-gray-100 hover:bg-primary-light/30 transition-colors">
+                  <td className="p-3 font-mono font-medium text-secondary">#{order._id.slice(-6)}</td>
+                  <td className="p-3">{order.userId.name}</td>
+                  <td className="p-3">{order.items.length} item(s)</td>
+                  <td className="p-3">
                     {order.localAmount && order.currency && order.currency !== 'USD' ? (
                       <>
                         <span>{formatCurrency(order.localAmount, order.currency)} </span>
@@ -127,7 +104,7 @@ const AdminOrders = () => {
                       <span>{formatCurrency(order.usdAmount || order.totalAmount, 'USD')}</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="p-3">
                     {order.shippingAddress ? (
                       <div>
                         <div>{order.shippingAddress.street}</div>
@@ -138,19 +115,15 @@ const AdminOrders = () => {
                       <span className="text-gray-400 italic">No address</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                      {order.status}
-                    </span>
+                  <td className="p-3">
+                    <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full shadow-sm ${getStatusColor(order.status)}`}>{order.status}</span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="p-3">{new Date(order.createdAt).toLocaleDateString()}</td>
+                  <td className="p-3">
                     <select
                       value={order.status}
                       onChange={(e) => updateOrderStatus(order._id, e.target.value)}
-                      className="border border-gray-300 rounded px-2 py-1 text-sm"
+                      className="input-field max-w-xs"
                     >
                       <option value="pending">Pending</option>
                       <option value="processing">Processing</option>
@@ -166,9 +139,9 @@ const AdminOrders = () => {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4 mb-4">
+      <div className="flex flex-wrap gap-4 mt-6">
         {Object.entries(salesByCurrency).map(([cur, amt]) => (
-          <div key={cur} className="bg-gray-100 px-4 py-2 rounded shadow text-sm font-semibold">
+          <div key={cur} className="bg-primary-light text-primary-dark px-4 py-2 rounded-2xl shadow-soft text-sm font-semibold">
             {formatCurrency(amt, cur)} {cur}
           </div>
         ))}

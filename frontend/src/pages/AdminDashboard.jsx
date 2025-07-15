@@ -156,8 +156,7 @@ const AdminDashboard = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Modernize dashboard container and sections */}
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto py-10 animate-fade-in">
         <h1 className="text-3xl font-heading font-bold text-secondary mb-8">Admin Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
@@ -198,15 +197,15 @@ const AdminDashboard = () => {
           ) : (
             <div className="space-y-4">
               {stats.recentOrders.map(order => (
-                <div key={order._id} className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4 last:border-b-0 animate-fade-in">
-                  <div>
-                    <span className="font-medium text-secondary">Order #{order._id.slice(-6)}</span>
-                    <span className="ml-4 text-gray-500 text-sm">{new Date(order.createdAt).toLocaleDateString()}</span>
+                <div key={order._id} className="bg-primary-light/30 rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-2 md:gap-6 shadow-soft">
+                  <div className="font-mono text-primary font-bold">#{order._id.slice(-6)}</div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-secondary">{order.userId?.name || 'Unknown'}</div>
+                    <div className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleString()}</div>
                   </div>
-                  <div className="flex gap-4 items-center">
-                    <span className="text-primary font-semibold">${order.totalAmount.toFixed(2)}</span>
-                    <span className="text-xs bg-primary-light text-primary px-3 py-1 rounded-xl">{order.status}</span>
-                  </div>
+                  <div className="text-sm text-secondary">{order.items.length} item(s)</div>
+                  <div className="text-sm font-semibold text-primary">{order.localAmount && order.currency && order.currency !== 'USD' ? `${order.localAmount} ${order.currency}` : `$${order.usdAmount || order.totalAmount}`}</div>
+                  <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full shadow-sm ${getStatusColor(order.status)}`}>{order.status}</span>
                 </div>
               ))}
             </div>

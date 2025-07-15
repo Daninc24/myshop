@@ -99,27 +99,27 @@ const AdminEvents = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow mt-8">
-      <h1 className="text-2xl font-bold mb-4">Manage Events</h1>
-      {msg && <div className="mb-2 text-green-700">{msg}</div>}
+    <div className="card max-w-4xl mx-auto mt-8">
+      <h1 className="text-3xl font-heading font-bold mb-6 text-secondary">Manage Events</h1>
+      {msg && <div className="mb-2 bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-2 animate-slide-in">{msg}</div>}
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <input name="title" value={form.title} onChange={handleChange} placeholder="Title" className="border rounded px-2 py-1" required />
-        <input name="date" type="datetime-local" value={form.date} onChange={handleChange} className="border rounded px-2 py-1" required />
-        <input name="link" value={form.link} onChange={handleChange} placeholder="Event Link (optional)" className="border rounded px-2 py-1" />
-        <input name="image" value={form.image} onChange={handleChange} placeholder="Image URL (optional)" className="border rounded px-2 py-1" />
-        <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description" className="border rounded px-2 py-1 md:col-span-2" required />
+        <input name="title" value={form.title} onChange={handleChange} placeholder="Title" className="input-field" required />
+        <input name="date" type="datetime-local" value={form.date} onChange={handleChange} className="input-field" required />
+        <input name="link" value={form.link} onChange={handleChange} placeholder="Event Link (optional)" className="input-field" />
+        <input name="image" value={form.image} onChange={handleChange} placeholder="Image URL (optional)" className="input-field" />
+        <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description" className="input-field md:col-span-2" required />
         <div className="flex flex-col gap-1">
           <label className="font-medium">Image Upload</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} />
+          <input type="file" accept="image/*" onChange={handleImageChange} className="file-upload-area" />
           {imagePreview && (
-            <div className="mt-2"><img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded" /></div>
+            <div className="mt-2"><img src={imagePreview} alt="Preview" className="image-preview" /></div>
           )}
         </div>
-        <button type="submit" className="bg-blue-600 text-white rounded px-4 py-2 md:col-span-2">
+        <button type="submit" className="btn-primary md:col-span-2">
           {editingId ? 'Update Event' : 'Create Event'}
         </button>
       </form>
-      <h2 className="text-xl font-semibold mb-4">All Events</h2>
+      <h2 className="text-xl font-heading font-semibold mb-4 text-secondary">All Events</h2>
       {loading ? (
         <div>Loading events...</div>
       ) : events.length === 0 ? (
@@ -127,17 +127,17 @@ const AdminEvents = () => {
       ) : (
         <div className="space-y-4">
           {events.map(event => (
-            <div key={event._id} className="bg-gray-50 rounded shadow p-4 flex flex-col md:flex-row items-center">
-              {event.image && <img src={event.image} alt={event.title} className="w-24 h-24 object-cover rounded mr-6 mb-4 md:mb-0" />}
+            <div key={event._id} className="card flex flex-col md:flex-row items-center gap-4">
+              {event.image && <img src={event.image} alt={event.title} className="image-preview mr-0 md:mr-6 mb-4 md:mb-0" />}
               <div className="flex-1">
-                <h3 className="text-lg font-bold mb-1">{event.title}</h3>
+                <h3 className="text-lg font-heading font-bold mb-1 text-secondary">{event.title}</h3>
                 <div className="text-gray-500 text-sm mb-2">{new Date(event.date).toLocaleString()}</div>
                 <p className="mb-2">{event.description}</p>
-                {event.link && <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Join/More Info</a>}
+                {event.link && <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Join/More Info</a>}
               </div>
-              <div className="flex flex-col gap-2 ml-4">
-                <button onClick={() => handleEdit(event)} className="bg-yellow-500 text-white rounded px-3 py-1 text-xs">Edit</button>
-                <button onClick={() => handleDelete(event._id)} className="bg-red-600 text-white rounded px-3 py-1 text-xs">Delete</button>
+              <div className="flex flex-col gap-2 md:ml-4">
+                <button onClick={() => handleEdit(event)} className="btn-secondary text-xs">Edit</button>
+                <button onClick={() => handleDelete(event._id)} className="btn-danger text-xs">Delete</button>
               </div>
             </div>
           ))}

@@ -508,13 +508,13 @@ const POS = () => {
           <div className="font-bold text-right">Grand Total: {totalAfterDiscount}</div>
         </div>
         <div className="flex gap-2 mt-4">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded" onClick={handlePrint}>
+          <button className="btn-primary" onClick={handlePrint}>
             Print Receipt
           </button>
-          <button className="px-4 py-2 bg-green-600 text-white rounded" onClick={handleDownloadPDF}>
+          <button className="btn-primary" onClick={handleDownloadPDF}>
             Download PDF
           </button>
-          <button className="px-4 py-2 bg-gray-400 text-white rounded" onClick={() => setReceipt(null)}>
+          <button className="btn-secondary" onClick={() => setReceipt(null)}>
             New Sale
           </button>
         </div>
@@ -551,7 +551,7 @@ const POS = () => {
           </tbody>
         </table>
         <div className="font-bold text-right text-red-700">Total Refund: Ksh {Math.abs(returnReceipt.total)}</div>
-        <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded" onClick={() => setReturnReceipt(null)}>
+        <button className="btn-primary" onClick={() => setReturnReceipt(null)}>
           New Return
         </button>
       </div>
@@ -609,12 +609,12 @@ const POS = () => {
             <div className="mb-2 flex gap-2 items-center">
               <input
                 type="text"
-                className="border rounded px-2 py-1 w-full"
+                className="input-field"
                 placeholder="Enter Sale ID"
                 value={returnSaleId}
                 onChange={e => setReturnSaleId(e.target.value)}
               />
-              <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={fetchReturnSale}>Search</button>
+              <button className="btn-primary" onClick={fetchReturnSale}>Search</button>
             </div>
             {returnError && <div className="text-red-500 mb-2">{returnError}</div>}
             {returnSale && (
@@ -643,7 +643,7 @@ const POS = () => {
                             max={Math.abs(item.quantity)}
                             value={item.returnQty}
                             onChange={e => setReturnQty(item.product, parseInt(e.target.value) || 0)}
-                            className="w-16 border rounded px-2 py-1 text-center"
+                            className="input-field w-16 text-center"
                           />
                         </td>
                         <td className="text-right">{item.price}</td>
@@ -652,7 +652,7 @@ const POS = () => {
                     ))}
                   </tbody>
                 </table>
-                <button className="px-4 py-2 bg-green-600 text-white rounded" onClick={handleProcessReturn}>Process Return</button>
+                <button className="btn-primary" onClick={handleProcessReturn}>Process Return</button>
               </div>
             )}
           </div>
@@ -666,7 +666,7 @@ const POS = () => {
             <h2 className="text-lg font-bold mb-4">Select or Add Customer</h2>
             <input
               type="text"
-              className="border rounded px-2 py-1 w-full mb-2"
+              className="input-field"
               placeholder="Search by name, phone, or email"
               value={customerSearch}
               onChange={e => {
@@ -681,7 +681,7 @@ const POS = () => {
                     <div className="font-medium">{c.name}</div>
                     <div className="text-xs text-gray-500">{c.phone} {c.email && <>| {c.email}</>}</div>
                   </div>
-                  <button className="px-2 py-1 bg-blue-600 text-white rounded text-xs" onClick={() => { setSelectedCustomer(c); setCustomerModal(false); }}>Select</button>
+                  <button className="btn-primary" onClick={() => { setSelectedCustomer(c); setCustomerModal(false); }}>Select</button>
                 </div>
               ))}
             </div>
@@ -689,26 +689,26 @@ const POS = () => {
               <h3 className="font-semibold mb-2">Add New Customer</h3>
               <input
                 type="text"
-                className="border rounded px-2 py-1 w-full mb-2"
+                className="input-field"
                 placeholder="Name"
                 value={newCustomer.name}
                 onChange={e => setNewCustomer({ ...newCustomer, name: e.target.value })}
               />
               <input
                 type="text"
-                className="border rounded px-2 py-1 w-full mb-2"
+                className="input-field"
                 placeholder="Phone"
                 value={newCustomer.phone}
                 onChange={e => setNewCustomer({ ...newCustomer, phone: e.target.value })}
               />
               <input
                 type="email"
-                className="border rounded px-2 py-1 w-full mb-2"
+                className="input-field"
                 placeholder="Email (optional)"
                 value={newCustomer.email}
                 onChange={e => setNewCustomer({ ...newCustomer, email: e.target.value })}
               />
-              <button className="px-4 py-2 bg-green-600 text-white rounded w-full" onClick={handleAddCustomer}>Add Customer</button>
+              <button className="btn-primary" onClick={handleAddCustomer}>Add Customer</button>
               {customerError && <div className="text-red-500 mt-2">{customerError}</div>}
             </div>
           </div>
@@ -717,7 +717,7 @@ const POS = () => {
       {/* Barcode Scanner Controls */}
       <div className="mb-4 flex gap-4 items-center">
         <button
-          className="px-3 py-2 bg-gray-700 text-white rounded"
+          className="btn-secondary"
           onClick={() => setShowScanner(s => !s)}
         >
           {showScanner ? 'Close Scanner' : 'Scan Barcode (Webcam)'}
@@ -725,7 +725,7 @@ const POS = () => {
         <span className="text-xs text-gray-500">or use USB barcode scanner and scan into the field below</span>
         <input
           type="text"
-          className="border rounded px-2 py-1 text-sm"
+          className="input-field"
           placeholder="Scan barcode here..."
           value={barcodeScan}
           onChange={e => setBarcodeScan(e.target.value)}
@@ -766,7 +766,7 @@ const POS = () => {
               <div className="text-xs text-gray-500 mb-2">Stock: {modalProduct.stock} | Category: {modalProduct.category}</div>
               <div className="mb-4 text-gray-700 text-sm">{modalProduct.description}</div>
               <button
-                className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+                className="btn-primary"
                 onClick={() => { addToCart(modalProduct); setModalProduct(null); }}
                 disabled={modalProduct.stock === 0}
               >
@@ -777,19 +777,19 @@ const POS = () => {
         </div>
       )}
       <div className="mb-4 flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center">
-        <button className="px-3 py-2 bg-red-600 text-white rounded" onClick={() => setReturnModal(true)}>
+        <button className="btn-danger" onClick={() => setReturnModal(true)}>
           Returns/Refunds
         </button>
-        <button className="px-3 py-2 bg-blue-600 text-white rounded" onClick={() => setCustomerModal(true)}>
+        <button className="btn-primary" onClick={() => setCustomerModal(true)}>
           {selectedCustomer ? 'Change Customer' : 'Select/Add Customer'}
         </button>
-        <button className="px-3 py-2 bg-indigo-600 text-white rounded" onClick={() => { setZReportModal(true); fetchZReport(); }}>
+        <button className="btn-primary" onClick={() => { setZReportModal(true); fetchZReport(); }}>
           Z-Report (Daily Summary)
         </button>
         {/* Add Product Button for Admin and Warehouse Manager */}
         {(user?.role === 'admin' || isWarehouseManager) && (
           <button 
-            className="px-3 py-2 bg-green-600 text-white rounded flex items-center gap-2 hover:bg-green-700 transition-colors" 
+            className="btn-secondary flex items-center gap-2 hover:bg-green-700 transition-colors" 
             onClick={() => setShowAddProduct(true)}
           >
             <PlusIcon className="h-4 w-4" />
@@ -805,7 +805,7 @@ const POS = () => {
       <div className="mb-4 flex gap-2">
         <input
           type="text"
-          className="border rounded px-3 py-2 w-full"
+          className="input-field"
           placeholder="Search products..."
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -831,7 +831,7 @@ const POS = () => {
                   </div>
                 </div>
                 <button
-                  className="px-2 py-1 bg-green-600 text-white rounded text-xs disabled:opacity-50"
+                  className="btn-primary"
                   onClick={e => { e.stopPropagation(); addToCart(product); }}
                   disabled={product.stock === 0}
                 >
@@ -868,10 +868,10 @@ const POS = () => {
                       max={item.stock}
                       value={item.quantity}
                       onChange={e => updateQuantity(item.product, Math.min(item.stock, Math.max(1, parseInt(e.target.value) || 1)))}
-                      className="w-16 border rounded px-2 py-1 text-center"
+                      className="input-field w-16 text-center"
                     />
                     <button
-                      className="px-2 py-1 bg-red-500 text-white rounded text-xs"
+                      className="btn-danger"
                       onClick={() => removeFromCart(item.product)}
                     >
                       Remove
@@ -879,7 +879,7 @@ const POS = () => {
                   </div>
                   <div className="flex items-center gap-1">
                     <select
-                      className="border rounded px-1 py-0.5 text-xs"
+                      className="input-field text-xs"
                       value={item.discountType || ''}
                       onChange={e => setItemDiscount(item.product, e.target.value, item.discountValue || 0)}
                     >
@@ -894,7 +894,7 @@ const POS = () => {
                         max={item.discountType === 'percent' ? 100 : item.price}
                         value={item.discountValue || ''}
                         onChange={e => setItemDiscount(item.product, item.discountType, Math.max(0, parseInt(e.target.value) || 0))}
-                        className="w-14 border rounded px-1 py-0.5 text-xs"
+                        className="input-field w-14 text-xs"
                         placeholder={item.discountType === 'percent' ? '% Off' : 'Ksh Off'}
                       />
                     )}
@@ -910,7 +910,7 @@ const POS = () => {
             {(itemDiscountTotal + couponDiscount) > 0 && <div className="font-bold text-green-700">Total Discount: -Ksh {itemDiscountTotal + couponDiscount}</div>}
             <div className="font-bold">Grand Total: Ksh {totalAfterDiscount}</div>
             <select
-              className="border rounded px-2 py-1"
+              className="input-field"
               value={paymentMethod}
               onChange={e => setPaymentMethod(e.target.value)}
             >
@@ -919,7 +919,7 @@ const POS = () => {
               ))}
             </select>
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded"
+              className="btn-primary"
               onClick={handleCheckout}
               disabled={cartWithDiscounts.length === 0 || loading}
             >
@@ -958,7 +958,7 @@ const POS = () => {
                           <select
                             value={u.role}
                             onChange={e => handleUserRoleChange(u._id, e.target.value)}
-                            className="border rounded px-2 py-1 text-xs"
+                            className="input-field text-xs"
                             disabled={u._id === user._id}
                           >
                             <option value="user">User</option>
@@ -980,7 +980,7 @@ const POS = () => {
                             min="0"
                             value={u.salary || ''}
                             onChange={e => handleUserSalaryChange(u._id, e.target.value)}
-                            className="border rounded px-2 py-1 w-20 text-xs"
+                            className="input-field w-20 text-xs"
                             disabled={u._id === user._id}
                           />
                         ) : (

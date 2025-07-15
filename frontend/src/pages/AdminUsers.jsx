@@ -80,36 +80,36 @@ const AdminUsers = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded shadow mt-8">
-      <h1 className="text-2xl font-bold mb-4">User Management</h1>
+    <div className="card max-w-6xl mx-auto mt-8">
+      <h1 className="text-3xl font-heading font-bold mb-6 text-secondary">User Management</h1>
 
-      {error && <div className="text-red-500 mb-3">{error}</div>}
-      {success && <div className="text-green-600 mb-3">{success}</div>}
+      {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-2 mb-3 animate-slide-in">{error}</div>}
+      {success && <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-2 mb-3 animate-slide-in">{success}</div>}
 
       {loading ? (
-        <div>Loading users...</div>
+        <div className="flex justify-center items-center py-8 text-secondary">Loading users...</div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm border rounded">
+          <table className="w-full text-sm rounded-2xl shadow-soft bg-surface">
             <thead>
-              <tr className="bg-gray-100 text-left">
-                <th className="p-2">Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Salary</th>
-                <th>Actions</th>
+              <tr className="bg-primary-light text-primary-dark">
+                <th className="p-3 font-semibold text-left">Name</th>
+                <th className="font-semibold text-left">Email</th>
+                <th className="font-semibold text-left">Role</th>
+                <th className="font-semibold text-left">Salary</th>
+                <th className="font-semibold text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u._id} className="border-t">
-                  <td className="p-2">{u.name}</td>
+                <tr key={u._id} className="border-t border-gray-100 hover:bg-primary-light/30 transition-colors">
+                  <td className="p-3">{u.name}</td>
                   <td>{u.email}</td>
                   <td>
                     <select
                       value={u.role}
                       onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                      className="border rounded px-2 py-1"
+                      className="input-field max-w-xs"
                       disabled={u._id === user._id}
                     >
                       {roleOptions.map((opt) => (
@@ -128,7 +128,7 @@ const AdminUsers = () => {
                         min="0"
                         value={u.salary || ''}
                         onChange={(e) => handleSalaryChange(u._id, e.target.value)}
-                        className="border rounded px-2 py-1 w-24"
+                        className="input-field max-w-[6rem]"
                         disabled={u._id === user._id}
                       />
                     ) : (
@@ -137,7 +137,7 @@ const AdminUsers = () => {
                   </td>
                   <td>
                     <button
-                      className="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                      className="btn-danger text-xs px-3 py-1"
                       onClick={() => handleDelete(u._id)}
                       disabled={u._id === user._id}
                     >

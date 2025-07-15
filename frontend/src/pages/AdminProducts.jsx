@@ -182,13 +182,13 @@ const AdminProducts = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto mt-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Manage Products</h1>
+        <h1 className="text-3xl font-heading font-bold text-secondary">Manage Products</h1>
         {isManagerOrAdmin && (
           <button
             onClick={() => setShowForm(true)}
-            className="btn-primary flex items-center space-x-2"
+            className="btn-primary flex items-center gap-2"
           >
             <PlusIcon className="h-5 w-5" />
             <span>Add Product</span>
@@ -198,234 +198,103 @@ const AdminProducts = () => {
 
       {/* Add/Edit Form */}
       {showForm && isManagerOrAdmin && (
-        <div className="card">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            {editingProduct ? 'Edit Product' : 'Add New Product'}
-          </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  className="input-field"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category
-                </label>
-                <select
-                  required
-                  value={formData.category}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  className="input-field"
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  required
-                  value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: e.target.value})}
-                  className="input-field"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Stock
-                </label>
-                <input
-                  type="number"
-                  required
-                  value={formData.stock}
-                  onChange={(e) => setFormData({...formData, stock: e.target.value})}
-                  className="input-field"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Product Images (Max 5)
-              </label>
-              <div className="space-y-4">
-                {/* File Input */}
-                <div className="flex items-center justify-center w-full">
-                  <label className="file-upload-area">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <PhotoIcon className="w-8 h-8 mb-4 text-gray-500" />
-                      <p className="mb-2 text-sm text-gray-500">
-                        <span className="font-semibold">Click to upload</span> or drag and drop
-                      </p>
-                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB each (Max 5 images)</p>
-                    </div>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageChange}
-                    />
-                  </label>
-                </div>
-                
-                {/* Image Previews */}
-                {imagePreviews.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                      {imagePreviews.map((preview, index) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={preview}
-                            alt={`Preview ${index + 1}`}
-                            className="image-preview w-full h-32"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                          >
-                            <XMarkIcon className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
+        <div className="card mb-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={e => setFormData(f => ({ ...f, title: e.target.value }))}
+              placeholder="Product Title"
+              className="input-field"
+              required
+            />
+            <input
+              type="number"
+              name="price"
+              value={formData.price}
+              onChange={e => setFormData(f => ({ ...f, price: e.target.value }))}
+              placeholder="Price"
+              className="input-field"
+              required
+            />
+            <select
+              name="category"
+              value={formData.category}
+              onChange={e => setFormData(f => ({ ...f, category: e.target.value }))}
+              className="input-field"
+              required
+            >
+              <option value="">Select Category</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+            <input
+              type="number"
+              name="stock"
+              value={formData.stock}
+              onChange={e => setFormData(f => ({ ...f, stock: e.target.value }))}
+              placeholder="Stock"
+              className="input-field"
+              required
+            />
+            <div className="flex flex-col gap-1 md:col-span-2">
+              <label className="font-medium">Description</label>
               <textarea
-                required
-                rows="3"
+                name="description"
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={e => setFormData(f => ({ ...f, description: e.target.value }))}
+                placeholder="Product Description"
                 className="input-field"
+                required
               />
             </div>
-            
-            <div className="flex space-x-4">
-              <button type="submit" className="btn-primary">
-                {editingProduct ? 'Update Product' : 'Add Product'}
-              </button>
-              <button type="button" onClick={resetForm} className="btn-secondary">
-                Cancel
-              </button>
+            <div className="flex flex-col gap-1 md:col-span-2">
+              <label className="font-medium">Images</label>
+              <input type="file" accept="image/*" multiple onChange={handleImageChange} className="file-upload-area" />
+              {imagePreviews.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-2">
+                  {imagePreviews.map((preview, idx) => (
+                    <div key={idx} className="relative">
+                      <img src={preview} alt={`Preview ${idx + 1}`} className="image-preview w-full h-32" />
+                      <button type="button" onClick={() => removeImage(idx)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"><XMarkIcon className="h-4 w-4" /></button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 md:col-span-2 mt-2">
+              <button type="submit" className="btn-primary">{editingProduct ? 'Update Product' : 'Add Product'}</button>
+              <button type="button" className="btn-secondary" onClick={resetForm}>Cancel</button>
             </div>
           </form>
         </div>
       )}
 
-      {/* Products List */}
-      <div className="card">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Product
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Stock
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product) => (
-                <tr key={product._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex -space-x-2 mr-3">
-                        {(product.images || []).slice(0, 3).map((image, index) => (
-                          <img
-                            key={index}
-                            src={image}
-                            alt={`${product.title} ${index + 1}`}
-                            className="w-10 h-10 object-cover rounded-lg border-2 border-white"
-                          />
-                        ))}
-                        {product.images && product.images.length > 3 && (
-                          <div className="w-10 h-10 bg-gray-200 rounded-lg border-2 border-white flex items-center justify-center text-xs text-gray-600">
-                            +{product.images.length - 3}
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {product.title}
-                        </div>
-                        <div className="text-sm text-gray-500 truncate max-w-xs">
-                          {product.description}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {product.category}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${product.price.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {product.stock}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      {isManagerOrAdmin && (
-                        <button
-                          onClick={() => handleEdit(product)}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          <PencilIcon className="h-5 w-5" />
-                        </button>
-                      )}
-                      {isManagerOrAdmin && (
-                        <button
-                          onClick={() => handleDelete(product._id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <TrashIcon className="h-5 w-5" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Product List */}
+      <div className="grid gap-4">
+        {products.map(product => (
+          <div key={product._id} className="card flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="flex items-center gap-4 flex-1">
+              {product.images && product.images[0] && (
+                <img src={product.images[0]} alt={product.title} className="image-preview" />
+              )}
+              <div>
+                <h2 className="text-lg font-heading font-bold text-secondary mb-1">{product.title}</h2>
+                <div className="text-gray-500 text-sm mb-1">{product.category}</div>
+                <div className="text-primary font-semibold text-xl mb-1">Ksh {product.price}</div>
+                <div className="text-xs text-gray-400">Stock: {product.stock}</div>
+                <div className="text-gray-700 text-sm mt-2 line-clamp-2">{product.description}</div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 md:ml-4">
+              <button className="btn-secondary" onClick={() => handleEdit(product)}><PencilIcon className="h-4 w-4 inline mr-1" />Edit</button>
+              <button className="btn-danger" onClick={() => handleDelete(product._id)}><TrashIcon className="h-4 w-4 inline mr-1" />Delete</button>
+            </div>
+          </div>
+        ))}
+        {products.length === 0 && <div className="text-gray-400 text-center">No products found.</div>}
       </div>
     </div>
   );

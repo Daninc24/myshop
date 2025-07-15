@@ -188,116 +188,65 @@ const AdminAdverts = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow mt-8">
-      <h1 className="text-2xl font-bold mb-4">Manage Product Adverts</h1>
-      {msg && <div className="mb-2 text-green-700">{msg}</div>}
+    <div className="card max-w-4xl mx-auto mt-8">
+      <h1 className="text-3xl font-heading font-bold mb-6 text-secondary">Manage Product Adverts</h1>
+      {msg && <div className="mb-2 bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-2 animate-slide-in">{msg}</div>}
       <form onSubmit={handleSubmit} className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4" encType="multipart/form-data">
-        <input name="title" value={form.title} onChange={handleChange} placeholder="Advert Title" className="border rounded px-2 py-1" required />
-        <input name="message" value={form.message} onChange={handleChange} placeholder="Message" className="border rounded px-2 py-1" required />
+        <input name="title" value={form.title} onChange={handleChange} placeholder="Advert Title" className="input-field" required />
+        <input name="message" value={form.message} onChange={handleChange} placeholder="Message" className="input-field" required />
         <div className="flex flex-col gap-1">
           <label className="font-medium">Product</label>
           <input
             type="text"
-            placeholder="Search product..."
-            value={productSearch}
-            onChange={e => setProductSearch(e.target.value)}
-            className="border rounded px-2 py-1 mb-1"
-          />
-          <select
             name="product"
             value={form.product}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
-            required
-          >
-            <option value="">Select Product</option>
-            {products
-              .filter(p => p.title?.toLowerCase().includes(productSearch.toLowerCase()) || p.name?.toLowerCase().includes(productSearch.toLowerCase()))
-              .map(p => (
-                <option key={p._id} value={p._id}>
-                  {p.title || p.name}
-                </option>
-              ))}
-          </select>
-          {form.product && (
-            <div className="flex items-center gap-2 mt-1">
-              {products.find(p => p._id === form.product)?.image && (
-                <img src={products.find(p => p._id === form.product)?.image} alt="Product" className="w-10 h-10 object-cover rounded" />
-              )}
-              <span className="text-sm text-gray-700">{products.find(p => p._id === form.product)?.title || products.find(p => p._id === form.product)?.name}</span>
-            </div>
-          )}
+            placeholder="Product ID or Name"
+            className="input-field"
+          />
         </div>
-        <input name="image" value={form.image} onChange={handleChange} placeholder="Image URL (optional)" className="border rounded px-2 py-1" />
-        <input name="startDate" type="date" value={form.startDate} onChange={handleChange} className="border rounded px-2 py-1" required />
-        <input name="endDate" type="date" value={form.endDate} onChange={handleChange} className="border rounded px-2 py-1" required />
-        <label className="flex items-center gap-2">
-          <input name="active" type="checkbox" checked={form.active} onChange={handleChange} /> Active
-        </label>
         <div className="flex flex-col gap-1">
           <label className="font-medium">Image</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-          {imagePreview && (
-            <div className="mt-2"><img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded" /></div>
-          )}
+          <input type="file" accept="image/*" onChange={handleImageChange} className="file-upload-area" />
+          {imagePreview && <img src={imagePreview} alt="Preview" className="image-preview mt-2" />}
+        </div>
+        <input type="date" name="startDate" value={form.startDate} onChange={handleChange} className="input-field" required />
+        <input type="date" name="endDate" value={form.endDate} onChange={handleChange} className="input-field" required />
+        <div className="flex items-center gap-2">
+          <input type="checkbox" name="active" checked={form.active} onChange={handleChange} className="form-checkbox" />
+          <label className="text-sm">Active</label>
         </div>
         <div className="flex flex-col gap-1">
           <label className="font-medium">Template</label>
-          <select value={template} onChange={e => setTemplate(e.target.value)} className="border rounded px-2 py-1">
+          <select value={template} onChange={e => setTemplate(e.target.value)} className="input-field">
             {advertTemplates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
         </div>
-        <div className="col-span-1 md:col-span-2">
-          <label className="font-medium mb-1 block">Live Preview</label>
-          {advertTemplates.find(t => t.id === template)?.render({
-            title: form.title,
-            message: form.message,
-            image: imagePreview || form.image,
-            product: products.find(p => p._id === form.product)?.title || ''
-          })}
+        <div className="flex gap-2 mt-2 md:col-span-2">
+          <button type="submit" className="btn-primary">{editingId ? 'Update Advert' : 'Create Advert'}</button>
+          {editingId && <button type="button" className="btn-secondary" onClick={() => { setForm(emptyAdvert); setEditingId(null); setImageFile(null); setImagePreview(''); }}>Cancel</button>}
         </div>
-        <button type="submit" className="bg-blue-600 text-white rounded px-4 py-2 col-span-1 md:col-span-2">
-          {editingId ? 'Update Advert' : 'Create Advert'}
-        </button>
-        {editingId && (
-          <button type="button" className="bg-gray-400 text-white rounded px-4 py-2 col-span-1 md:col-span-2" onClick={() => { setForm(emptyAdvert); setEditingId(null); }}>Cancel Edit</button>
-        )}
       </form>
-      <h2 className="text-lg font-semibold mb-2">All Adverts</h2>
-      {loading ? <div>Loading...</div> : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs border rounded">
-            <thead>
-              <tr className="bg-gray-100 text-left">
-                <th className="p-2">Title</th>
-                <th>Product</th>
-                <th>Active</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {adverts.map(ad => (
-                <tr key={ad._id} className="border-t">
-                  <td className="p-2">{ad.title}</td>
-                  <td>{ad.product?.title || ad.product?.name || ad.product}</td>
-                  <td>{ad.active ? 'Yes' : 'No'}</td>
-                  <td>{ad.startDate ? ad.startDate.slice(0, 10) : ''}</td>
-                  <td>{ad.endDate ? ad.endDate.slice(0, 10) : ''}</td>
-                  <td>
-                    <button className="px-2 py-1 bg-blue-500 text-white rounded text-xs mr-1" onClick={() => handleEdit(ad)}>Edit</button>
-                    <button className="px-2 py-1 bg-red-500 text-white rounded text-xs" onClick={() => handleDelete(ad._id)}>Delete</button>
-                  </td>
-                </tr>
-              ))}
-              {adverts.length === 0 && (
-                <tr><td colSpan="6" className="text-center py-2 text-gray-500">No adverts found.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <div className="grid gap-4">
+        {adverts.map(advert => (
+          <div key={advert._id} className="card flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="flex-1">
+              {(advertTemplates.find(t => t.id === (advert.template || 'classic'))?.render || advertTemplates[0].render)({
+                title: advert.title,
+                message: advert.message,
+                image: advert.image,
+                product: products.find(p => p._id === advert.product)?.title || advert.product,
+                productId: advert.product,
+              })}
+            </div>
+            <div className="flex flex-col gap-2 md:ml-4">
+              <button className="btn-secondary" onClick={() => handleEdit(advert)}>Edit</button>
+              <button className="btn-danger" onClick={() => handleDelete(advert._id)}>Delete</button>
+            </div>
+          </div>
+        ))}
+        {adverts.length === 0 && <div className="text-gray-400 text-center">No adverts found.</div>}
+      </div>
     </div>
   );
 };

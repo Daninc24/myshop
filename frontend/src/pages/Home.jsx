@@ -89,6 +89,8 @@ const advertTemplates = [
   },
 ];
 
+const HERO_IMAGE = '/src/assets/gambia-market.jpg';
+
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
@@ -287,9 +289,9 @@ const Home = () => {
   const { top: topAdverts, middle: middleAdverts, bottom: bottomAdverts } = splitAdverts(adverts);
 
   return (
-    <>
+    <div className="min-h-screen bg-background">
       <Helmet>
-        <title>MyShopping Center - Your One-Stop Shopping Destination</title>
+        <title>MyShopping Center - Home</title>
         <meta name="description" content="Shop the best products, discover deals, and enjoy fast delivery at MyShopping Center. Electronics, fashion, home, and more!" />
         <meta name="keywords" content="shopping, ecommerce, deals, electronics, fashion, home, delivery, online store" />
         <meta property="og:title" content="MyShopping Center - Your One-Stop Shopping Destination" />
@@ -316,6 +318,20 @@ const Home = () => {
           }
         `}</script>
       </Helmet>
+      {/* Hero Section */}
+      <section className="relative w-full h-[350px] md:h-[480px] flex items-center justify-center mb-12">
+        <img
+          src={HERO_IMAGE}
+          alt="Market Hero"
+          className="absolute inset-0 w-full h-full object-cover object-center z-0"
+          style={{ filter: 'brightness(0.7)' }}
+        />
+        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4">
+          <h1 className="text-4xl md:text-6xl font-heading font-bold text-white drop-shadow mb-4 animate-fade-in">Welcome to MyShopping Center</h1>
+          <p className="text-lg md:text-2xl text-white/90 mb-6 max-w-2xl animate-fade-in">Discover the best products, unbeatable deals, and a vibrant marketplace experience. Shop with confidence and enjoy fast delivery!</p>
+          <Link to="/products" className="btn-primary text-lg px-8 py-3 animate-bounce-in">Shop Now</Link>
+        </div>
+      </section>
       {/* Top Adverts Section */}
       {topAdverts.length > 0 && (
         <section className="max-w-3xl mx-auto mt-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -622,7 +638,7 @@ const Home = () => {
           </div>
         </section>
       )}
-    </>
+    </div>
   );
 };
 

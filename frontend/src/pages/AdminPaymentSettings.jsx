@@ -68,10 +68,10 @@ const AdminPaymentSettings = () => {
 
   return (
     <div className="max-w-2xl mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-6">Payment Gateway Settings</h1>
+      <h1 className="text-3xl font-heading font-bold text-secondary mb-8">Payment Gateway Settings</h1>
       {Object.keys(gatewayFields).map(gateway => (
-        <div key={gateway} className="bg-white rounded shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold mb-4 capitalize">{gateway} Credentials</h2>
+        <div key={gateway} className="card mb-8">
+          <h2 className="text-lg font-heading font-semibold mb-4 capitalize text-secondary">{gateway} Credentials</h2>
           <form
             onSubmit={e => {
               e.preventDefault();
@@ -86,7 +86,7 @@ const AdminPaymentSettings = () => {
                   type={field.type}
                   value={credentials[gateway]?.[field.key] || ''}
                   onChange={e => handleChange(gateway, field.key, e.target.value)}
-                  className="border p-2 rounded w-full"
+                  className="input-field"
                   required
                 />
               </div>
