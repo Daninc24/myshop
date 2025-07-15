@@ -159,6 +159,20 @@ const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dealCountdown, setDealCountdown] = useState(3600); // 1 hour in seconds
   const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const [bannerIndex, setBannerIndex] = useState(0);
+  const bannerIntervalRef = useRef();
+  // Use topAdverts as banners for now
+  const banners = topAdverts.length > 0 ? topAdverts : adverts.slice(0, 3);
+  // Carousel auto-advance
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    bannerIntervalRef.current = setInterval(() => {
+      setBannerIndex((prev) => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(bannerIntervalRef.current);
+  }, [banners.length]);
+  const handlePrevBanner = () => setBannerIndex((prev) => (prev - 1 + banners.length) % banners.length);
+  const handleNextBanner = () => setBannerIndex((prev) => (prev + 1) % banners.length);
 
   useEffect(() => {
     fetchProducts();
@@ -287,13 +301,12 @@ const Home = () => {
     }
   };
 
-  // Filtered products by search and category
+  // Filtered products by search and category (search always applies)
   const filteredProducts = (products || [])
     .filter(p =>
       (selectedCategory === 'all' || p.category === selectedCategory) &&
       (search.trim() === '' || p.title?.toLowerCase().includes(search.trim().toLowerCase()) || p.name?.toLowerCase().includes(search.trim().toLowerCase()))
-    )
-    .slice(0, 8);
+    );
 
   // Add a sample flash deals array (could be improved to fetch from backend)
   const flashDeals = products.filter(p => p.isDeal || p.price < 20).slice(0, 6);
@@ -382,8 +395,25 @@ const Home = () => {
           }
         `}</script>
       </Helmet>
-      {/* Hero Section with Search */}
-      <section className="relative w-full h-[350px] md:h-[420px] flex items-center justify-center mb-8 bg-gradient-to-br from-orange-100 to-orange-300">
+      {/* Top Search Bar (always visible, sticky on mobile) */}
+      <div className="w-full bg-white shadow sticky top-0 z-30 px-2 py-2 md:hidden flex items-center gap-2">
+        <MagnifyingGlassIcon className="h-6 w-6 text-orange-600 ml-2" />
+        <input
+          ref={searchInputRef}
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search for products, brands, categories..."
+          className="flex-1 px-4 py-2 bg-transparent outline-none text-base text-gray-900"
+        />
+        {search && (
+          <button onClick={() => setSearch('')} className="text-gray-400 hover:text-orange-600 px-2">
+            <XMarkIcon className="h-5 w-5" />
+          </button>
+        )}
+      </div>
+      {/* Hero Section with Search (desktop only) */}
+      <section className="relative w-full h-[350px] md:h-[420px] flex items-center justify-center mb-8 bg-gradient-to-br from-orange-100 to-orange-200 hidden md:flex">
         <img
           src={HERO_IMAGE}
           alt="Market Hero"
@@ -391,20 +421,20 @@ const Home = () => {
         />
         <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full">
           <h1 className="text-4xl md:text-5xl font-heading font-bold text-orange-900 drop-shadow mb-4 animate-fade-in">Welcome to MyShopping Center</h1>
-          <p className="text-lg md:text-2xl text-orange-800/90 mb-6 max-w-2xl animate-fade-in">Discover the best products, unbeatable deals, and a vibrant marketplace experience. Shop with confidence and enjoy fast delivery!</p>
-          {/* Search Bar */}
+          <p className="text-lg md:text-2xl text-gray-900 mb-6 max-w-2xl animate-fade-in">Discover the best products, unbeatable deals, and a vibrant marketplace experience. Shop with confidence and enjoy fast delivery!</p>
+          {/* Search Bar (desktop only) */}
           <div className="w-full max-w-2xl flex items-center bg-white rounded-2xl shadow-lg p-2 mb-4 animate-slide-in">
-            <MagnifyingGlassIcon className="h-6 w-6 text-orange-500 ml-2" />
+            <MagnifyingGlassIcon className="h-6 w-6 text-orange-600 ml-2" />
             <input
               ref={searchInputRef}
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search for products, brands, categories..."
-              className="flex-1 px-4 py-2 bg-transparent outline-none text-lg text-gray-800"
+              className="flex-1 px-4 py-2 bg-transparent outline-none text-lg text-gray-900"
             />
             {search && (
-              <button onClick={() => setSearch('')} className="text-gray-400 hover:text-orange-500 px-2">
+              <button onClick={() => setSearch('')} className="text-gray-400 hover:text-orange-600 px-2">
                 <XMarkIcon className="h-5 w-5" />
               </button>
             )}
@@ -412,32 +442,77 @@ const Home = () => {
           <Link to="/products" className="btn-primary text-lg px-8 py-3 animate-bounce-in">Shop Now</Link>
         </div>
       </section>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 grid grid-cols-1 md:grid-cols-5 gap-6">
-        {/* Sidebar: Categories (mobile toggle) */}
-        <aside className="md:col-span-1">
-          <button
-            className="md:hidden flex items-center gap-2 mb-4 bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            {sidebarOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
-            Categories
-          </button>
-          <div className={`bg-white rounded-2xl shadow-lg p-4 h-fit sticky top-24 self-start ${sidebarOpen ? '' : 'hidden md:block'}`}> 
-            <h3 className="text-lg font-bold text-orange-700 mb-4">Categories</h3>
-            <ul className="space-y-2">
-              {categories.map(category => (
-                <li key={category.id}>
-                  <button
-                    onClick={() => { setSelectedCategory(category.id); setSidebarOpen(false); }}
-                    className={`w-full text-left px-3 py-2 rounded-lg font-medium transition-colors ${selectedCategory === category.id ? 'bg-orange-600 text-white' : 'text-gray-700 hover:bg-orange-100'}`}
-                  >
-                    {category.name}
-                  </button>
-                </li>
+      {/* Main Banner Carousel (below search/hero) */}
+      {banners.length > 0 && (
+        <section className="max-w-5xl mx-auto mb-8 relative">
+          <div className="relative rounded-2xl overflow-hidden shadow-lg">
+            {banners.map((ad, idx) => {
+              const Template = advertTemplates.find(t => t.id === (ad.template || 'banner'))?.render;
+              return (
+                <div
+                  key={ad._id}
+                  className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${idx === bannerIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
+                >
+                  {Template ? Template({
+                    title: ad.title,
+                    message: ad.message,
+                    image: ad.image,
+                    product: ad.product?.title || ad.product?.name,
+                    productId: ad.product?._id || ad.product
+                  }) : null}
+                </div>
+              );
+            })}
+            {/* Carousel Controls */}
+            {banners.length > 1 && (
+              <>
+                <button onClick={handlePrevBanner} className="absolute left-2 top-1/2 -translate-y-1/2 bg-orange-200/90 hover:bg-orange-300 text-orange-900 rounded-full p-2 shadow z-20 border border-orange-400"><ArrowRightIcon className="h-6 w-6 rotate-180" /></button>
+                <button onClick={handleNextBanner} className="absolute right-2 top-1/2 -translate-y-1/2 bg-orange-200/90 hover:bg-orange-300 text-orange-900 rounded-full p-2 shadow z-20 border border-orange-400"><ArrowRightIcon className="h-6 w-6" /></button>
+              </>
+            )}
+            {/* Dots */}
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+              {banners.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setBannerIndex(i)}
+                  className={`w-3 h-3 rounded-full border-2 ${i === bannerIndex ? 'bg-orange-600 border-orange-600' : 'bg-orange-200 border-orange-400'}`}
+                />
               ))}
-            </ul>
+            </div>
           </div>
-        </aside>
+        </section>
+      )}
+      {/* Mobile: Horizontal Category Bar */}
+      <div className="md:hidden w-full overflow-x-auto flex gap-2 py-2 mb-4">
+        {categories.map(category => (
+          <button
+            key={category.id}
+            onClick={() => setSelectedCategory(category.id)}
+            className={`flex-shrink-0 px-4 py-2 rounded-full font-medium border transition-colors whitespace-nowrap ${selectedCategory === category.id ? 'bg-orange-600 text-white border-orange-600' : 'bg-orange-100 text-gray-900 border-orange-200 hover:bg-orange-200'}`}
+          >
+            {category.name}
+          </button>
+        ))}
+      </div>
+      {/* Sidebar: Categories (desktop only) */}
+      <aside className="md:col-span-1 hidden md:block">
+        <div className="bg-white rounded-2xl shadow-lg p-4 h-fit sticky top-24 self-start">
+          <h3 className="text-lg font-bold text-orange-700 mb-4">Categories</h3>
+          <ul className="space-y-2">
+            {categories.map(category => (
+              <li key={category.id}>
+                <button
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`w-full text-left px-3 py-2 rounded-lg font-medium transition-colors ${selectedCategory === category.id ? 'bg-orange-600 text-white' : 'text-gray-900 hover:bg-orange-100'}`}
+                >
+                  {category.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
         {/* Main Content */}
         <main className="md:col-span-4 flex flex-col gap-8">
           {/* Flash Deals Section */}
@@ -498,14 +573,14 @@ const Home = () => {
               <h2 className="text-2xl font-bold text-gray-900">{selectedCategory === 'all' ? 'Featured Products' : categories.find(cat => cat.id === selectedCategory)?.name}</h2>
               <Link to="/products" className="text-orange-600 hover:underline font-medium">View All</Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts && filteredProducts.length > 0 ? (
                 filteredProducts.map((product) => (
                   <ProductCard key={product._id} product={product} />
                 ))
               ) : (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-gray-500">No products available at the moment.</p>
+                  <p className="text-gray-500">No products found. Try a different search or category.</p>
                 </div>
               )}
             </div>
