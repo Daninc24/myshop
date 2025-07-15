@@ -4,6 +4,8 @@ const Product = require('../models/Product');
 // Admin: Create advert
 exports.createAdvert = async (req, res) => {
   try {
+    console.log('req.file:', req.file);
+    console.log('req.body:', req.body);
     const { title, message, product, startDate, endDate, active, template } = req.body;
     let image = req.body.image;
     if (req.file) {
