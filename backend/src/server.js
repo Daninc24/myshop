@@ -216,6 +216,9 @@ app.get('/uploads/:filename', (req, res) => {
   }
 });
 
+// Add this line to serve static files from /uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 app.get('/', (req, res) => {
   res.send('MyShopping Center API is running...');
 });
