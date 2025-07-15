@@ -209,14 +209,20 @@ const AdminAdverts = () => {
         <input name="message" value={form.message} onChange={handleChange} placeholder="Message" className="input-field" required />
         <div className="flex flex-col gap-1">
           <label className="font-medium">Product</label>
-          <input
-            type="text"
+          <select
             name="product"
             value={form.product}
             onChange={handleChange}
-            placeholder="Product ID or Name"
             className="input-field"
-          />
+            required
+          >
+            <option value="">Select a product</option>
+            {products.map((product) => (
+              <option key={product._id} value={product._id}>
+                {product.title}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="flex flex-col gap-1">
           <label className="font-medium">Image</label>
