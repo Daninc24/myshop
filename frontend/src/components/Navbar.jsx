@@ -9,12 +9,14 @@ import axios from 'axios';
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { cart } = useCart();
+  const { currency, setCurrency } = useCart();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const socketRef = useRef(null);
   const [currencies, setCurrencies] = useState(['USD']);
-  const [selectedCurrency, setSelectedCurrency] = useState(() => localStorage.getItem('currency') || 'USD');
+  // Remove local selectedCurrency state
+  // const [selectedCurrency, setSelectedCurrency] = useState(() => localStorage.getItem('currency') || 'USD');
 
   // Socket.IO for online status
   useEffect(() => {
@@ -42,9 +44,9 @@ const Navbar = () => {
   }, []);
 
   const handleCurrencyChange = (e) => {
-    setSelectedCurrency(e.target.value);
+    setCurrency(e.target.value);
     localStorage.setItem('currency', e.target.value);
-    window.location.reload(); // reload to propagate currency change (can be improved with context)
+    // No reload needed, context will update prices in real time
   };
 
   const handleLogout = () => {
@@ -92,7 +94,7 @@ const Navbar = () => {
             )}
             {/* Currency Selector */}
             <select
-              value={selectedCurrency}
+              value={currency}
               onChange={handleCurrencyChange}
               className="border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary"
               style={{ minWidth: 100 }}
@@ -170,7 +172,7 @@ const Navbar = () => {
               </Link>
             )}
             <select
-              value={selectedCurrency}
+              value={currency}
               onChange={handleCurrencyChange}
               className="border border-gray-300 rounded-xl px-3 py-2 text-lg w-full mt-2 focus:outline-none focus:ring-2 focus:ring-primary"
               title="Select currency"

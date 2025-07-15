@@ -33,9 +33,10 @@ const Register = () => {
       return;
     }
 
-    // Validate password length
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    // Validate password strength (min 8 chars, uppercase, lowercase, number, symbol)
+    const passwordPolicy = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+    if (!passwordPolicy.test(formData.password)) {
+      setError('Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.');
       setLoading(false);
       return;
     }
@@ -68,7 +69,7 @@ const Register = () => {
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" role="alert">
               {error}
             </div>
           )}
@@ -119,7 +120,11 @@ const Register = () => {
                 onChange={handleChange}
                 className="input-field mt-1"
                 placeholder="Enter your password"
+                aria-describedby="passwordHelp"
               />
+              <p id="passwordHelp" className="text-xs text-gray-500 mt-1">
+                Must be at least 8 characters and include uppercase, lowercase, number, and symbol.
+              </p>
             </div>
             
             <div>

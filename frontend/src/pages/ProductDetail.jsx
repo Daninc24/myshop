@@ -12,7 +12,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
-  const { addToCart } = useCart();
+  const { addToCart, currency, convertPrice } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -36,6 +36,17 @@ const ProductDetail = () => {
       setQuantity(1);
     }
     setAddingToCart(false);
+  };
+
+  // Utility for currency symbols
+  const getCurrencySymbol = (cur) => {
+    switch (cur) {
+      case 'USD': return '$';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      case 'GMD': return 'D';
+      default: return cur + ' ';
+    }
   };
 
   if (loading) {
@@ -147,7 +158,7 @@ const ProductDetail = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <span className="text-3xl font-bold text-blue-600">${product.price.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-blue-600">{getCurrencySymbol(currency)}{convertPrice(product.price).toFixed(2)}</span>
               <span className="text-sm text-gray-500">Stock: {product.stock}</span>
             </div>
 

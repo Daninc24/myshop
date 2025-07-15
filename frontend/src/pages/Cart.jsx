@@ -15,7 +15,7 @@ import {
 import { Helmet } from 'react-helmet';
 
 const Cart = () => {
-  const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { cart, updateQuantity, removeFromCart, clearCart, currency, convertPrice } = useCart();
   const { user } = useAuth();
   const { error } = useToast();
   const navigate = useNavigate();
@@ -60,6 +60,17 @@ const Cart = () => {
 
     fetchCartProducts();
   }, [cart, error]);
+
+  // Utility for currency symbols
+  const getCurrencySymbol = (cur) => {
+    switch (cur) {
+      case 'USD': return '$';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      case 'GMD': return 'D';
+      default: return cur + ' ';
+    }
+  };
 
   const subtotal = cartProducts.reduce((total, item) => total + ((item.price || 0) * (item.quantity || 1)), 0);
   const shipping = subtotal > 50 ? 0 : 10;
@@ -160,7 +171,10 @@ const Cart = () => {
                     <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded-2xl shadow-soft" />
                     <div className="flex-1">
                       <h2 className="text-xl font-heading font-bold text-secondary mb-1">{item.name}</h2>
-                      <p className="text-gray-500 mb-1">${item.price} x {item.quantity}</p>
+                      <div className="flex justify-between items-center">
+                        <span>{item.title} x {item.quantity}</span>
+                        <span>{getCurrencySymbol(currency)}{convertPrice(item.price * item.quantity).toFixed(2)}</span>
+                      </div>
                       <div className="flex items-center gap-2 mt-2">
                         <button onClick={() => updateQuantity(item.product, item.quantity - 1)} className="btn-secondary px-3 py-1">-</button>
                         <span className="font-medium text-secondary">{item.quantity}</span>
@@ -175,9 +189,21 @@ const Cart = () => {
             {/* Cart Summary */}
             <div className="card flex flex-col gap-6">
               <h2 className="text-2xl font-heading font-bold text-secondary mb-2">Order Summary</h2>
-              <div className="flex justify-between text-lg font-medium">
+              <div className="flex justify-between text-lg font-medium mt-4">
                 <span>Subtotal:</span>
-                <span>${cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}</span>
+                <span>{getCurrencySymbol(currency)}{convertPrice(subtotal).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-lg font-medium mt-1">
+                <span>Shipping:</span>
+                <span>{getCurrencySymbol(currency)}{convertPrice(shipping).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-lg font-medium mt-1">
+                <span>Tax (8%):</span>
+                <span>{getCurrencySymbol(currency)}{convertPrice(tax).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-lg font-bold mt-4">
+                <span>Total:</span>
+                <span>{getCurrencySymbol(currency)}{convertPrice(total).toFixed(2)}</span>
               </div>
               <button className="btn-primary w-full mt-4" onClick={handleCheckout}>Proceed to Checkout</button>
             </div>

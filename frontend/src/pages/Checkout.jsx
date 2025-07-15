@@ -62,6 +62,17 @@ const Checkout = () => {
     error('Payment failed. Please try again.');
   };
 
+  // Utility for currency symbols
+  const getCurrencySymbol = (cur) => {
+    switch (cur) {
+      case 'USD': return '$';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      case 'GMD': return 'D';
+      default: return cur + ' ';
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -110,17 +121,17 @@ const Checkout = () => {
               {cart.map(item => (
                 <div key={item.product} className="flex justify-between items-center">
                   <span>{item.name} x {item.quantity}</span>
-                  <span>${(item.price * item.quantity).toFixed(2)}</span>
+                  <span>{getCurrencySymbol(currency)}{convertPrice(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
             <div className="flex justify-between text-lg font-medium mt-4">
               <span>Total:</span>
-              <span>${cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}</span>
+              <span>{getCurrencySymbol(currency)}{convertPrice(cart.reduce((sum, item) => sum + item.price * item.quantity, 0)).toFixed(2)}</span>
             </div>
             {/* PaymentForm component can be placed here */}
             <div className="mt-4">
-              <PaymentForm onPaymentSuccess={onPaymentSuccess} onPaymentError={onPaymentError} />
+              <PaymentForm onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />
             </div>
           </div>
         </div>
