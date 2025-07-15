@@ -118,10 +118,7 @@ io.on('connection', (socket) => {
   });
 });
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(securityHeaders);
-}
-
+app.use(securityHeaders);
 app.use(requestId);
 app.use(logger);
 app.use(express.json({ limit: '10mb' }));

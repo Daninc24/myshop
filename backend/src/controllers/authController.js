@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Joi = require('joi');
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -12,9 +13,29 @@ const generateToken = (userId) => {
   });
 };
 
+const registerSchema = Joi.object({
+  name: Joi.string().min(2).max(50).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string()
+    .min(8)
+    .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\-=[\]{};:\"\\|,.<>/?]).+$'))
+    .required()
+    .messages({
+      'string.pattern.base': 'Password must include uppercase, lowercase, number, and symbol.'
+    })
+});
+
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required()
+});
+
 // Register user
 const register = async (req, res) => {
   try {
+    const { error } = registerSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
     const { name, email, password } = req.body;
 
     // Check if user already exists
@@ -60,6 +81,9 @@ const register = async (req, res) => {
 // Login user
 const login = async (req, res) => {
   try {
+    const { error } = loginSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
     const { email, password } = req.body;
 
     // Find user
