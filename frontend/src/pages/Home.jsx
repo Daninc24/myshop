@@ -31,14 +31,26 @@ const advertTemplates = [
   {
     id: 'classic',
     render: ({ title, message, image, product, productId }) => (
-      <div className="card flex gap-6 items-center mb-6 animate-fade-in">
-        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-28 h-28 object-cover rounded-2xl shadow-soft" />}
-        <div>
-          <h2 className="text-2xl font-heading font-bold text-secondary mb-1">{title}</h2>
-          <p className="text-gray-700 mb-2">{message}</p>
-          {product && productId && <Link to={`/products/${productId}`} className="text-primary underline text-sm mt-2 block font-medium">View Product</Link>}
+      productId ? (
+        <Link to={`/products/${productId}`} className="block group">
+          <div className="card flex gap-6 items-center mb-6 animate-fade-in group-hover:shadow-lg transition-shadow">
+            {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-28 h-28 object-cover rounded-2xl shadow-soft" />}
+            <div>
+              <h2 className="text-2xl font-heading font-bold text-secondary mb-1 group-hover:text-primary transition-colors">{title}</h2>
+              <p className="text-gray-700 mb-2">{message}</p>
+              {product && <span className="text-primary underline text-sm mt-2 block font-medium">View Product</span>}
+            </div>
+          </div>
+        </Link>
+      ) : (
+        <div className="card flex gap-6 items-center mb-6 animate-fade-in">
+          {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-28 h-28 object-cover rounded-2xl shadow-soft" />}
+          <div>
+            <h2 className="text-2xl font-heading font-bold text-secondary mb-1">{title}</h2>
+            <p className="text-gray-700 mb-2">{message}</p>
+          </div>
         </div>
-      </div>
+      )
     )
   },
   {
@@ -78,13 +90,17 @@ const advertTemplates = [
   },
   {
     id: 'cta-card',
-    render: ({ title, message, image, product }) => (
+    render: ({ title, message, image, product, productId }) => (
       <div className="bg-surface border-2 border-primary rounded-2xl p-8 flex flex-col items-center shadow-strong mb-6 animate-fade-in">
         {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-28 h-28 object-cover rounded-full border-4 border-primary-light mb-3" />}
         <h2 className="text-2xl font-heading font-bold text-primary mb-1">{title}</h2>
         <p className="text-secondary mb-2">{message}</p>
         {product && <span className="text-xs text-primary mb-2">{product}</span>}
-        <button className="btn-primary mt-2">Shop Now</button>
+        {productId ? (
+          <Link to={`/products/${productId}`} className="btn-primary mt-2">Shop Now</Link>
+        ) : (
+          <button className="btn-primary mt-2" disabled>Shop Now</button>
+        )}
       </div>
     )
   },

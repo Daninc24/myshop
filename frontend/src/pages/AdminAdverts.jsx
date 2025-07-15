@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
 
 const emptyAdvert = {
   title: '',
@@ -248,19 +249,19 @@ const AdminAdverts = () => {
       </form>
       <div className="grid gap-4">
         {adverts.map(advert => (
-          <div key={advert._id} className="card flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex-1 cursor-pointer" onClick={() => setSelectedAdvert(advert)}>
+          <div key={advert._id} className="card flex flex-col md:flex-row gap-4 items-center justify-between cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setSelectedAdvert(advert)}>
+            <div className="flex-1">
               {(advertTemplates.find(t => t.id === (advert.template || 'classic'))?.render || advertTemplates[0].render)({
                 title: advert.title,
                 message: advert.message,
                 image: advert.image,
                 product: getProductTitle(advert.product, products),
-                productId: advert.product,
+                productId: advert.product?._id || advert.product,
               })}
             </div>
             <div className="flex flex-col gap-2 md:ml-4">
-              <button className="btn-secondary" onClick={() => handleEdit(advert)}>Edit</button>
-              <button className="btn-danger" onClick={() => handleDelete(advert._id)}>Delete</button>
+              <button className="btn-secondary" onClick={e => { e.stopPropagation(); handleEdit(advert); }}>Edit</button>
+              <button className="btn-danger" onClick={e => { e.stopPropagation(); handleDelete(advert._id); }}>Delete</button>
             </div>
           </div>
         ))}
@@ -281,6 +282,9 @@ const AdminAdverts = () => {
             <div className="mb-2 text-sm text-gray-500">End: {selectedAdvert.endDate ? new Date(selectedAdvert.endDate).toLocaleDateString() : '-'}</div>
             <div className="mb-2 text-sm text-gray-500">Active: {selectedAdvert.active ? 'Yes' : 'No'}</div>
             <div className="mb-2 text-sm text-gray-500">Template: {selectedAdvert.template || 'classic'}</div>
+            {selectedAdvert.product && (
+              <Link to={`/products/${selectedAdvert.product._id || selectedAdvert.product}`} className="btn-primary mt-4 inline-block">View Product</Link>
+            )}
           </div>
         </div>
       )}
