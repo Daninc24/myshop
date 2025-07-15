@@ -96,6 +96,32 @@ const Navbar = () => {
                 <option key={cur} value={cur}>{cur}</option>
               ))}
             </select>
+            {/* Cart Icon */}
+            <Link to="/cart" className="relative group">
+              <ShoppingCartIcon className="h-7 w-7 text-secondary group-hover:text-primary transition-colors" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-soft">
+                  {cartItemCount}
+                </span>
+              )}
+            </Link>
+            {/* User Controls */}
+            {!user ? (
+              <Link to="/login" className="btn-primary px-5 py-2 text-base font-semibold rounded-xl ml-2">
+                Login
+              </Link>
+            ) : (
+              <div className="relative group ml-2">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-secondary hover:text-primary font-medium focus:outline-none">
+                  <UserIcon className="h-6 w-6" />
+                  <span className="hidden md:inline">{user.name?.split(' ')[0] || 'Account'}</span>
+                </button>
+                <div className="absolute right-0 mt-2 w-40 bg-surface border border-gray-100 rounded-xl shadow-strong z-20 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
+                  <Link to="/profile" className="block px-4 py-2 text-secondary hover:bg-gray-50 rounded-t-xl">Profile</Link>
+                  <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50 rounded-b-xl">Logout</button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -136,6 +162,25 @@ const Navbar = () => {
                 <option key={cur} value={cur}>{cur}</option>
               ))}
             </select>
+            <Link to="/cart" className="relative flex items-center gap-2 mt-4">
+              <ShoppingCartIcon className="h-7 w-7 text-secondary" />
+              {cartItemCount > 0 && (
+                <span className="bg-primary text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-soft ml-1">
+                  {cartItemCount}
+                </span>
+              )}
+              <span className="text-secondary text-lg">Cart</span>
+            </Link>
+            {!user ? (
+              <Link to="/login" className="btn-primary block w-full text-center mt-4 py-2 rounded-xl text-lg font-semibold">
+                Login
+              </Link>
+            ) : (
+              <div className="mt-4">
+                <Link to="/profile" className="block px-4 py-2 text-secondary hover:bg-gray-50 rounded-t-xl">Profile</Link>
+                <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50 rounded-b-xl">Logout</button>
+              </div>
+            )}
           </div>
         )}
       </div>
