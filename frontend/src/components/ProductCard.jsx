@@ -19,11 +19,13 @@ const ProductCard = ({ product, small }) => {
       <img
         src={product.images && product.images[0]}
         alt={product.title}
-        className={`rounded-2xl object-cover mb-4 ${small ? 'w-24 h-24' : 'w-40 h-40'}`}
+        className={`rounded-2xl object-cover object-center mb-4 ${small ? 'w-16 h-16' : 'w-24 h-24'}`}
       />
       <h3 className="text-lg font-heading font-bold text-secondary mb-1 text-center line-clamp-2">{product.title}</h3>
       <p className="text-primary font-semibold text-xl mb-2">${product.price}</p>
-      <button className="btn-primary w-full mt-auto">View Details</button>
+      <Link to={`/products/${product._id}`} className="w-full mt-auto">
+        <button className="btn-primary w-full">View Details</button>
+      </Link>
     </div>
   );
 };
