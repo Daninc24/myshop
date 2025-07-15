@@ -4,8 +4,8 @@ import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useToast } from '../contexts/ToastContext';
-import { 
-  ArrowRightIcon, 
+import {
+  ArrowRightIcon,
   StarIcon,
   TruckIcon,
   ShieldCheckIcon,
@@ -18,6 +18,16 @@ import {
 import { io } from 'socket.io-client';
 import { Helmet } from 'react-helmet';
 import gambiaMarket from '../assets/gambia-market.jpg';
+
+// Custom debounce hook
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debouncedValue;
+}
 
 const getAdvertImageUrl = (image) => {
   if (!image) return '';
@@ -155,8 +165,8 @@ const Home = () => {
   const [adverts, setAdverts] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const searchInputRef = useRef();
-  const searchTimeoutRef = useRef();
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 350);
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -260,7 +270,7 @@ const Home = () => {
     // Real-time events
     if (!socketRef.current) {
       const socketUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com';
-      const socket = io(socketUrl, { 
+      const socket = io(socketUrl, {
         transports: ['websocket'],
         withCredentials: true
       });
@@ -310,9 +320,12 @@ const Home = () => {
     setRecentlyViewed(viewed);
   }, [products]);
 
+  const [loadingProducts, setLoadingProducts] = useState(true); // Only for product grid
+
   // Fetch products from backend with search and category
   const fetchProducts = async (searchTerm = '', category = 'all') => {
     try {
+      setLoadingProducts(true);
       const params = {};
       if (searchTerm) params.search = searchTerm;
       if (category && category !== 'all') params.category = category;
@@ -321,21 +334,14 @@ const Home = () => {
     } catch (err) {
       setProducts([]);
     } finally {
-      setLoading(false);
+      setLoadingProducts(false);
     }
   };
-
   // Debounced search effect for fetching products
   useEffect(() => {
-    setLoading(true);
-    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-    searchTimeoutRef.current = setTimeout(() => {
-      fetchProducts(search, selectedCategory);
-    }, 300);
-    return () => clearTimeout(searchTimeoutRef.current);
+    fetchProducts(debouncedSearch, selectedCategory);
     // eslint-disable-next-line
-  }, [search, selectedCategory]);
-
+  }, [debouncedSearch, selectedCategory]);
   // Autocomplete: fetch suggestions as user types
   useEffect(() => {
     if (!search) {
@@ -343,20 +349,24 @@ const Home = () => {
       setShowSuggestions(false);
       return;
     }
+    let cancelled = false;
     const fetchSuggestions = async () => {
       try {
         const res = await axios.get('/products', { params: { search } });
-        setSearchSuggestions((res.data || []).slice(0, 8));
-        setShowSuggestions(true);
+        if (!cancelled) {
+          setSearchSuggestions((res.data || []).slice(0, 8));
+          setShowSuggestions(true);
+        }
       } catch {
-        setSearchSuggestions([]);
-        setShowSuggestions(false);
+        if (!cancelled) {
+          setSearchSuggestions([]);
+          setShowSuggestions(false);
+        }
       }
     };
     const timeout = setTimeout(fetchSuggestions, 200);
-    return () => clearTimeout(timeout);
+    return () => { cancelled = true; clearTimeout(timeout); };
   }, [search]);
-
   // Hide suggestions on click outside
   useEffect(() => {
     const handleClick = (e) => {
@@ -395,8 +405,6 @@ const Home = () => {
   ];
 
   const nextEvent = events.length > 0 ? events[0] : null;
-
-  if (loading) return <LoadingSpinner />;
 
   // Recommended for You: products from the same category as the most recently viewed, excluding already viewed
   let recommended = [];
@@ -443,7 +451,7 @@ const Home = () => {
           }
         `}</script>
       </Helmet>
-      {/* Search Bar with Autocomplete */}
+      {/* Single Search Bar with Autocomplete (all screens) */}
       <div className="max-w-3xl mx-auto px-4 pt-8 relative z-20">
         <div className="relative" ref={searchInputRef}>
           <input
@@ -481,7 +489,7 @@ const Home = () => {
           )}
         </div>
       </div>
-      {/* Hero Section with Search (desktop only) */}
+      {/* Hero Section with Search (desktop only, but now search is unified) */}
       <section className="relative w-full h-[350px] md:h-[420px] flex items-center justify-center mb-8 bg-gradient-to-br from-orange-100 to-orange-200 hidden md:flex">
         <img
           src={HERO_IMAGE}
@@ -491,23 +499,6 @@ const Home = () => {
         <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full">
           <h1 className="text-4xl md:text-5xl font-heading font-bold text-orange-900 drop-shadow mb-4 animate-fade-in">Welcome to MyShopping Center</h1>
           <p className="text-lg md:text-2xl text-gray-900 mb-6 max-w-2xl animate-fade-in">Discover the best products, unbeatable deals, and a vibrant marketplace experience. Shop with confidence and enjoy fast delivery!</p>
-          {/* Search Bar (desktop only) */}
-          <div className="w-full max-w-2xl flex items-center bg-white rounded-2xl shadow-lg p-2 mb-4 animate-slide-in">
-            <MagnifyingGlassIcon className="h-6 w-6 text-orange-600 ml-2" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search for products, brands, categories..."
-              className="flex-1 px-4 py-2 bg-transparent outline-none text-lg text-gray-900"
-            />
-            {search && (
-              <button onClick={() => setSearch('')} className="text-gray-400 hover:text-orange-600 px-2">
-                <XMarkIcon className="h-5 w-5" />
-              </button>
-            )}
-          </div>
           <Link to="/products" className="btn-primary text-lg px-8 py-3 animate-bounce-in">Shop Now</Link>
         </div>
       </section>
@@ -644,32 +635,39 @@ const Home = () => {
               <h2 className="text-2xl font-bold text-gray-900">{selectedCategory === 'all' ? 'Featured Products' : categories.find(cat => cat.id === selectedCategory)?.name}</h2>
               <Link to="/products" className="text-orange-600 hover:underline font-medium">View All</Link>
             </div>
-            {/* Mobile: Horizontal scroll */}
-            <div className="md:hidden overflow-x-auto flex gap-4 pb-2">
-              {products && products.length > 0 ? (
-                products.map((product) => (
-                  <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
-                    <ProductCard product={product} />
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-12 w-full">
-                  <p className="text-gray-500">No products found. Try a different search or category.</p>
+            {/* Loading spinner only for product grid */}
+            {loadingProducts ? (
+              <div className="flex justify-center items-center py-12"><LoadingSpinner /></div>
+            ) : (
+              <>
+                {/* Mobile: Horizontal scroll */}
+                <div className="md:hidden overflow-x-auto flex gap-4 pb-2">
+                  {products && products.length > 0 ? (
+                    products.map((product) => (
+                      <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
+                        <ProductCard product={product} />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-12 w-full">
+                      <p className="text-gray-500">No products found. Try a different search or category.</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            {/* Desktop: Grid */}
-            <div className="hidden md:grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products && products.length > 0 ? (
-                products.map((product) => (
-                  <ProductCard key={product._id} product={product} />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-gray-500">No products found. Try a different search or category.</p>
+                {/* Desktop: Grid */}
+                <div className="hidden md:grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {products && products.length > 0 ? (
+                    products.map((product) => (
+                      <ProductCard key={product._id} product={product} />
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-12">
+                      <p className="text-gray-500">No products found. Try a different search or category.</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
           </section>
           {/* Middle Adverts Section */}
           {middleAdverts.length > 0 && (
