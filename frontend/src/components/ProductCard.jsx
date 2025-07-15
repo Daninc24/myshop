@@ -23,6 +23,7 @@ const ProductCard = ({ product, small }) => {
       />
       <h3 className="text-lg font-heading font-bold text-secondary mb-1 text-center line-clamp-2">{product.title}</h3>
       <p className="text-primary font-semibold text-xl mb-2">${product.price}</p>
+      <span className="btn-primary w-full mt-2 text-center">View Details</span>
     </Link>
   );
 };
