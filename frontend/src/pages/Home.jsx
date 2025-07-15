@@ -162,6 +162,16 @@ const Home = () => {
   const [bannerIndex, setBannerIndex] = useState(0);
   const bannerIntervalRef = useRef();
   // Use topAdverts as banners for now
+  const splitAdverts = (adverts) => {
+    if (adverts.length <= 3) return { top: adverts, middle: [], bottom: [] };
+    return {
+      top: adverts.slice(0, 2),
+      middle: adverts.slice(2, 4),
+      bottom: adverts.slice(4)
+    };
+  };
+
+  const { top: topAdverts, middle: middleAdverts, bottom: bottomAdverts } = splitAdverts(adverts);
   const banners = topAdverts.length > 0 ? topAdverts : adverts.slice(0, 3);
   // Carousel auto-advance
   useEffect(() => {
@@ -337,18 +347,6 @@ const Home = () => {
   const nextEvent = events.length > 0 ? events[0] : null;
 
   if (loading) return <LoadingSpinner />;
-
-  // Helper to split adverts for different screen areas
-  const splitAdverts = (adverts) => {
-    if (adverts.length <= 3) return { top: adverts, middle: [], bottom: [] };
-    return {
-      top: adverts.slice(0, 2),
-      middle: adverts.slice(2, 4),
-      bottom: adverts.slice(4)
-    };
-  };
-
-  const { top: topAdverts, middle: middleAdverts, bottom: bottomAdverts } = splitAdverts(adverts);
 
   // Recommended for You: products from the same category as the most recently viewed, excluding already viewed
   let recommended = [];
