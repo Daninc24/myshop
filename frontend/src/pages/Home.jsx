@@ -188,8 +188,10 @@ const Home = () => {
   const fetchNewArrivals = async () => {
     try {
       const response = await axios.get('/products');
+      console.log('New Arrivals:', response.data);
       setNewArrivals((response.data || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4));
     } catch (err) {
+      console.error('Error fetching new arrivals:', err);
       setNewArrivals([]);
     }
   };
@@ -198,8 +200,10 @@ const Home = () => {
   const fetchBestSelling = async () => {
     try {
       const response = await axios.get('/products/best-selling');
+      console.log('Best Selling:', response.data);
       setBestSelling(response.data || []);
     } catch (err) {
+      console.error('Error fetching best selling:', err);
       setBestSelling([]);
     }
   };
