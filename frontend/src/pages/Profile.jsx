@@ -110,7 +110,17 @@ const Profile = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Profile Info */}
           <div className="card flex flex-col gap-6 items-center">
-            <img src={user?.profileImage || '/default-avatar.png'} alt="Profile" className="w-32 h-32 object-cover rounded-full shadow-strong mb-4" />
+            {user?.profileImage ? (
+              <img src={user.profileImage} alt="Profile" className="w-32 h-32 object-cover rounded-full shadow-strong mb-4" />
+            ) : (
+              <div className="w-32 h-32 flex items-center justify-center rounded-full shadow-strong mb-4 bg-gray-100">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="32" cy="32" r="32" fill="#F3F4F6" />
+                  <circle cx="32" cy="26" r="12" fill="#D1D5DB" />
+                  <ellipse cx="32" cy="48" rx="16" ry="8" fill="#D1D5DB" />
+                </svg>
+              </div>
+            )}
             <h2 className="text-xl font-heading font-bold text-secondary mb-1">{user?.name}</h2>
             <p className="text-gray-500 mb-1">{user?.email}</p>
             <span className="text-sm text-primary font-medium">{user?.role}</span>

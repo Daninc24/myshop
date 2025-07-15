@@ -16,7 +16,14 @@ import {
   EyeIcon,
   PlusIcon,
   ArrowUpIcon,
-  ArrowDownIcon
+  ArrowDownIcon,
+  BuildingStorefrontIcon,
+  CreditCardIcon,
+  DocumentChartBarIcon,
+  ClipboardDocumentListIcon,
+  PresentationChartBarIcon,
+  MegaphoneIcon,
+  BoxIcon
 } from '@heroicons/react/24/outline';
 import { Tab } from '@headlessui/react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, PieChart, Pie, Cell } from 'recharts';
@@ -159,6 +166,49 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto py-10 animate-fade-in">
         <h1 className="text-3xl font-heading font-bold text-secondary mb-8">Admin Dashboard</h1>
+        {/* Admin Shortcuts */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-10">
+          <Link to="/pos" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <BuildingStorefrontIcon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">POS</span>
+          </Link>
+          <Link to="/admin/products" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <BoxIcon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">Products</span>
+          </Link>
+          <Link to="/admin/orders" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <ClipboardDocumentListIcon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">Orders</span>
+          </Link>
+          <Link to="/admin/users" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <UserIcon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">Users</span>
+          </Link>
+          <Link to="/admin/payment-settings" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <CreditCardIcon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">Payment Settings</span>
+          </Link>
+          <Link to="/admin/events" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <MegaphoneIcon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">Events</span>
+          </Link>
+          <Link to="/admin/sales-report" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <DocumentChartBarIcon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">Sales Report</span>
+          </Link>
+          <Link to="/admin/inventory-logs" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <ExclamationTriangleIcon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">Inventory Logs</span>
+          </Link>
+          <Link to="/admin/performance-dashboard" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <PresentationChartBarIcon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">Performance</span>
+          </Link>
+          <Link to="/admin/adverts" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <MegaphoneIcon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">Adverts</span>
+          </Link>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Stats Cards */}
           <div className="card flex flex-col items-center gap-2">

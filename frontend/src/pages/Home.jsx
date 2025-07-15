@@ -17,6 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { io } from 'socket.io-client';
 import { Helmet } from 'react-helmet';
+import gambiaMarket from '../assets/gambia-market.jpg';
 
 const getAdvertImageUrl = (image) => {
   if (!image) return '';
@@ -89,7 +90,7 @@ const advertTemplates = [
   },
 ];
 
-const HERO_IMAGE = '/src/assets/gambia-market.jpg';
+const HERO_IMAGE = gambiaMarket;
 
 const Home = () => {
   const [products, setProducts] = useState([]);
