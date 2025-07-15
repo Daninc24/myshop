@@ -208,6 +208,16 @@ const Home = () => {
     }
   };
 
+  // Fetch events
+  const fetchEvents = async () => {
+    try {
+      const response = await axios.get('/events?upcoming=true');
+      setEvents(response.data || []);
+    } catch (err) {
+      setEvents([]);
+    }
+  };
+
   useEffect(() => {
     fetchNewArrivals();
     fetchBestSelling();
