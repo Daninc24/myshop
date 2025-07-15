@@ -218,6 +218,16 @@ const Home = () => {
     }
   };
 
+  // Fetch adverts
+  const fetchAdverts = async () => {
+    try {
+      const res = await axios.get('/adverts/active');
+      setAdverts(res.data.adverts || []);
+    } catch {
+      setAdverts([]);
+    }
+  };
+
   useEffect(() => {
     fetchNewArrivals();
     fetchBestSelling();
