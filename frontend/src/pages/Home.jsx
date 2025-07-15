@@ -695,40 +695,39 @@ const Home = () => {
             </section>
           )}
         </main>
+        {/* Recently Viewed Section */}
+        {recentlyViewed.length > 0 && (
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div className="flex items-center mb-4">
+              <ArrowRightIcon className="h-6 w-6 text-orange-500 mr-2" />
+              <h2 className="text-xl font-bold text-gray-900">Recently Viewed</h2>
+            </div>
+            <div className="overflow-x-auto flex gap-4 pb-2">
+              {recentlyViewed.map(product => (
+                <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
+                  <ProductCard product={product} small />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+        {/* Recommended for You Section */}
+        {recommended.length > 0 && (
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div className="flex items-center mb-4">
+              <StarIcon className="h-6 w-6 text-orange-500 mr-2" />
+              <h2 className="text-xl font-bold text-gray-900">Recommended for You</h2>
+            </div>
+            <div className="overflow-x-auto flex gap-4 pb-2">
+              {recommended.map(product => (
+                <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
+                  <ProductCard product={product} small />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
-      {/* Recently Viewed Section */}
-      {recentlyViewed.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="flex items-center mb-4">
-            <ArrowRightIcon className="h-6 w-6 text-orange-500 mr-2" />
-            <h2 className="text-xl font-bold text-gray-900">Recently Viewed</h2>
-          </div>
-          <div className="overflow-x-auto flex gap-4 pb-2">
-            {recentlyViewed.map(product => (
-              <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
-                <ProductCard product={product} small />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-      {/* Recommended for You Section */}
-      {recommended.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="flex items-center mb-4">
-            <StarIcon className="h-6 w-6 text-orange-500 mr-2" />
-            <h2 className="text-xl font-bold text-gray-900">Recommended for You</h2>
-          </div>
-          <div className="overflow-x-auto flex gap-4 pb-2">
-            {recommended.map(product => (
-              <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
-                <ProductCard product={product} small />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
   );
 };
 
