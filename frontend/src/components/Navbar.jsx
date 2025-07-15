@@ -84,6 +84,12 @@ const Navbar = () => {
             >
               Products
             </Link>
+            {/* Admin Dashboard Link */}
+            {user?.role === 'admin' && (
+              <Link to="/admin" className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors">
+                Admin Dashboard
+              </Link>
+            )}
             {/* Currency Selector */}
             <select
               value={selectedCurrency}
@@ -107,9 +113,14 @@ const Navbar = () => {
             </Link>
             {/* User Controls */}
             {!user ? (
-              <Link to="/login" className="btn-primary px-5 py-2 text-base font-semibold rounded-xl ml-2">
-                Login
-              </Link>
+              <>
+                <Link to="/login" className="btn-primary px-5 py-2 text-base font-semibold rounded-xl ml-2">
+                  Login
+                </Link>
+                <Link to="/register" className="btn-secondary px-5 py-2 text-base font-semibold rounded-xl ml-2">
+                  Register
+                </Link>
+              </>
             ) : (
               <div className="relative group ml-2">
                 <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-secondary hover:text-primary font-medium focus:outline-none">
@@ -152,6 +163,12 @@ const Navbar = () => {
             >
               Products
             </Link>
+            {/* Admin Dashboard Link */}
+            {user?.role === 'admin' && (
+              <Link to="/admin" className="block text-secondary hover:text-primary px-4 py-3 rounded-xl text-lg font-medium transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                Admin Dashboard
+              </Link>
+            )}
             <select
               value={selectedCurrency}
               onChange={handleCurrencyChange}
@@ -172,9 +189,14 @@ const Navbar = () => {
               <span className="text-secondary text-lg">Cart</span>
             </Link>
             {!user ? (
-              <Link to="/login" className="btn-primary block w-full text-center mt-4 py-2 rounded-xl text-lg font-semibold">
-                Login
-              </Link>
+              <>
+                <Link to="/login" className="btn-primary block w-full text-center mt-4 py-2 rounded-xl text-lg font-semibold">
+                  Login
+                </Link>
+                <Link to="/register" className="btn-secondary block w-full text-center mt-2 py-2 rounded-xl text-lg font-semibold">
+                  Register
+                </Link>
+              </>
             ) : (
               <div className="mt-4">
                 <Link to="/profile" className="block px-4 py-2 text-secondary hover:bg-gray-50 rounded-t-xl">Profile</Link>
