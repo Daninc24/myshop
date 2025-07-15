@@ -86,6 +86,13 @@ const Navbar = () => {
             >
               Products
             </Link>
+            {/* Messages Link for all authenticated users */}
+            {user && (
+              <Link to="/messages" className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors flex items-center gap-2">
+                <ChatBubbleLeftRightIcon className="h-6 w-6" />
+                <span>Messages</span>
+              </Link>
+            )}
             {/* Admin Dashboard Link */}
             {user?.role === 'admin' && (
               <Link to="/admin" className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors">
@@ -165,6 +172,13 @@ const Navbar = () => {
             >
               Products
             </Link>
+            {/* Messages Link for all authenticated users */}
+            {user && (
+              <Link to="/messages" className="block text-secondary hover:text-primary px-4 py-3 rounded-xl text-lg font-medium transition-colors flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
+                <ChatBubbleLeftRightIcon className="h-6 w-6" />
+                <span>Messages</span>
+              </Link>
+            )}
             {/* Admin Dashboard Link */}
             {user?.role === 'admin' && (
               <Link to="/admin" className="block text-secondary hover:text-primary px-4 py-3 rounded-xl text-lg font-medium transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
