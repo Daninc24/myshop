@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { PhotoIcon } from '@heroicons/react/24/outline';
+import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const emptyAdvert = {
   title: '',
@@ -91,6 +91,7 @@ const AdminAdverts = () => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [productSearch, setProductSearch] = useState('');
+  const [selectedAdvert, setSelectedAdvert] = useState(null);
 
   useEffect(() => {
     fetchAdverts();
@@ -230,7 +231,7 @@ const AdminAdverts = () => {
       <div className="grid gap-4">
         {adverts.map(advert => (
           <div key={advert._id} className="card flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex-1">
+            <div className="flex-1 cursor-pointer" onClick={() => setSelectedAdvert(advert)}>
               {(advertTemplates.find(t => t.id === (advert.template || 'classic'))?.render || advertTemplates[0].render)({
                 title: advert.title,
                 message: advert.message,
@@ -247,6 +248,24 @@ const AdminAdverts = () => {
         ))}
         {adverts.length === 0 && <div className="text-gray-400 text-center">No adverts found.</div>}
       </div>
+      {/* Advert Detail Modal */}
+      {selectedAdvert && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-strong max-w-lg w-full p-6 relative animate-fade-in">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500" onClick={() => setSelectedAdvert(null)}>
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+            <h2 className="text-2xl font-bold mb-2">{selectedAdvert.title}</h2>
+            {selectedAdvert.image && <img src={selectedAdvert.image} alt="Advert" className="w-full h-48 object-cover rounded mb-3" />}
+            <div className="mb-2 text-gray-700">{selectedAdvert.message}</div>
+            <div className="mb-2 text-sm text-gray-500">Product: {products.find(p => p._id === selectedAdvert.product)?.title || selectedAdvert.product}</div>
+            <div className="mb-2 text-sm text-gray-500">Start: {selectedAdvert.startDate ? new Date(selectedAdvert.startDate).toLocaleDateString() : '-'}</div>
+            <div className="mb-2 text-sm text-gray-500">End: {selectedAdvert.endDate ? new Date(selectedAdvert.endDate).toLocaleDateString() : '-'}</div>
+            <div className="mb-2 text-sm text-gray-500">Active: {selectedAdvert.active ? 'Yes' : 'No'}</div>
+            <div className="mb-2 text-sm text-gray-500">Template: {selectedAdvert.template || 'classic'}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
