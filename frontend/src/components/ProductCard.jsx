@@ -15,7 +15,7 @@ const ProductCard = ({ product, small }) => {
   };
 
   return (
-    <div className={`card flex flex-col items-center transition-transform duration-200 hover:scale-105 hover:shadow-strong ${small ? 'p-4' : 'p-8'} animate-fade-in`}>
+    <Link to={`/products/${product._id}`} className={`card flex flex-col items-center transition-transform duration-200 hover:scale-105 hover:shadow-strong ${small ? 'p-4' : 'p-8'} animate-fade-in focus:outline-none focus:ring-2 focus:ring-primary`} tabIndex={0}>
       <img
         src={product.images && product.images[0]}
         alt={product.title}
@@ -23,10 +23,7 @@ const ProductCard = ({ product, small }) => {
       />
       <h3 className="text-lg font-heading font-bold text-secondary mb-1 text-center line-clamp-2">{product.title}</h3>
       <p className="text-primary font-semibold text-xl mb-2">${product.price}</p>
-      <Link to={`/products/${product._id}`} className="w-full mt-auto">
-        <button className="btn-primary w-full">View Details</button>
-      </Link>
-    </div>
+    </Link>
   );
 };
 
