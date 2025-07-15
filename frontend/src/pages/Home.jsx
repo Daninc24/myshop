@@ -705,8 +705,8 @@ const Home = () => {
           </div>
           <div className="overflow-x-auto flex gap-4 pb-2">
             {recentlyViewed.map(product => (
-              <div className="min-w-[180px] max-w-[200px] flex-shrink-0">
-                <ProductCard key={product._id} product={product} small />
+              <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
+                <ProductCard product={product} small />
               </div>
             ))}
           </div>
@@ -721,8 +721,8 @@ const Home = () => {
           </div>
           <div className="overflow-x-auto flex gap-4 pb-2">
             {recommended.map(product => (
-              <div className="min-w-[180px] max-w-[200px] flex-shrink-0">
-                <ProductCard key={product._id} product={product} small />
+              <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
+                <ProductCard product={product} small />
               </div>
             ))}
           </div>
