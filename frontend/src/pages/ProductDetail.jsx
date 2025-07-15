@@ -29,6 +29,19 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
+  useEffect(() => {
+    if (product) {
+      // Add to recently viewed in localStorage
+      const viewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+      // Remove if already present
+      const filtered = viewed.filter(p => p._id !== product._id);
+      // Add to front
+      filtered.unshift({ ...product, images: product.images });
+      // Keep max 12
+      localStorage.setItem('recentlyViewed', JSON.stringify(filtered.slice(0, 12)));
+    }
+  }, [product]);
+
   const handleAddToCart = async () => {
     setAddingToCart(true);
     const result = await addToCart(product._id, quantity);

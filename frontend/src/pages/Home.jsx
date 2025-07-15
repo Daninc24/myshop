@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
@@ -154,6 +154,11 @@ const Home = () => {
   ];
   const [adverts, setAdverts] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
+  const searchInputRef = useRef();
+  const [search, setSearch] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [dealCountdown, setDealCountdown] = useState(3600); // 1 hour in seconds
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   useEffect(() => {
     fetchProducts();
@@ -211,6 +216,26 @@ const Home = () => {
     // eslint-disable-next-line
   }, []);
 
+  // Countdown timer for flash deals
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDealCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  // Format countdown as HH:MM:SS
+  const formatCountdown = (seconds) => {
+    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  };
+  // Recently viewed products from localStorage
+  useEffect(() => {
+    const viewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+    setRecentlyViewed(viewed);
+  }, [products]);
+
   const fetchProducts = async () => {
     try {
       const response = await axios.get('/products');
@@ -262,9 +287,16 @@ const Home = () => {
     }
   };
 
-  const filteredProducts = selectedCategory === 'all' 
-    ? (products || []).slice(0, 8) 
-    : (products || []).filter(p => p.category === selectedCategory).slice(0, 8);
+  // Filtered products by search and category
+  const filteredProducts = (products || [])
+    .filter(p =>
+      (selectedCategory === 'all' || p.category === selectedCategory) &&
+      (search.trim() === '' || p.title?.toLowerCase().includes(search.trim().toLowerCase()) || p.name?.toLowerCase().includes(search.trim().toLowerCase()))
+    )
+    .slice(0, 8);
+
+  // Add a sample flash deals array (could be improved to fetch from backend)
+  const flashDeals = products.filter(p => p.isDeal || p.price < 20).slice(0, 6);
 
   const features = [
     {
@@ -305,6 +337,21 @@ const Home = () => {
 
   const { top: topAdverts, middle: middleAdverts, bottom: bottomAdverts } = splitAdverts(adverts);
 
+  // Recommended for You: products from the same category as the most recently viewed, excluding already viewed
+  let recommended = [];
+  if (recentlyViewed.length > 0) {
+    const lastViewed = recentlyViewed[0];
+    recommended = products.filter(p =>
+      p.category === lastViewed.category &&
+      !recentlyViewed.some(rv => rv._id === p._id)
+    ).slice(0, 8);
+    // If not enough, fill with best sellers not already viewed
+    if (recommended.length < 8) {
+      const bestFill = bestSelling.filter(p => !recentlyViewed.some(rv => rv._id === p._id) && !recommended.some(r => r._id === p._id)).slice(0, 8 - recommended.length);
+      recommended = recommended.concat(bestFill);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -335,293 +382,274 @@ const Home = () => {
           }
         `}</script>
       </Helmet>
-      {/* Hero Section */}
-      <section className="relative w-full h-[350px] md:h-[480px] flex items-center justify-center mb-12">
+      {/* Hero Section with Search */}
+      <section className="relative w-full h-[350px] md:h-[420px] flex items-center justify-center mb-8 bg-gradient-to-br from-orange-100 to-orange-300">
         <img
           src={HERO_IMAGE}
           alt="Market Hero"
-          className="absolute inset-0 w-full h-full object-cover object-center z-0"
-          style={{ filter: 'brightness(0.7)' }}
+          className="absolute inset-0 w-full h-full object-cover object-center z-0 opacity-60"
         />
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl md:text-6xl font-heading font-bold text-white drop-shadow mb-4 animate-fade-in">Welcome to MyShopping Center</h1>
-          <p className="text-lg md:text-2xl text-white/90 mb-6 max-w-2xl animate-fade-in">Discover the best products, unbeatable deals, and a vibrant marketplace experience. Shop with confidence and enjoy fast delivery!</p>
+        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold text-orange-900 drop-shadow mb-4 animate-fade-in">Welcome to MyShopping Center</h1>
+          <p className="text-lg md:text-2xl text-orange-800/90 mb-6 max-w-2xl animate-fade-in">Discover the best products, unbeatable deals, and a vibrant marketplace experience. Shop with confidence and enjoy fast delivery!</p>
+          {/* Search Bar */}
+          <div className="w-full max-w-2xl flex items-center bg-white rounded-2xl shadow-lg p-2 mb-4 animate-slide-in">
+            <MagnifyingGlassIcon className="h-6 w-6 text-orange-500 ml-2" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search for products, brands, categories..."
+              className="flex-1 px-4 py-2 bg-transparent outline-none text-lg text-gray-800"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="text-gray-400 hover:text-orange-500 px-2">
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            )}
+          </div>
           <Link to="/products" className="btn-primary text-lg px-8 py-3 animate-bounce-in">Shop Now</Link>
         </div>
       </section>
-      {/* Top Adverts Section */}
-      {topAdverts.length > 0 && (
-        <section className="max-w-3xl mx-auto mt-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {topAdverts.map(ad => {
-            const Template = advertTemplates.find(t => t.id === (ad.template || 'classic'))?.render;
-            return Template ? (
-              <div key={ad._id}>{Template({
-                title: ad.title,
-                message: ad.message,
-                image: ad.image,
-                product: ad.product?.title || ad.product?.name,
-                productId: ad.product?._id || ad.product
-              })}</div>
-            ) : null;
-          })}
-        </section>
-      )}
-      {/* Live Event Banner */}
-      {nextEvent && (
-        <div className="bg-gradient-to-r from-purple-600 to-orange-600 text-white py-4 px-4 flex items-center justify-center relative">
-          {nextEvent.image && (
-            <img src={nextEvent.image} alt={nextEvent.title} className="w-20 h-20 object-cover rounded shadow-lg mr-6 hidden sm:block" />
-          )}
-          <div className="flex-1">
-            <div className="text-lg font-bold">Live Event: {nextEvent.title}</div>
-            <div className="text-sm mb-1">{new Date(nextEvent.date).toLocaleString()}</div>
-            <div className="text-sm line-clamp-1">{nextEvent.description}</div>
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 grid grid-cols-1 md:grid-cols-5 gap-6">
+        {/* Sidebar: Categories (mobile toggle) */}
+        <aside className="md:col-span-1">
+          <button
+            className="md:hidden flex items-center gap-2 mb-4 bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            {sidebarOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
+            Categories
+          </button>
+          <div className={`bg-white rounded-2xl shadow-lg p-4 h-fit sticky top-24 self-start ${sidebarOpen ? '' : 'hidden md:block'}`}> 
+            <h3 className="text-lg font-bold text-orange-700 mb-4">Categories</h3>
+            <ul className="space-y-2">
+              {categories.map(category => (
+                <li key={category.id}>
+                  <button
+                    onClick={() => { setSelectedCategory(category.id); setSidebarOpen(false); }}
+                    className={`w-full text-left px-3 py-2 rounded-lg font-medium transition-colors ${selectedCategory === category.id ? 'bg-orange-600 text-white' : 'text-gray-700 hover:bg-orange-100'}`}
+                  >
+                    {category.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
-          {nextEvent.link && (
-            <a href={nextEvent.link} target="_blank" rel="noopener noreferrer" className="ml-4 bg-white text-orange-700 px-4 py-2 rounded font-semibold hover:bg-orange-100 transition-colors">Join/More Info</a>
-          )}
-        </div>
-      )}
-
-      {/* Features Section */}
-      <section className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-600 text-white rounded-full mb-4">
-                  <feature.icon className="h-8 w-8" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600">
-                  {feature.description}
-                </p>
+        </aside>
+        {/* Main Content */}
+        <main className="md:col-span-4 flex flex-col gap-8">
+          {/* Flash Deals Section */}
+          {flashDeals.length > 0 && (
+            <section className="bg-gradient-to-r from-orange-400 to-yellow-200 rounded-2xl p-6 mb-4 shadow-lg">
+              <div className="flex items-center mb-4">
+                <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold mr-3">Flash Deals</span>
+                <span className="text-lg font-bold text-orange-900 mr-4">Limited Time Offers</span>
+                <span className="ml-auto bg-white text-orange-700 px-3 py-1 rounded-full text-xs font-mono font-bold shadow">{formatCountdown(dealCountdown)}</span>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Products Section */}
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Featured Products
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Discover our handpicked selection of premium products
-            </p>
-          </div>
-
-          {/* Category Filter */}
-          <div className="mb-8 p-2">
-            {/* Hamburger Menu for All Screens */}
-            <div className="w-full">
-              <button
-                onClick={() => setShowCategoryMenu(!showCategoryMenu)}
-                className="flex items-center justify-center w-full bg-gray-100 text-gray-700 px-4 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-              >
-                {showCategoryMenu ? (
-                  <XMarkIcon className="h-5 w-5 mr-2" />
-                ) : (
-                  <Bars3Icon className="h-5 w-5 mr-2" />
-                )}
-                {selectedCategory === 'all' ? 'All Categories' : categories.find(cat => cat.id === selectedCategory)?.name || 'All Categories'}
-              </button>
-              
-              {/* Dropdown Menu */}
-              {showCategoryMenu && (
-                <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => {
-                        setSelectedCategory(category.id);
-                        setShowCategoryMenu(false);
-                      }}
-                      className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors border-b border-gray-100 last:border-b-0 ${
-                        selectedCategory === category.id
-                          ? 'bg-orange-600 text-white'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {category.name}
-                    </button>
-                  ))}
+              <div className="overflow-x-auto flex gap-4 pb-2">
+                {flashDeals.map(product => (
+                  <div className="min-w-[180px] max-w-[200px] flex-shrink-0">
+                    <ProductCard key={product._id} product={{...product, isDeal: true}} small />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+          {/* Top Adverts Section */}
+          {topAdverts.length > 0 && (
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {topAdverts.map(ad => {
+                const Template = advertTemplates.find(t => t.id === (ad.template || 'classic'))?.render;
+                return Template ? (
+                  <div key={ad._id}>{Template({
+                    title: ad.title,
+                    message: ad.message,
+                    image: ad.image,
+                    product: ad.product?.title || ad.product?.name,
+                    productId: ad.product?._id || ad.product
+                  })}</div>
+                ) : null;
+              })}
+            </section>
+          )}
+          {/* Features Section */}
+          <section className="bg-gray-50 rounded-2xl p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {features.map((feature, index) => (
+                <div key={index} className="text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-600 text-white rounded-full mb-4">
+                    <feature.icon className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+          {/* Product Grid Section */}
+          <section>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">{selectedCategory === 'all' ? 'Featured Products' : categories.find(cat => cat.id === selectedCategory)?.name}</h2>
+              <Link to="/products" className="text-orange-600 hover:underline font-medium">View All</Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredProducts && filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <ProductCard key={product._id} product={product} />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <p className="text-gray-500">No products available at the moment.</p>
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts && filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12">
-                <p className="text-gray-500">No products available at the moment.</p>
+          </section>
+          {/* Middle Adverts Section */}
+          {middleAdverts.length > 0 && (
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {middleAdverts.map(ad => {
+                const Template = advertTemplates.find(t => t.id === (ad.template || 'classic'))?.render;
+                return Template ? (
+                  <div key={ad._id}>{Template({
+                    title: ad.title,
+                    message: ad.message,
+                    image: ad.image,
+                    product: ad.product?.title || ad.product?.name,
+                    productId: ad.product?._id || ad.product
+                  })}</div>
+                ) : null;
+              })}
+            </section>
+          )}
+          {/* New Arrivals & Best Selling (as horizontal carousels) */}
+          <section className="flex flex-col gap-8">
+            <div>
+              <div className="flex items-center mb-4">
+                <ArrowRightIcon className="h-6 w-6 text-orange-500 mr-2" />
+                <h2 className="text-xl font-bold text-gray-900">New Arrivals</h2>
               </div>
-            )}
-          </div>
-
-          {/* View All Button */}
-          <div className="text-center mt-12">
-            <Link
-              to="/products"
-              className="inline-flex items-center bg-orange-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors"
-            >
-              View All Products
-              <ArrowRightIcon className="ml-2 h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-12 bg-orange-700 text-white" >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Ready to Start Shopping?
-          </h2>
-          <p className="text-xl mb-8 text-orange-100">
-            Join thousands of satisfied customers today
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/register"
-              className="bg-white text-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Create Account
-            </Link>
-            <Link
-              to="/products"
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-orange-600 transition-colors"
-            >
-              Browse Products
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Events Section */}
-      {events.length > 0 && (
-        <section className="py-8 bg-purple-50 border-b border-purple-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-purple-800 mb-4">Upcoming Live Events</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.slice(0, 3).map(event => (
-                <div key={event._id} className="bg-white rounded shadow p-4 flex flex-col">
-                  {event.image && <img src={event.image} alt={event.title} className="w-full h-40 object-cover rounded mb-3" />}
-                  <h3 className="text-lg font-bold mb-1">{event.title}</h3>
-                  <div className="text-gray-500 text-sm mb-2">{new Date(event.date).toLocaleString()}</div>
-                  <p className="mb-2 line-clamp-2">{event.description}</p>
-                  {event.link && <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">Join/More Info</a>}
-                </div>
-              ))}
-            </div>
-            <div className="text-right mt-4">
-              <Link to="/events" className="text-purple-700 hover:underline font-medium">See all events</Link>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* New Arrivals Section */}
-      <section className="py-10 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center mb-6">
-            <ArrowRightIcon className="h-6 w-6 text-orange-500 mr-2" />
-            <h2 className="text-2xl font-bold text-gray-900">New Arrivals</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {newArrivals.map(product => (
-              <ProductCard key={product._id} product={product} small />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Best Selling Section */}
-      <section className="py-10 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center mb-6">
-            <StarIcon className="h-6 w-6 text-orange-500 mr-2" />
-            <h2 className="text-2xl font-bold text-gray-900">Best Selling</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {bestSelling.map(product => (
-              <ProductCard key={product._id} product={product} small />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Middle Adverts Section */}
-      {middleAdverts.length > 0 && (
-        <section className="max-w-3xl mx-auto my-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {middleAdverts.map(ad => {
-            const Template = advertTemplates.find(t => t.id === (ad.template || 'classic'))?.render;
-            return Template ? (
-              <div key={ad._id}>{Template({
-                title: ad.title,
-                message: ad.message,
-                image: ad.image,
-                product: ad.product?.title || ad.product?.name,
-                productId: ad.product?._id || ad.product
-              })}</div>
-            ) : null;
-          })}
-        </section>
-      )}
-
-      {/* Bottom Adverts Section */}
-      {bottomAdverts.length > 0 && (
-        <section className="max-w-3xl mx-auto my-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {bottomAdverts.map(ad => {
-            const Template = advertTemplates.find(t => t.id === (ad.template || 'classic'))?.render;
-            return Template ? (
-              <div key={ad._id}>{Template({
-                title: ad.title,
-                message: ad.message,
-                image: ad.image,
-                product: ad.product?.title || ad.product?.name,
-                productId: ad.product?._id || ad.product
-              })}</div>
-            ) : null;
-          })}
-        </section>
-      )}
-
-      {/* Testimonials Section */}
-      {testimonials.length > 0 && (
-        <section className="py-12 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                What Our Customers Say
-              </h2>
-              <p className="text-lg text-gray-600">
-                Don't just take our word for it
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="bg-white p-6 rounded-lg shadow-md">
-                  <div className="flex items-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <StarIcon key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                    ))}
+              <div className="overflow-x-auto flex gap-4 pb-2">
+                {newArrivals.map(product => (
+                  <div className="min-w-[180px] max-w-[200px] flex-shrink-0">
+                    <ProductCard key={product._id} product={product} small />
                   </div>
-                  <p className="text-gray-600 mb-4">"{testimonial.message}"</p>
-                  <p className="font-semibold text-gray-900">{testimonial.name || 'Anonymous'}</p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+            <div>
+              <div className="flex items-center mb-4">
+                <StarIcon className="h-6 w-6 text-orange-500 mr-2" />
+                <h2 className="text-xl font-bold text-gray-900">Best Selling</h2>
+              </div>
+              <div className="overflow-x-auto flex gap-4 pb-2">
+                {bestSelling.map(product => (
+                  <div className="min-w-[180px] max-w-[200px] flex-shrink-0">
+                    <ProductCard key={product._id} product={product} small />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+          {/* Bottom Adverts Section */}
+          {bottomAdverts.length > 0 && (
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {bottomAdverts.map(ad => {
+                const Template = advertTemplates.find(t => t.id === (ad.template || 'classic'))?.render;
+                return Template ? (
+                  <div key={ad._id}>{Template({
+                    title: ad.title,
+                    message: ad.message,
+                    image: ad.image,
+                    product: ad.product?.title || ad.product?.name,
+                    productId: ad.product?._id || ad.product
+                  })}</div>
+                ) : null;
+              })}
+            </section>
+          )}
+          {/* Live Events Section */}
+          {events.length > 0 && (
+            <section className="py-8 bg-purple-50 border-b border-purple-200 rounded-2xl">
+              <h2 className="text-xl font-bold text-purple-800 mb-4">Upcoming Live Events</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {events.slice(0, 3).map(event => (
+                  <div key={event._id} className="bg-white rounded shadow p-4 flex flex-col">
+                    {event.image && <img src={event.image} alt={event.title} className="w-full h-40 object-cover rounded mb-3" />}
+                    <h3 className="text-lg font-bold mb-1">{event.title}</h3>
+                    <div className="text-gray-500 text-sm mb-2">{new Date(event.date).toLocaleString()}</div>
+                    <p className="mb-2 line-clamp-2">{event.description}</p>
+                    {event.link && <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">Join/More Info</a>}
+                  </div>
+                ))}
+              </div>
+              <div className="text-right mt-4">
+                <Link to="/events" className="text-purple-700 hover:underline font-medium">See all events</Link>
+              </div>
+            </section>
+          )}
+          {/* Testimonials Section */}
+          {testimonials.length > 0 && (
+            <section className="py-12 bg-gray-50 rounded-2xl">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                  What Our Customers Say
+                </h2>
+                <p className="text-lg text-gray-600">
+                  Don't just take our word for it
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {testimonials.map((testimonial, index) => (
+                  <div key={index} className="bg-white p-6 rounded-lg shadow-md">
+                    <div className="flex items-center mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <StarIcon key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                    <p className="text-gray-600 mb-4">"{testimonial.message}"</p>
+                    <p className="font-semibold text-gray-900">{testimonial.name || 'Anonymous'}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </main>
+      </div>
+      {/* Recently Viewed Section */}
+      {recentlyViewed.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex items-center mb-4">
+            <ArrowRightIcon className="h-6 w-6 text-orange-500 mr-2" />
+            <h2 className="text-xl font-bold text-gray-900">Recently Viewed</h2>
+          </div>
+          <div className="overflow-x-auto flex gap-4 pb-2">
+            {recentlyViewed.map(product => (
+              <div className="min-w-[180px] max-w-[200px] flex-shrink-0">
+                <ProductCard key={product._id} product={product} small />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+      {/* Recommended for You Section */}
+      {recommended.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex items-center mb-4">
+            <StarIcon className="h-6 w-6 text-orange-500 mr-2" />
+            <h2 className="text-xl font-bold text-gray-900">Recommended for You</h2>
+          </div>
+          <div className="overflow-x-auto flex gap-4 pb-2">
+            {recommended.map(product => (
+              <div className="min-w-[180px] max-w-[200px] flex-shrink-0">
+                <ProductCard key={product._id} product={product} small />
+              </div>
+            ))}
           </div>
         </section>
       )}
