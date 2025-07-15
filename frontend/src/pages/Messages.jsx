@@ -3,15 +3,17 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { io } from 'socket.io-client';
+import { UserIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 
 axios.defaults.withCredentials = true;
 
 const isValidUserId = id => typeof id === 'string' && id.length > 0 && id !== 'undefined' && id !== 'null';
 
+const getInitials = (name = '') => name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+
 const Messages = () => {
   const { user } = useAuth();
   const { success, error } = useToast();
-
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [withUser, setWithUser] = useState(null);
@@ -27,6 +29,7 @@ const Messages = () => {
   const typingTimeoutRef = useRef(null);
   const socketRef = useRef(null);
 
+  // Fetch users/conversations
   useEffect(() => {
     if (user?.role === 'admin') {
       axios.get('/users').then(res => {
@@ -104,14 +107,11 @@ const Messages = () => {
   useEffect(() => {
     if (!user) return;
     if (socketRef.current) return;
-
     const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com', {
       withCredentials: true,
       transports: ['websocket'],
     });
-
     socketRef.current = socket;
-
     socket.on('new_message', (msg) => {
       if (
         (msg.sender === user._id && msg.receiver === withUser) ||
@@ -120,19 +120,15 @@ const Messages = () => {
         setMessages(prev => [...prev, msg]);
       }
     });
-
     socket.on('typing', ({ from, to }) => {
       if (to === user._id && from === withUser) setOtherTyping(true);
     });
-
     socket.on('stop_typing', ({ from, to }) => {
       if (to === user._id && from === withUser) setOtherTyping(false);
     });
-
     socket.on('online_users', (users) => {
       setOnlineUsers(users);
     });
-
     socket.on('messages_read', ({ from, to }) => {
       if (from === withUser && to === user._id) {
         setMessages(prev =>
@@ -142,9 +138,7 @@ const Messages = () => {
         );
       }
     });
-
     socket.emit('get_online_users');
-
     return () => {
       socket.disconnect();
       socketRef.current = null;
@@ -182,86 +176,106 @@ const Messages = () => {
     }
   };
 
+  // Sidebar: conversations (admin: all users, user: just admin)
+  const sidebarConversations = user?.role === 'admin' ? messagedUsers : users.filter(u => u._id === adminId);
+  const currentContact = user?.role === 'admin'
+    ? messagedUsers.find(u => u._id === withUser)
+    : users.find(u => u._id === adminId);
+
   return (
-    <div className="max-w-3xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Messages</h1>
-
-      {!user ? (
-        <div className="text-center text-gray-500">Loading...</div>
-      ) : user.role === 'admin' && messagedUsers.length === 0 ? (
-        <div className="p-4 text-center text-gray-500">No users have messaged you yet.</div>
-      ) : !isValidUserId(withUser) ? (
-        <div className="p-4 text-center text-gray-500">Select a user to view messages.</div>
-      ) : (
-        <div className="space-y-4">
-          {user.role === 'admin' && (
-            <div>
-              <label className="block mb-1 font-semibold">Select User</label>
-              <select
-                value={withUser || ''}
-                onChange={e => setWithUser(e.target.value)}
-                className="border rounded px-3 py-2 w-full shadow-sm"
-              >
-                <option value="">-- Select a user --</option>
-                {messagedUsers.map(u => (
-                  <option key={u._id} value={u._id}>{u.name} ({u.email})</option>
-                ))}
-              </select>
-            </div>
+    <div className="flex flex-col md:flex-row max-w-5xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden min-h-[70vh] my-8 border border-orange-100">
+      {/* Sidebar */}
+      <aside className="w-full md:w-72 bg-gradient-to-b from-orange-50 to-white border-r border-orange-100 p-4 flex-shrink-0">
+        <div className="flex items-center gap-2 mb-6">
+          <ChatBubbleLeftRightIcon className="h-7 w-7 text-orange-500" />
+          <span className="font-bold text-lg text-orange-700">Conversations</span>
+        </div>
+        <ul className="space-y-2">
+          {sidebarConversations && sidebarConversations.length > 0 ? (
+            sidebarConversations.map(u => (
+              <li key={u._id}>
+                <button
+                  onClick={() => setWithUser(u._id)}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-colors text-left
+                    ${withUser === u._id ? 'bg-orange-100 text-orange-900 font-semibold' : 'hover:bg-orange-50 text-gray-700'}`}
+                >
+                  <div className="w-10 h-10 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 font-bold text-lg shadow">
+                    {u.avatar ? <img src={u.avatar} alt={u.name} className="w-10 h-10 rounded-full object-cover" /> : getInitials(u.name)}
+                  </div>
+                  <div className="flex-1">
+                    <div className="truncate">{u.name}</div>
+                    <div className="text-xs text-gray-400 truncate">{u.email}</div>
+                  </div>
+                  <span className={`h-2 w-2 rounded-full ${onlineUsers.includes(u._id) ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                </button>
+              </li>
+            ))
+          ) : (
+            <li className="text-gray-400 text-sm">No conversations yet.</li>
           )}
-
-          {adminError && <div className="text-red-500 font-semibold">{adminError}</div>}
-
-          <div className="flex  items-center gap-3 text-sm text-gray-500">
-            <span className={`h-2 w-2 rounded-full ${onlineUsers.includes(withUser) ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-            <span>{onlineUsers.includes(withUser) ? 'Online' : 'Offline'}</span>
-            {otherTyping && <span className="text-blue-500 animate-pulse">Typing...</span>}
+        </ul>
+      </aside>
+      {/* Main Chat Window */}
+      <main className="flex-1 flex flex-col">
+        {/* Chat Header */}
+        <div className="flex items-center gap-4 border-b border-orange-100 px-6 py-4 bg-gradient-to-r from-orange-50 to-white">
+          <div className="w-12 h-12 rounded-full bg-orange-200 flex items-center justify-center text-orange-700 font-bold text-xl shadow">
+            {currentContact?.avatar ? <img src={currentContact.avatar} alt={currentContact.name} className="w-12 h-12 rounded-full object-cover" /> : getInitials(currentContact?.name)}
           </div>
-
-          <div className="bg-white jus rounded-lg border h-96 overflow-y-auto px-4 py-3 space-y-2">
-            <button onClick={fetchMessages} className="text-blue-500 hover:underline text-sm">Refresh</button>
-            {loading ? <div>Loading...</div> : (
-              messages.length === 0 ? <div className="text-gray-400">No messages yet.</div> : (
-                messages.map((msg, idx) => {
+          <div className="flex-1">
+            <div className="font-bold text-lg text-orange-900">{currentContact?.name || 'No Contact'}</div>
+            <div className="text-xs text-gray-500">{currentContact?.email}</div>
+          </div>
+          <span className={`h-3 w-3 rounded-full ${onlineUsers.includes(withUser) ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+          <span className="text-xs text-gray-500 ml-2">{onlineUsers.includes(withUser) ? 'Online' : 'Offline'}</span>
+        </div>
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto px-6 py-4 bg-white" style={{ minHeight: 0 }}>
+          {loading ? <div>Loading...</div> : (
+            messages.length === 0 ? <div className="text-gray-400 text-center mt-12">No messages yet.</div> : (
+              <div className="flex flex-col gap-2">
+                {messages.map((msg, idx) => {
                   const isOwn = msg.sender === user._id;
                   return (
                     <div key={msg._id || idx} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`px-4 py-2 rounded-xl shadow-sm max-w-xs text-sm
+                      <div className={`px-4 py-2 rounded-2xl shadow max-w-xs md:max-w-md text-sm
                         ${isOwn
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-800'}`}
+                          ? 'bg-orange-600 text-white rounded-br-none'
+                          : 'bg-orange-100 text-orange-900 rounded-bl-none'}`}
                       >
                         <div>{msg.content}</div>
-                        <div className="text-xs text-right text-gray-300 mt-1">
+                        <div className="text-xs text-right text-orange-300 mt-1">
                           {new Date(msg.timestamp).toLocaleString()}
                         </div>
                       </div>
                     </div>
                   );
-                })
-              )
-            )}
-          </div>
-
-          <form onSubmit={handleSend} className="flex gap-2">
-            <input
-              type="text"
-              value={message}
-              onChange={handleTyping}
-              className="flex-1 border rounded px-3 py-2 shadow-sm"
-              placeholder="Type your message..."
-              disabled={!isValidUserId(withUser) || !!adminError}
-            />
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              disabled={!isValidUserId(withUser) || !message.trim() || !!adminError}
-            >
-              Send
-            </button>
-          </form>
+                })}
+                {otherTyping && <div className="text-left text-xs text-orange-500 animate-pulse">Typing...</div>}
+              </div>
+            )
+          )}
         </div>
-      )}
+        {/* Message Input */}
+        <form onSubmit={handleSend} className="flex gap-2 border-t border-orange-100 px-6 py-4 bg-white">
+          <input
+            type="text"
+            value={message}
+            onChange={handleTyping}
+            className="flex-1 border rounded-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            placeholder="Type your message..."
+            disabled={!isValidUserId(withUser) || !!adminError}
+          />
+          <button
+            type="submit"
+            className="bg-orange-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-orange-700 transition-colors"
+            disabled={!isValidUserId(withUser) || !message.trim() || !!adminError}
+          >
+            Send
+          </button>
+        </form>
+        {adminError && <div className="text-red-500 font-semibold text-center py-2">{adminError}</div>}
+      </main>
     </div>
   );
 };
