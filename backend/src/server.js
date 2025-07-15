@@ -182,41 +182,7 @@ app.options('/uploads/:filename', (req, res) => {
   res.status(200).end();
 });
 
-// Serve uploaded files with CORS
-app.get('/uploads/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const filePath = path.join(__dirname, '../uploads', filename);
-  
-  // Use fs to read and serve the file directly with proper headers
-  const fs = require('fs');
-  
-  if (fs.existsSync(filePath)) {
-    const ext = path.extname(filename).toLowerCase();
-    let contentType = 'image/jpeg'; // default
-    
-    if (ext === '.png') contentType = 'image/png';
-    else if (ext === '.gif') contentType = 'image/gif';
-    else if (ext === '.webp') contentType = 'image/webp';
-    
-    // Set headers for cross-origin access
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
-    res.header('Content-Type', contentType);
-    res.header('Cache-Control', 'public, max-age=31536000');
-    
-    // Stream the file directly
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-    
-    console.log('Image served successfully:', filename);
-  } else {
-    console.error('Image not found:', filePath);
-    res.status(404).json({ error: 'File not found' });
-  }
-});
-
-// Add this line to serve static files from /uploads
+// Serve static files from /uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/', (req, res) => {
