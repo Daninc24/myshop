@@ -451,58 +451,58 @@ const Home = () => {
           }
         `}</script>
       </Helmet>
-      {/* Single Search Bar with Autocomplete (all screens) */}
-      <div className="max-w-3xl mx-auto px-4 pt-8 relative z-20">
-        <div className="relative" ref={searchInputRef}>
-          <input
-            type="text"
-            className="w-full rounded-full border border-gray-300 px-5 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-sm"
-            placeholder="Search for products, brands, or categories..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            onFocus={() => search && setShowSuggestions(true)}
-            autoComplete="off"
-          />
-          <MagnifyingGlassIcon className="w-6 h-6 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-          {/* Autocomplete Suggestions Dropdown */}
-          {showSuggestions && searchSuggestions.length > 0 && (
-            <ul className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-72 overflow-y-auto">
-              {searchSuggestions.map(suggestion => (
-                <li
-                  key={suggestion._id}
-                  className="px-4 py-2 hover:bg-orange-100 cursor-pointer flex items-center gap-2"
-                  onClick={() => {
-                    setSearch(suggestion.title || suggestion.name);
-                    setShowSuggestions(false);
-                  }}
-                >
-                  {suggestion.images && suggestion.images[0] && (
-                    <img src={suggestion.images[0]} alt="" className="w-8 h-8 object-cover rounded mr-2" />
-                  )}
-                  <span>{suggestion.title || suggestion.name}</span>
-                  {suggestion.category && (
-                    <span className="ml-auto text-xs text-gray-400">{suggestion.category}</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-      {/* Hero Section with Search (desktop only, but now search is unified) */}
-      <section className="relative w-full h-[350px] md:h-[420px] flex items-center justify-center mb-8 bg-gradient-to-br from-orange-100 to-orange-200 hidden md:flex">
+      {/* Hero Section with Search (search bar over image, above Shop Now) */}
+      <section className="relative w-full h-[350px] md:h-[420px] flex items-center justify-center mb-8 bg-gradient-to-br from-orange-100 to-orange-200">
         <img
           src={HERO_IMAGE}
           alt="Market Hero"
-          className="absolute inset-0 w-full h-full object-cover object-center z-0 opacity-60"
+          className="absolute inset-0 w-full h-full object-cover object-center z-0" // Remove opacity for full image
         />
         <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full">
+          {/* Search Bar (centered, above Shop Now) */}
+          <div className="w-full max-w-2xl mb-6">
+            <div className="relative" ref={searchInputRef}>
+              <input
+                type="text"
+                className="w-full rounded-full border border-gray-300 px-5 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-sm bg-white/90"
+                placeholder="Search for products, brands, or categories..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onFocus={() => search && setShowSuggestions(true)}
+                autoComplete="off"
+              />
+              <MagnifyingGlassIcon className="w-6 h-6 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              {/* Autocomplete Suggestions Dropdown */}
+              {showSuggestions && searchSuggestions.length > 0 && (
+                <ul className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-72 overflow-y-auto">
+                  {searchSuggestions.map(suggestion => (
+                    <li
+                      key={suggestion._id}
+                      className="px-4 py-2 hover:bg-orange-100 cursor-pointer flex items-center gap-2"
+                      onClick={() => {
+                        setSearch(suggestion.title || suggestion.name);
+                        setShowSuggestions(false);
+                      }}
+                    >
+                      {suggestion.images && suggestion.images[0] && (
+                        <img src={suggestion.images[0]} alt="" className="w-8 h-8 object-cover rounded mr-2" />
+                      )}
+                      <span>{suggestion.title || suggestion.name}</span>
+                      {suggestion.category && (
+                        <span className="ml-auto text-xs text-gray-400">{suggestion.category}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
           <h1 className="text-4xl md:text-5xl font-heading font-bold text-orange-900 drop-shadow mb-4 animate-fade-in">Welcome to MyShopping Center</h1>
           <p className="text-lg md:text-2xl text-gray-900 mb-6 max-w-2xl animate-fade-in">Discover the best products, unbeatable deals, and a vibrant marketplace experience. Shop with confidence and enjoy fast delivery!</p>
           <Link to="/products" className="btn-primary text-lg px-8 py-3 animate-bounce-in">Shop Now</Link>
         </div>
       </section>
-      {/* Main Banner Carousel (below search/hero) */}
+      {/* Main Banner Carousel (below hero) */}
       {banners.length > 0 && (
         <section className="max-w-5xl mx-auto mb-8 relative">
           <div className="relative rounded-2xl overflow-hidden shadow-lg">
