@@ -33,9 +33,9 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
-        <AuthProvider>
-          <CartProvider>
-            <ToastProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <CartProvider>
               <div className="min-h-screen bg-gray-50">
                 <Navbar />
                 <main className="container mx-auto px-4 py-8">
@@ -126,9 +126,9 @@ function App() {
                 </main>
                 <Footer />
               </div>
-            </ToastProvider>
-          </CartProvider>
-        </AuthProvider>
+            </CartProvider>
+          </AuthProvider>
+        </ToastProvider>
       </Router>
     </ErrorBoundary>
   );
