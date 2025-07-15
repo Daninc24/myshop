@@ -117,6 +117,24 @@ const ProductDetail = () => {
             }
           `}</script>
         )}
+        {product && product.faq && (
+          <script type="application/ld+json">{`
+            {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                ${product.faq.map(q => `{
+                  "@type": "Question",
+                  "name": "${q.question}",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "${q.answer}"
+                  }
+                }`).join(',')}
+              ]
+            }
+          `}</script>
+        )}
       </Helmet>
       <div className="space-y-8">
         {/* Breadcrumb */}
@@ -132,35 +150,28 @@ const ProductDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Product Image */}
           <div className="space-y-4">
-            {/* Main Image */}
-            <div className="relative">
-              <img
-                src={product.images && product.images.length > 0 ? product.images[selectedImage] : '/placeholder-image.jpg'}
-                alt={product.title}
-                className="w-full h-96 object-cover rounded-lg shadow-lg"
-              />
-            </div>
-
             {/* Thumbnail Gallery */}
             {product.images && product.images.length > 1 && (
-              <div className="flex space-x-2 overflow-x-auto pb-2">
-                {product.images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                      selectedImage === index ? 'border-blue-500' : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${product.title} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
+              <div className="flex gap-4 mb-4">
+                {product.images.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={product.title + ' image ' + (idx + 1)}
+                    className={`w-24 h-24 object-cover rounded-lg border-2 cursor-pointer ${selectedImage === idx ? 'border-orange-500' : 'border-gray-200'}`}
+                    onClick={() => setSelectedImage(idx)}
+                  />
                 ))}
               </div>
             )}
+            {/* Main Image */}
+            <div className="relative">
+              <img
+                src={product.images && product.images[selectedImage] ? product.images[selectedImage] : 'https://myshoppingcenter.com/logo.png'}
+                alt={product.title + ' main image'}
+                className="w-full h-96 object-contain rounded-2xl bg-white mb-6"
+              />
+            </div>
           </div>
 
           {/* Product Info */}

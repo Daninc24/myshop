@@ -235,8 +235,8 @@ const Products = () => {
           {/* Products Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 animate-fade-in">
             {filteredProducts && filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <ProductCard key={product._id} product={product} />
+              filteredProducts.map(product => (
+                <ProductCard key={product._id} product={product} altText={product.title} />
               ))
             ) : (
               <div className="col-span-full text-center py-16">

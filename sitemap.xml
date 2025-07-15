@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://myshoppingcenter.com/</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://myshoppingcenter.com/products</loc>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://myshoppingcenter.com/cart</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://myshoppingcenter.com/checkout</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://myshoppingcenter.com/login</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://myshoppingcenter.com/register</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://myshoppingcenter.com/profile</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://myshoppingcenter.com/events</loc>
+    <priority>0.7</priority>
+  </url>
+  <!-- Product detail template, to be replaced with actual product URLs by backend or deployment script -->
+  <url>
+    <loc>https://myshoppingcenter.com/products/[productId]</loc>
+    <priority>0.9</priority>
+  </url>
+</urlset> 
