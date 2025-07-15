@@ -104,93 +104,47 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Profile
-            </h3>
-
-            <form onSubmit={handleProfileSave} className="space-y-4 bg-white p-6 rounded shadow">
-              <div className="flex items-center mb-4">
-                {user.profileImage ? (
-                  <span className="relative inline-block">
-                    <img src={user.profileImage} alt="Avatar" className="h-20 w-20 rounded-full object-cover border" />
-                    <span className={`absolute bottom-1 right-1 h-4 w-4 rounded-full border-2 border-white ${onlineUsers.includes(user._id) ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                  </span>
-                ) : (
-                  <span className="relative inline-block">
-                    <UserIcon className="h-16 w-16" />
-                    <span className={`absolute bottom-1 right-1 h-4 w-4 rounded-full border-2 border-white ${onlineUsers.includes(user._id) ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                  </span>
-                )}
-                <div className="ml-4">
-                  <h2 className="text-xl font-bold">{user.name}</h2>
-                  <p className="text-gray-600">{user.email}</p>
-                  <div className="flex items-center mt-1">
-                    <span className={`h-2 w-2 rounded-full mr-2 ${onlineUsers.includes(user._id) ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                    <span className="text-sm">{onlineUsers.includes(user._id) ? 'Online' : 'Offline'}</span>
+      {/* Modernize profile container and sections */}
+      <div className="max-w-3xl mx-auto py-10 animate-fade-in">
+        <h1 className="text-3xl font-heading font-bold text-secondary mb-8">My Profile</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Profile Info */}
+          <div className="card flex flex-col gap-6 items-center">
+            <img src={user?.profileImage || '/default-avatar.png'} alt="Profile" className="w-32 h-32 object-cover rounded-full shadow-strong mb-4" />
+            <h2 className="text-xl font-heading font-bold text-secondary mb-1">{user?.name}</h2>
+            <p className="text-gray-500 mb-1">{user?.email}</p>
+            <span className="text-sm text-primary font-medium">{user?.role}</span>
+          </div>
+          {/* Edit Profile Form */}
+          <form className="card flex flex-col gap-6">
+            <h2 className="text-lg font-heading font-bold text-secondary mb-2">Edit Profile</h2>
+            <input type="text" placeholder="Name" className="input-field" value={profile.name} onChange={handleProfileChange} />
+            <input type="email" placeholder="Email" className="input-field" value={profile.email} onChange={handleProfileChange} />
+            <input type="password" placeholder="New Password" className="input-field" value={passwords.newPassword} onChange={handlePasswordChange} />
+            <button type="submit" className="btn-primary mt-2" onClick={handleProfileSave} disabled={loading}>Save Changes</button>
+          </form>
+        </div>
+        {/* Order History */}
+        <div className="card mt-10">
+          <h2 className="text-xl font-heading font-bold text-secondary mb-4">Order History</h2>
+          {orders.length === 0 ? (
+            <p className="text-gray-500">You have no orders yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {orders.map(order => (
+                <div key={order._id} className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4 last:border-b-0 animate-fade-in">
+                  <div>
+                    <span className="font-medium text-secondary">Order #{order._id.slice(-6)}</span>
+                    <span className="ml-4 text-gray-500 text-sm">{new Date(order.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex gap-4 items-center">
+                    <span className="text-primary font-semibold">{formatCurrency(order.total, 'USD')}</span>
+                    <span className="text-xs bg-primary-light text-primary px-3 py-1 rounded-xl">{order.status}</span>
                   </div>
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Name</label>
-                <input type="text" name="name" value={profile.name} onChange={handleProfileChange} className="mt-1 block w-full border rounded p-2" disabled={!editing} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Email</label>
-                <input type="email" name="email" value={profile.email} onChange={handleProfileChange} className="mt-1 block w-full border rounded p-2" disabled={!editing} />
-              </div>
-              <div className="flex space-x-2">
-                {editing ? (
-                  <>
-                    <button type="submit" className="btn-primary" disabled={loading}>Save</button>
-                    <button type="button" className="btn-secondary" onClick={() => setEditing(false)} disabled={loading}>Cancel</button>
-                  </>
-                ) : (
-                  <button type="button" className="btn-primary" onClick={() => setEditing(true)}>Edit Profile</button>
-                )}
-              </div>
-            </form>
-            <form onSubmit={handlePasswordSave} className="space-y-4 bg-white p-6 rounded shadow mt-8">
-              <h2 className="text-lg font-semibold mb-2">Change Password</h2>
-              <div>
-                <label className="block text-sm font-medium">Current Password</label>
-                <input type="password" name="currentPassword" value={passwords.currentPassword} onChange={handlePasswordChange} className="mt-1 block w-full border rounded p-2" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">New Password</label>
-                <input type="password" name="newPassword" value={passwords.newPassword} onChange={handlePasswordChange} className="mt-1 block w-full border rounded p-2" required />
-              </div>
-              <button type="submit" className="btn-primary" disabled={loading}>Change Password</button>
-            </form>
-            {/* User Order History */}
-            {orders.length > 0 && (
-              <div className="bg-white p-6 rounded shadow mt-8">
-                <h2 className="text-lg font-semibold mb-4">Order History</h2>
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {orders.map((order) => (
-                      <tr key={order._id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order._id}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.status}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(order.total, 'USD')}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

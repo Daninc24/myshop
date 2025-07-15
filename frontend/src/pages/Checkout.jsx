@@ -86,69 +86,42 @@ const Checkout = () => {
         <meta name="twitter:image" content="https://myshoppingcenter.com/logo.png" />
         <link rel="canonical" href="https://myshoppingcenter.com/checkout" />
       </Helmet>
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-gray-800">Checkout</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Order Summary */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800">Order Summary</h2>
-            
-            {cartProducts.map((item) => (
-              <div key={item.productId} className="card flex items-center space-x-4">
-                <img
-                  src={item.product?.images?.[0] || item.product?.image}
-                  alt={item.product?.title}
-                  className="w-16 h-16 object-cover rounded-lg"
-                />
-                
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800">{item.product?.title}</h3>
-                  <p className="text-gray-600 text-sm">Quantity: {item.quantity}</p>
-                  <p className="text-blue-600 font-semibold">
-                    {currency === 'USD'
-                      ? `$${(item.product?.price * item.quantity).toFixed(2)} USD`
-                      : `${convertPrice(item.product?.price * item.quantity).toFixed(2)} ${currency} / $${(item.product?.price * item.quantity).toFixed(2)} USD`}
-                  </p>
+      {/* Modernize checkout container and form */}
+      <div className="max-w-4xl mx-auto py-10 animate-fade-in">
+        <h1 className="text-3xl font-heading font-bold text-secondary mb-8">Checkout</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Checkout Form */}
+          <form className="card flex flex-col gap-6">
+            <h2 className="text-xl font-heading font-bold text-secondary mb-2">Shipping Details</h2>
+            <input type="text" placeholder="Full Name" className="input-field" required />
+            <input type="email" placeholder="Email Address" className="input-field" required />
+            <input type="text" placeholder="Address" className="input-field" required />
+            <input type="text" placeholder="City" className="input-field" required />
+            <input type="text" placeholder="State" className="input-field" required />
+            <input type="text" placeholder="Zip Code" className="input-field" required />
+            <input type="text" placeholder="Country" className="input-field" required />
+            <button type="submit" className="btn-primary mt-4">Continue to Payment</button>
+          </form>
+          {/* Order Summary & Payment */}
+          <div className="card flex flex-col gap-6">
+            <h2 className="text-xl font-heading font-bold text-secondary mb-2">Order Summary</h2>
+            {/* List of products and total */}
+            <div className="space-y-2">
+              {cart.map(item => (
+                <div key={item.product} className="flex justify-between items-center">
+                  <span>{item.name} x {item.quantity}</span>
+                  <span>${(item.price * item.quantity).toFixed(2)}</span>
                 </div>
-              </div>
-            ))}
-            
-            <div className="card">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal:</span>
-                  <span className="font-semibold">
-                    {currency === 'USD'
-                      ? `$${total.toFixed(2)} USD`
-                      : `${convertPrice(total).toFixed(2)} ${currency} / $${total.toFixed(2)} USD`}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping:</span>
-                  <span className="font-semibold">Free</span>
-                </div>
-                <hr className="my-2" />
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Total:</span>
-                  <span className="text-blue-600">
-                    {currency === 'USD'
-                      ? `$${total.toFixed(2)} USD`
-                      : `${convertPrice(total).toFixed(2)} ${currency} / $${total.toFixed(2)} USD`}
-                  </span>
-                </div>
-              </div>
+              ))}
             </div>
-          </div>
-          
-          {/* Payment Form */}
-          <div className="space-y-6">
-            <Elements stripe={stripePromise}>
-              <PaymentForm 
-                onPaymentSuccess={handlePaymentSuccess}
-                onPaymentError={handlePaymentError}
-              />
-            </Elements>
+            <div className="flex justify-between text-lg font-medium mt-4">
+              <span>Total:</span>
+              <span>${cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}</span>
+            </div>
+            {/* PaymentForm component can be placed here */}
+            <div className="mt-4">
+              <PaymentForm onPaymentSuccess={onPaymentSuccess} onPaymentError={onPaymentError} />
+            </div>
           </div>
         </div>
       </div>

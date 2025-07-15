@@ -55,16 +55,16 @@ const Navbar = () => {
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
+    <nav className="bg-surface shadow-strong sticky top-0 z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-18 items-center">
           {/* Logo and Brand */}
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <div className="h-8 w-8 bg-orange-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">M</span>
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex-shrink-0 flex items-center gap-2">
+              <div className="h-10 w-10 bg-primary rounded-2xl flex items-center justify-center shadow-strong">
+                <span className="text-white font-bold text-2xl">M</span>
               </div>
-              <span className="ml-2 text-xl font-bold text-gray-900 hidden sm:block">
+              <span className="ml-2 text-2xl font-heading font-bold text-secondary hidden sm:block">
                 MyShopping
               </span>
             </Link>
@@ -74,245 +74,71 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link 
               to="/" 
-              className="text-gray-700 hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors"
             >
               Home
             </Link>
             <Link 
               to="/products" 
-              className="text-gray-700 hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors"
             >
               Products
             </Link>
-            
             {/* Currency Selector */}
             <select
               value={selectedCurrency}
               onChange={handleCurrencyChange}
-              className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-              style={{ minWidth: 80 }}
+              className="border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary"
+              style={{ minWidth: 100 }}
               title="Select currency"
             >
               {currencies.map(cur => (
                 <option key={cur} value={cur}>{cur}</option>
               ))}
             </select>
-
-            {/* Cart Icon */}
-            <Link to="/cart" className="relative text-gray-700 hover:text-orange-600 transition-colors">
-              <ShoppingCartIcon className="h-6 w-6" />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-            </Link>
-            {/* Chat Icon */}
-            {user && (
-              <Link to="/messages" className="text-gray-700 hover:text-orange-600" title="Messages">
-                <ChatBubbleLeftRightIcon className="h-6 w-6" />
-              </Link>
-            )}
-            {/* POS Link: Show for all allowed roles */}
-            {user && [
-              'admin',
-              'employee',
-              'shopkeeper',
-              'delivery',
-              'moderator',
-              'store_manager',
-              'warehouse_manager',
-              'manager',
-            ].includes(user.role) && (
-              <Link 
-                to="/pos" 
-                className="text-gray-700 hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                POS
-              </Link>
-            )}
-
-            {/* User Menu */}
-            {user ? (
-              <div className="relative group flex items-center">
-                <button className="flex items-center text-gray-700 hover:text-orange-600 transition-colors">
-                  {user.profileImage ? (
-                    <span className="relative inline-block">
-                      <img src={user.profileImage} alt="Avatar" className="h-8 w-8 rounded-full object-cover mr-2 border" />
-                      {/* Online status dot */}
-                      <span className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-white ${onlineUsers.includes(user._id) ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                    </span>
-                  ) : (
-                    <span className="relative inline-block">
-                      <UserIcon className="h-6 w-6 mr-1" />
-                      {/* Online status dot */}
-                      <span className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-white ${onlineUsers.includes(user._id) ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                    </span>
-                  )}
-                  <span className="text-sm font-medium hidden lg:block">{user.name}</span>
-                </button>
-                {/* Dropdown Menu */}
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <Link 
-                    to="/profile" 
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Profile
-                  </Link>
-                  {user.role === 'admin' && (
-                    <>
-                      <Link to="/admin" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"><ChartBarIcon className="h-4 w-4 mr-2" />Dashboard</Link>
-                      <Link to="/admin/products" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"><Cog6ToothIcon className="h-4 w-4 mr-2" />Manage Products</Link>
-                      <Link to="/admin/orders" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">Orders</Link>
-                      <Link to="/admin/payment-settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">Payment Settings</Link>
-                      <Link to="/admin/events" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">Events</Link>
-                      <Link to="/admin/users" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">Users</Link>
-                      <Link to="/admin/sales-report" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">Sales Report</Link>
-                      <Link to="/admin/inventory-logs" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">Inventory Logs</Link>
-                      <Link to="/admin/performance-dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">Performance Dashboard</Link>
-                      <Link to="/admin/adverts" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">Manage Adverts</Link>
-                    </>
-                  )}
-                  <button 
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Link 
-                  to="/login" 
-                  className="text-gray-700 hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Login
-                </Link>
-                <Link 
-                  to="/register" 
-                  className="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
-                >
-                  Register
-                </Link>
-              </div>
-            )}
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="flex md:hidden items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-700 hover:text-orange-600 transition-colors"
+              className="inline-flex items-center justify-center p-2 rounded-xl text-secondary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? (
-                <XMarkIcon className="h-6 w-6" />
-              ) : (
-                <Bars3Icon className="h-6 w-6" />
-              )}
+              {isMobileMenuOpen ? <XMarkIcon className="h-7 w-7" /> : <Bars3Icon className="h-7 w-7" />}
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Mobile Navigation Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200">
-          <div className="px-2 pt-2 pb-3 space-y-1">
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-surface rounded-2xl shadow-strong mt-2 p-4 animate-slide-in">
             <Link 
               to="/" 
-              className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium"
+              className="block text-secondary hover:text-primary px-4 py-3 rounded-xl text-lg font-medium transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Home
             </Link>
             <Link 
               to="/products" 
-              className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium"
+              className="block text-secondary hover:text-primary px-4 py-3 rounded-xl text-lg font-medium transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Products
             </Link>
-            <Link 
-              to="/cart" 
-              className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center"
-              onClick={() => setIsMobileMenuOpen(false)}
+            <select
+              value={selectedCurrency}
+              onChange={handleCurrencyChange}
+              className="border border-gray-300 rounded-xl px-3 py-2 text-lg w-full mt-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              title="Select currency"
             >
-              <ShoppingCartIcon className="h-5 w-5 mr-2" />
-              Cart ({cartItemCount})
-            </Link>
-            {user && [
-              'admin',
-              'employee',
-              'shopkeeper',
-              'delivery',
-              'moderator',
-              'store_manager',
-              'warehouse_manager',
-              'manager',
-            ].includes(user.role) && (
-              <Link 
-                to="/pos" 
-                className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                POS
-              </Link>
-            )}
-            {user ? (
-              <>
-                <Link 
-                  to="/profile" 
-                  className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Profile
-                </Link>
-                {user.role === 'admin' && (
-                  <>
-                    <Link to="/admin" className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center" onClick={() => setIsMobileMenuOpen(false)}><ChartBarIcon className="h-5 w-5 mr-2" />Dashboard</Link>
-                    <Link to="/admin/products" className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center" onClick={() => setIsMobileMenuOpen(false)}><Cog6ToothIcon className="h-5 w-5 mr-2" />Manage Products</Link>
-                    <Link to="/admin/orders" className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center" onClick={() => setIsMobileMenuOpen(false)}>Orders</Link>
-                    <Link to="/admin/payment-settings" className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center" onClick={() => setIsMobileMenuOpen(false)}>Payment Settings</Link>
-                    <Link to="/admin/events" className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center" onClick={() => setIsMobileMenuOpen(false)}>Events</Link>
-                    <Link to="/admin/users" className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center" onClick={() => setIsMobileMenuOpen(false)}>Users</Link>
-                    <Link to="/admin/sales-report" className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center" onClick={() => setIsMobileMenuOpen(false)}>Sales Report</Link>
-                    <Link to="/admin/inventory-logs" className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center" onClick={() => setIsMobileMenuOpen(false)}>Inventory Logs</Link>
-                    <Link to="/admin/performance-dashboard" className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center" onClick={() => setIsMobileMenuOpen(false)}>Performance Dashboard</Link>
-                    <Link to="/admin/adverts" className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium flex items-center" onClick={() => setIsMobileMenuOpen(false)}>Manage Adverts</Link>
-                  </>
-                )}
-                <button 
-                  onClick={() => {
-                    handleLogout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="block w-full text-left px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link 
-                  to="/login" 
-                  className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link 
-                  to="/register" 
-                  className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md text-base font-medium"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Register
-                </Link>
-              </>
-            )}
+              {currencies.map(cur => (
+                <option key={cur} value={cur}>{cur}</option>
+              ))}
+            </select>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
   );
 };

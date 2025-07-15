@@ -30,12 +30,12 @@ const advertTemplates = [
   {
     id: 'classic',
     render: ({ title, message, image, product, productId }) => (
-      <div className="border rounded p-4 bg-white flex gap-4 items-center mb-4">
-        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-24 h-24 object-cover rounded" />}
+      <div className="card flex gap-6 items-center mb-6 animate-fade-in">
+        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-28 h-28 object-cover rounded-2xl shadow-soft" />}
         <div>
-          <h2 className="text-xl font-bold">{title}</h2>
-          <p className="text-gray-700">{message}</p>
-          {product && productId && <Link to={`/products/${productId}`} className="text-blue-600 underline text-xs mt-2 block">View Product</Link>}
+          <h2 className="text-2xl font-heading font-bold text-secondary mb-1">{title}</h2>
+          <p className="text-gray-700 mb-2">{message}</p>
+          {product && productId && <Link to={`/products/${productId}`} className="text-primary underline text-sm mt-2 block font-medium">View Product</Link>}
         </div>
       </div>
     )
@@ -43,11 +43,11 @@ const advertTemplates = [
   {
     id: 'banner',
     render: ({ title, message, image }) => (
-      <div className="relative h-32 flex items-center justify-center bg-blue-100 rounded overflow-hidden mb-4">
-        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="absolute inset-0 w-full h-full object-cover opacity-40" />}
+      <div className="relative h-36 flex items-center justify-center bg-primary-light rounded-2xl overflow-hidden mb-6 animate-slide-in">
+        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="absolute inset-0 w-full h-full object-cover opacity-30" />}
         <div className="relative z-10 text-center">
-          <h2 className="text-2xl font-bold text-blue-900 drop-shadow">{title}</h2>
-          <p className="text-blue-800 mt-1">{message}</p>
+          <h2 className="text-3xl font-heading font-bold text-primary drop-shadow mb-1">{title}</h2>
+          <p className="text-primary-dark text-lg">{message}</p>
         </div>
       </div>
     )
@@ -55,22 +55,22 @@ const advertTemplates = [
   {
     id: 'card',
     render: ({ title, message, image }) => (
-      <div className="bg-gradient-to-br from-pink-100 to-yellow-100 rounded-lg p-4 flex flex-col items-center mb-4">
-        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-20 h-20 object-cover rounded-full mb-2" />}
-        <h2 className="text-lg font-bold text-pink-700">{title}</h2>
-        <p className="text-sm text-gray-700">{message}</p>
+      <div className="bg-gradient-to-br from-primary-light to-accent-light rounded-2xl p-6 flex flex-col items-center mb-6 animate-bounce-in">
+        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-24 h-24 object-cover rounded-full mb-3 shadow-soft" />}
+        <h2 className="text-xl font-heading font-bold text-primary mb-1">{title}</h2>
+        <p className="text-base text-secondary mb-1">{message}</p>
       </div>
     )
   },
   {
     id: 'left-image',
     render: ({ title, message, image, product }) => (
-      <div className="flex items-center bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg p-4 gap-4 mb-4">
-        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-28 h-28 object-cover rounded-lg shadow-lg" />}
+      <div className="flex items-center bg-gradient-to-r from-accent to-primary text-white rounded-2xl p-6 gap-6 mb-6 animate-slide-in">
+        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-32 h-32 object-cover rounded-2xl shadow-strong" />}
         <div>
-          <h2 className="text-2xl font-bold mb-1">{title}</h2>
+          <h2 className="text-2xl font-heading font-bold mb-1">{title}</h2>
           <p className="text-white mb-2">{message}</p>
-          {product && <span className="text-xs bg-white/20 px-2 py-1 rounded">{product}</span>}
+          {product && <span className="text-xs bg-white/20 px-3 py-1 rounded-xl">{product}</span>}
         </div>
       </div>
     )
@@ -78,12 +78,12 @@ const advertTemplates = [
   {
     id: 'cta-card',
     render: ({ title, message, image, product }) => (
-      <div className="bg-white border-2 border-pink-400 rounded-xl p-6 flex flex-col items-center shadow-md mb-4">
-        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-24 h-24 object-cover rounded-full border-4 border-pink-200 mb-2" />}
-        <h2 className="text-xl font-bold text-pink-700 mb-1">{title}</h2>
-        <p className="text-gray-700 mb-2">{message}</p>
-        {product && <span className="text-xs text-pink-600 mb-2">{product}</span>}
-        <button className="bg-pink-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-pink-600 transition">Shop Now</button>
+      <div className="bg-surface border-2 border-primary rounded-2xl p-8 flex flex-col items-center shadow-strong mb-6 animate-fade-in">
+        {image && <img src={getAdvertImageUrl(image)} alt="Advert" className="w-28 h-28 object-cover rounded-full border-4 border-primary-light mb-3" />}
+        <h2 className="text-2xl font-heading font-bold text-primary mb-1">{title}</h2>
+        <p className="text-secondary mb-2">{message}</p>
+        {product && <span className="text-xs text-primary mb-2">{product}</span>}
+        <button className="btn-primary mt-2">Shop Now</button>
       </div>
     )
   },
