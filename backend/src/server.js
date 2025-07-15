@@ -182,7 +182,13 @@ app.options('/uploads/:filename', (req, res) => {
   res.status(200).end();
 });
 
-// Serve static files from /uploads
+// Add CORS headers for /uploads before static middleware
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
+  next();
+});
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/', (req, res) => {
