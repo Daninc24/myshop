@@ -21,7 +21,7 @@ const AdminEvents = () => {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/events');
+      const res = await axios.get('/events');
       setEvents(res.data || []);
     } catch {
       setEvents([]);
@@ -59,10 +59,10 @@ const AdminEvents = () => {
       else if (form.image) data.append('image', form.image);
       let res;
       if (editingId) {
-        res = await axios.put(`/api/events/${editingId}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
+        res = await axios.put(`/events/${editingId}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
         setMsg('Event updated!');
       } else {
-        res = await axios.post('/api/events', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+        res = await axios.post('/events', data, { headers: { 'Content-Type': 'multipart/form-data' } });
         setMsg('Event created!');
       }
       setForm(emptyEvent);
@@ -90,7 +90,7 @@ const AdminEvents = () => {
     if (!window.confirm('Delete this event?')) return;
     setMsg('');
     try {
-      await axios.delete(`/api/events/${id}`);
+      await axios.delete(`/events/${id}`);
       setMsg('Event deleted!');
       fetchEvents();
     } catch (err) {

@@ -241,7 +241,7 @@ const POS = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post('/api/pos/sales', {
+      const res = await axios.post('/pos/sales', {
         items: cartWithDiscounts.map(item => ({
           product: item.product,
           quantity: item.quantity,
@@ -309,7 +309,7 @@ const POS = () => {
     setReturnItems([]);
     if (!returnSaleId) return;
     try {
-      const res = await axios.get(`/api/pos/sales/${returnSaleId}`);
+      const res = await axios.get(`/pos/sales/${returnSaleId}`);
       setReturnSale(res.data.sale);
       setReturnItems(res.data.sale.items.map(item => ({ ...item, returnQty: 0 })));
     } catch (err) {
@@ -333,7 +333,7 @@ const POS = () => {
       return;
     }
     try {
-      const res = await axios.post('/api/pos/sales/return', {
+      const res = await axios.post('/pos/sales/return', {
         saleId: returnSale._id,
         items: itemsToReturn,
         reason: 'Customer return',
@@ -353,7 +353,7 @@ const POS = () => {
     setZReportError('');
     try {
       const today = new Date().toISOString().slice(0, 10);
-      const res = await axios.get('/api/pos/z-report', { params: { date: today } });
+      const res = await axios.get('/pos/z-report', { params: { date: today } });
       setZReport(res.data);
     } catch (err) {
       setZReportError('Failed to fetch Z-report');

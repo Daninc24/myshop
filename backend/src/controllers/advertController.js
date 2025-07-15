@@ -87,11 +87,23 @@ exports.listAdverts = async (req, res) => {
 exports.getActiveAdverts = async (req, res) => {
   try {
     const now = new Date();
-    const adverts = await Advert.find({
-      active: true,
-      startDate: { $lte: now },
-      endDate: { $gte: now }
-    }).populate('product');
+    console.log('--- getActiveAdverts called ---');
+    console.log('Current date:', now.toISOString());
+    // Log all adverts for debugging
+    const allAdverts = await Advert.find().populate('product');
+    allAdverts.forEach(ad => {
+      const reasons = [];
+      if (!ad.active) reasons.push('inactive');
+      if (ad.startDate && ad.startDate > now) reasons.push('startDate in future');
+      if (ad.endDate && ad.endDate < now) reasons.push('endDate in past');
+      if (reasons.length === 0) {
+        console.log(`[INCLUDED] ${ad.title} (${ad._id})`);
+      } else {
+        console.log(`[EXCLUDED] ${ad.title} (${ad._id}): ${reasons.join(', ')}`);
+      }
+    });
+    const adverts = allAdverts.filter(ad => ad.active && (!ad.startDate || ad.startDate <= now) && (!ad.endDate || ad.endDate >= now));
+    console.log('Filtered adverts count:', adverts.length);
     res.json({ adverts });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching active adverts', error: error.message });
