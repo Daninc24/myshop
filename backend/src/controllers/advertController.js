@@ -9,7 +9,19 @@ exports.createAdvert = async (req, res) => {
     if (req.file) {
       image = `/uploads/${req.file.filename}`;
     }
-    const advert = await Advert.create({ title, message, product, image, startDate, endDate, active, template });
+    // Parse dates to ensure correct type
+    const startDateParsed = startDate ? new Date(startDate) : undefined;
+    const endDateParsed = endDate ? new Date(endDate) : undefined;
+    const advert = await Advert.create({
+      title,
+      message,
+      product,
+      image,
+      startDate: startDateParsed,
+      endDate: endDateParsed,
+      active,
+      template
+    });
     res.status(201).json({ advert });
   } catch (error) {
     res.status(500).json({ message: 'Error creating advert', error: error.message });
@@ -25,7 +37,23 @@ exports.updateAdvert = async (req, res) => {
     if (req.file) {
       image = `/uploads/${req.file.filename}`;
     }
-    const advert = await Advert.findByIdAndUpdate(id, { title, message, product, image, startDate, endDate, active, template }, { new: true });
+    // Parse dates to ensure correct type
+    const startDateParsed = startDate ? new Date(startDate) : undefined;
+    const endDateParsed = endDate ? new Date(endDate) : undefined;
+    const advert = await Advert.findByIdAndUpdate(
+      id,
+      {
+        title,
+        message,
+        product,
+        image,
+        startDate: startDateParsed,
+        endDate: endDateParsed,
+        active,
+        template
+      },
+      { new: true }
+    );
     if (!advert) return res.status(404).json({ message: 'Advert not found' });
     res.json({ advert });
   } catch (error) {
