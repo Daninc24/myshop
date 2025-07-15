@@ -18,7 +18,7 @@ const registerSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string()
     .min(8)
-    .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\-=[\]{};:\"\\|,.<>/?]).+$'))
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};:'"\\|,.<>/?]).+$/)
     .required()
     .messages({
       'string.pattern.base': 'Password must include uppercase, lowercase, number, and symbol.'
