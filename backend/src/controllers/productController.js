@@ -5,7 +5,20 @@ const InventoryLog = require('../models/InventoryLog');
 // Get all products
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    const { search, category } = req.query;
+    let query = {};
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { name: { $regex: search, $options: 'i' } }
+      ];
+    }
+    if (category && category !== 'all') {
+      query.category = category;
+    }
+
+    const products = await Product.find(query).sort({ createdAt: -1 });
     
     // Migrate old products that have 'image' field instead of 'images'
     const migratedProducts = products.map(product => {

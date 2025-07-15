@@ -260,63 +260,27 @@ const Home = () => {
     setRecentlyViewed(viewed);
   }, [products]);
 
-  const fetchProducts = async () => {
+  // Fetch products from backend with search and category
+  const fetchProducts = async (searchTerm = '', category = 'all') => {
     try {
-      const response = await axios.get('/products');
+      const params = {};
+      if (searchTerm) params.search = searchTerm;
+      if (category && category !== 'all') params.category = category;
+      const response = await axios.get('/products', { params });
       setProducts(response.data || []);
     } catch (err) {
-      err('Error fetching products');
       setProducts([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchNewArrivals = async () => {
-    try {
-      const response = await axios.get('/products');
-      setNewArrivals((response.data || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4));
-    } catch (err) {
-      console.log(err)
-      setNewArrivals([]);
-    }
-  };
-
-  const fetchBestSelling = async () => {
-    try {
-      const response = await axios.get('/products/best-selling');
-      setBestSelling(response.data || []);
-    } catch (err) {
-      console.log(err)
-      setBestSelling([]);
-    }
-  };
-
-  const fetchEvents = async () => {
-    try {
-      const response = await axios.get('/events?upcoming=true');
-      setEvents(response.data || []);
-    } catch (err) {
-      console.log(err)
-      setEvents([]);
-    }
-  };
-
-  const fetchAdverts = async () => {
-    try {
-      const res = await axios.get('/adverts/active');
-      setAdverts(res.data.adverts || []);
-    } catch {
-      setAdverts([]);
-    }
-  };
-
-  // Filtered products by search and category (search always applies)
-  const filteredProducts = (products || [])
-    .filter(p =>
-      (selectedCategory === 'all' || p.category === selectedCategory) &&
-      (search.trim() === '' || p.title?.toLowerCase().includes(search.trim().toLowerCase()) || p.name?.toLowerCase().includes(search.trim().toLowerCase()))
-    );
+  // Fetch products when search or category changes
+  useEffect(() => {
+    setLoading(true);
+    fetchProducts(search, selectedCategory);
+    // eslint-disable-next-line
+  }, [search, selectedCategory]);
 
   // Add a sample flash deals array (could be improved to fetch from backend)
   const flashDeals = products.filter(p => p.isDeal || p.price < 20).slice(0, 6);
@@ -481,38 +445,40 @@ const Home = () => {
           </div>
         </section>
       )}
-      {/* Mobile: Horizontal Category Bar */}
-      <div className="md:hidden w-full overflow-x-auto flex gap-2 py-2 mb-4">
-        {categories.map(category => (
-          <button
-            key={category.id}
-            onClick={() => setSelectedCategory(category.id)}
-            className={`flex-shrink-0 px-4 py-2 rounded-full font-medium border transition-colors whitespace-nowrap ${selectedCategory === category.id ? 'bg-orange-600 text-white border-orange-600' : 'bg-orange-100 text-gray-900 border-orange-200 hover:bg-orange-200'}`}
-          >
-            {category.name}
-          </button>
-        ))}
-      </div>
-      {/* Sidebar: Categories (desktop only) */}
-      <aside className="md:col-span-1 hidden md:block">
-        <div className="bg-white rounded-2xl shadow-lg p-4 h-fit sticky top-24 self-start">
-          <h3 className="text-lg font-bold text-orange-700 mb-4">Categories</h3>
-          <ul className="space-y-2">
-            {categories.map(category => (
-              <li key={category.id}>
-                <button
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`w-full text-left px-3 py-2 rounded-lg font-medium transition-colors ${selectedCategory === category.id ? 'bg-orange-600 text-white' : 'text-gray-900 hover:bg-orange-100'}`}
-                >
-                  {category.name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
+      {/* Responsive Grid: Sidebar + Main Content */}
+      <div className="md:grid md:grid-cols-5 gap-8">
+        {/* Sidebar: Categories (desktop only) */}
+        <aside className="md:col-span-1 hidden md:block">
+          <div className="bg-white rounded-2xl shadow-lg p-4 h-fit sticky top-24 self-start">
+            <h3 className="text-lg font-bold text-orange-700 mb-4">Categories</h3>
+            <ul className="space-y-2">
+              {categories.map(category => (
+                <li key={category.id}>
+                  <button
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`w-full text-left px-3 py-2 rounded-lg font-medium transition-colors ${selectedCategory === category.id ? 'bg-orange-600 text-white' : 'text-gray-900 hover:bg-orange-100'}`}
+                  >
+                    {category.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
         {/* Main Content */}
         <main className="md:col-span-4 flex flex-col gap-8">
+          {/* Mobile: Horizontal Category Bar (improved) */}
+          <div className="md:hidden w-full overflow-x-auto flex gap-2 py-2 mb-4 sticky top-0 z-20 bg-white shadow-sm border-b border-orange-100">
+            {categories.map(category => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full font-medium border transition-colors whitespace-nowrap ${selectedCategory === category.id ? 'bg-orange-600 text-white border-orange-600' : 'bg-orange-100 text-gray-900 border-orange-200 hover:bg-orange-200'}`}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
           {/* Flash Deals Section */}
           {flashDeals.length > 0 && (
             <section className="bg-gradient-to-r from-orange-400 to-yellow-200 rounded-2xl p-6 mb-4 shadow-lg">
@@ -565,15 +531,30 @@ const Home = () => {
               ))}
             </div>
           </section>
-          {/* Product Grid Section */}
+          {/* Product Grid Section - Responsive/Scrollable */}
           <section>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">{selectedCategory === 'all' ? 'Featured Products' : categories.find(cat => cat.id === selectedCategory)?.name}</h2>
               <Link to="/products" className="text-orange-600 hover:underline font-medium">View All</Link>
             </div>
-            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts && filteredProducts.length > 0 ? (
-                filteredProducts.map((product) => (
+            {/* Mobile: Horizontal scroll */}
+            <div className="md:hidden overflow-x-auto flex gap-4 pb-2">
+              {products && products.length > 0 ? (
+                products.map((product) => (
+                  <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
+                    <ProductCard product={product} />
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-12 w-full">
+                  <p className="text-gray-500">No products found. Try a different search or category.</p>
+                </div>
+              )}
+            </div>
+            {/* Desktop: Grid */}
+            <div className="hidden md:grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+              {products && products.length > 0 ? (
+                products.map((product) => (
                   <ProductCard key={product._id} product={product} />
                 ))
               ) : (
@@ -726,6 +707,7 @@ const Home = () => {
           </section>
         )}
       </div>
+    </div>
   );
 };
 
