@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from './AuthContext';
+import { AuthContext } from './AuthContext';
 
 const CartContext = createContext();
 
@@ -15,7 +15,7 @@ export const useCart = () => {
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useContext(AuthContext);
   const [currency, setCurrency] = useState(() => localStorage.getItem('currency') || 'USD');
   const [rates, setRates] = useState({ USD: 1 });
 
