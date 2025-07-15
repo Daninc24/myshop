@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useToast } from './ToastContext';
 
 export const AuthContext = createContext();
 
@@ -14,6 +15,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { error: showError } = useToast();
 
   // Configure axios defaults
   let apiBase = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com/api';
@@ -32,6 +34,9 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
     } catch (error) {
       setUser(null);
+      if (error.response && error.response.status === 401 && window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        showError('You are not logged in. Please log in to access your account.');
+      }
     } finally {
       setLoading(false);
     }

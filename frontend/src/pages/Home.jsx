@@ -155,6 +155,7 @@ const Home = () => {
   const [adverts, setAdverts] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const searchInputRef = useRef();
+  const searchTimeoutRef = useRef();
   const [search, setSearch] = useState('');
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -259,19 +260,23 @@ const Home = () => {
     // Real-time events
     if (!socketRef.current) {
       const socketUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com';
-      socketRef.current = io(socketUrl, { 
+      const socket = io(socketUrl, { 
         transports: ['websocket'],
         withCredentials: true
       });
-      socketRef.current.on('event_created', (event) => {
+      socketRef.current = socket;
+      socket.on('connect_error', (err) => {
+        error('Real-time connection failed. Some live features may not work.');
+      });
+      socket.on('event_created', (event) => {
         fetchEvents();
         success(`New event: ${event.title}`);
       });
-      socketRef.current.on('event_updated', (event) => {
+      socket.on('event_updated', (event) => {
         fetchEvents();
         info(`Event updated: ${event.title}`);
       });
-      socketRef.current.on('event_deleted', (eventId) => {
+      socket.on('event_deleted', (eventId) => {
         fetchEvents();
         warning('An event was deleted');
       });
