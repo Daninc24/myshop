@@ -131,7 +131,9 @@ const Checkout = () => {
             </div>
             {/* PaymentForm component can be placed here */}
             <div className="mt-4">
-              <PaymentForm onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />
+              <Elements stripe={stripePromise}>
+                <PaymentForm onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />
+              </Elements>
             </div>
           </div>
         </div>
