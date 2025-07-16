@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCartIcon, UserIcon, Bars3Icon, XMarkIcon, Cog6ToothIcon, ChartBarIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
+import { ShoppingCartIcon, UserIcon, Bars3Icon, XMarkIcon, Cog6ToothIcon, ChartBarIcon, ChatBubbleLeftRightIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { io } from 'socket.io-client';
@@ -98,8 +98,9 @@ const Navbar = () => {
             )}
             {/* POS Link for allowed roles */}
             {user && posRoles.includes(user.role) && (
-              <Link to="/pos" className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors">
-                POS
+              <Link to="/pos" className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors flex items-center gap-2">
+                <CreditCardIcon className="h-6 w-6" />
+                <span>POS</span>
               </Link>
             )}
             {/* Admin Dashboard Link */}
@@ -190,8 +191,9 @@ const Navbar = () => {
             )}
             {/* POS Link for allowed roles (mobile) */}
             {user && posRoles.includes(user.role) && (
-              <Link to="/pos" className="block text-secondary hover:text-primary px-4 py-3 rounded-xl text-lg font-medium transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                POS
+              <Link to="/pos" className="block text-secondary hover:text-primary px-4 py-3 rounded-xl text-lg font-medium transition-colors flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
+                <CreditCardIcon className="h-6 w-6" />
+                <span>POS</span>
               </Link>
             )}
             {/* Admin Dashboard Link */}
