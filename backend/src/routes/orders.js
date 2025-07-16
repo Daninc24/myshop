@@ -6,14 +6,14 @@ const {
   getAllOrders, 
   updateOrderStatus 
 } = require('../controllers/orderController');
-const { auth, admin } = require('../middleware/auth');
+const { auth, orderProcessor } = require('../middleware/auth');
 
 // User routes
 router.post('/', auth, placeOrder);
 router.get('/', auth, getUserOrders);
 
-// Admin routes - using different patterns to avoid conflicts
-router.get('/all', auth, admin, getAllOrders);
-router.put('/:id/status', auth, admin, updateOrderStatus);
+// Order processing routes - admin, staff, cashier, manager
+router.get('/all', auth, orderProcessor, getAllOrders);
+router.put('/:id/status', auth, orderProcessor, updateOrderStatus);
 
 module.exports = router; 

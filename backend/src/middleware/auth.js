@@ -27,11 +27,12 @@ const auth = async (req, res, next) => {
   }
 };
 
-const admin = async (req, res, next) => {
+const orderProcessor = async (req, res, next) => {
   try {
     await auth(req, res, () => {
-      if (req.user.role !== 'admin') {
-        return res.status(403).json({ message: 'Access denied. Admin only.' });
+      const allowedRoles = ['admin', 'staff', 'cashier', 'manager'];
+      if (!allowedRoles.includes(req.user.role)) {
+        return res.status(403).json({ message: 'Access denied. Order processing allowed for admin, staff, cashier, or manager only.' });
       }
       next();
     });
@@ -40,4 +41,4 @@ const admin = async (req, res, next) => {
   }
 };
 
-module.exports = { auth, admin }; 
+module.exports = { auth, orderProcessor }; 
