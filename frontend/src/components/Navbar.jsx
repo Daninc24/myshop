@@ -56,6 +56,9 @@ const Navbar = () => {
 
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
 
+  // Roles allowed to see POS
+  const posRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
+
   return (
     <nav className="bg-surface shadow-strong sticky top-0 z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -91,6 +94,12 @@ const Navbar = () => {
               <Link to="/messages" className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors flex items-center gap-2">
                 <ChatBubbleLeftRightIcon className="h-6 w-6" />
                 <span>Messages</span>
+              </Link>
+            )}
+            {/* POS Link for allowed roles */}
+            {user && posRoles.includes(user.role) && (
+              <Link to="/pos" className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors">
+                POS
               </Link>
             )}
             {/* Admin Dashboard Link */}
@@ -177,6 +186,12 @@ const Navbar = () => {
               <Link to="/messages" className="block text-secondary hover:text-primary px-4 py-3 rounded-xl text-lg font-medium transition-colors flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
                 <ChatBubbleLeftRightIcon className="h-6 w-6" />
                 <span>Messages</span>
+              </Link>
+            )}
+            {/* POS Link for allowed roles (mobile) */}
+            {user && posRoles.includes(user.role) && (
+              <Link to="/pos" className="block text-secondary hover:text-primary px-4 py-3 rounded-xl text-lg font-medium transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                POS
               </Link>
             )}
             {/* Admin Dashboard Link */}
