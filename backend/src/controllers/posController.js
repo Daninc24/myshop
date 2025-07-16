@@ -6,6 +6,10 @@ const mongoose = require('mongoose');
 // Create a sale (checkout)
 exports.createSale = async (req, res) => {
   try {
+    const allowedRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
     const { items, total, paymentMethod } = req.body;
     const shopkeeper = req.user._id;
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -36,13 +40,15 @@ exports.createSale = async (req, res) => {
 // List sales (admin: all, shopkeeper: own)
 exports.listSales = async (req, res) => {
   try {
+    const allowedRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
     let sales;
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
     if (req.user.role === 'admin') {
       sales = await Sale.find().populate('shopkeeper', 'name email').sort({ createdAt: -1 });
-    } else if (req.user.role === 'shopkeeper') {
-      sales = await Sale.find({ shopkeeper: req.user._id }).populate('shopkeeper', 'name email').sort({ createdAt: -1 });
     } else {
-      return res.status(403).json({ message: 'Access denied' });
+      sales = await Sale.find({ shopkeeper: req.user._id }).populate('shopkeeper', 'name email').sort({ createdAt: -1 });
     }
     res.json({ sales });
   } catch (error) {
