@@ -8,7 +8,7 @@ const cloudinary = require('./utils/cloudinary');
 
 const isCloudinaryUrl = url => url && url.startsWith('https://res.cloudinary.com/');
 
-async function migrate() {
+async function migrateProductImagesToCloudinary() {
   await mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -68,10 +68,15 @@ async function migrate() {
     }
   }
   console.log(`Migration complete. Updated ${updatedCount} products.`);
-  mongoose.disconnect();
+  await mongoose.disconnect();
 }
 
-migrate().catch(err => {
-  console.error('Migration failed:', err);
-  process.exit(1);
-}); 
+// Only run if executed directly
+if (require.main === module) {
+  migrateProductImagesToCloudinary().catch(err => {
+    console.error('Migration failed:', err);
+    process.exit(1);
+  });
+}
+
+module.exports = migrateProductImagesToCloudinary; 
