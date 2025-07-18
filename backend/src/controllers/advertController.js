@@ -8,13 +8,9 @@ exports.createAdvert = async (req, res) => {
     console.log('req.file:', req.file);
     console.log('req.body:', req.body);
     const { title, message, product, startDate, endDate, active, template } = req.body;
-    let image = req.body.image;
+    let image = '';
     if (req.file) {
       image = req.file.path; // Cloudinary URL
-    } else if (image && image.startsWith('data:')) {
-      // If base64, upload to Cloudinary
-      const uploaded = await cloudinary.uploader.upload(image, { folder: 'adverts' });
-      image = uploaded.secure_url;
     }
     // Parse dates to ensure correct type
     const startDateParsed = startDate ? new Date(startDate) : undefined;
@@ -40,13 +36,9 @@ exports.updateAdvert = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, message, product, startDate, endDate, active, template } = req.body;
-    let image = req.body.image;
+    let image = '';
     if (req.file) {
       image = req.file.path; // Cloudinary URL
-    } else if (image && image.startsWith('data:')) {
-      // If base64, upload to Cloudinary
-      const uploaded = await cloudinary.uploader.upload(image, { folder: 'adverts' });
-      image = uploaded.secure_url;
     }
     // Parse dates to ensure correct type
     const startDateParsed = startDate ? new Date(startDate) : undefined;
