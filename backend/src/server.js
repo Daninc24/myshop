@@ -23,7 +23,7 @@ const { uploadMultiple } = require('./middleware/upload');
 dotenv.config();
 
 const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
+const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orders');
 const cartRoutes = require('./routes/cart');
 const paymentRoutes = require('./routes/payment');
