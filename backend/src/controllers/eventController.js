@@ -35,7 +35,7 @@ exports.createEvent = async (req, res) => {
   try {
     let imageUrl = req.body.image || '';
     if (req.file) {
-      imageUrl = req.file.path; // Cloudinary URL
+      imageUrl = req.file.path; // Cloudinary URL from multer-storage-cloudinary
     }
     const event = new Event({
       ...req.body,
@@ -54,7 +54,7 @@ exports.updateEvent = async (req, res) => {
   try {
     let imageUrl = req.body.image || '';
     if (req.file) {
-      imageUrl = req.file.path; // Cloudinary URL
+      imageUrl = req.file.path; // Cloudinary URL from multer-storage-cloudinary
     }
     const updateData = {
       ...req.body,
