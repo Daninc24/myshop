@@ -208,6 +208,16 @@ const getInventoryLogs = async (req, res) => {
   }
 };
 
+console.log("EXPORTING productController:", {
+  getAllProducts: typeof getAllProducts,
+  getProduct: typeof getProduct,
+  createProduct: typeof createProduct,
+  updateProduct: typeof updateProduct,
+  deleteProduct: typeof deleteProduct,
+  getBestSellingProducts: typeof getBestSellingProducts,
+  getInventoryLogs: typeof getInventoryLogs
+});
+
 module.exports = {
   getAllProducts,
   getProduct,
