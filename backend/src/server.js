@@ -19,7 +19,6 @@ const logger = require('./middleware/logger');
 const requestId = require('./middleware/requestId');
 const securityHeaders = require('./middleware/security');
 const { uploadMultiple } = require('./middleware/upload');
-const migrateProductImagesToCloudinary = require('./migrateProductImagesToCloudinary');
 
 dotenv.config();
 
@@ -352,16 +351,6 @@ passport.deserializeUser(async (id, done) => {
     });
 
     console.log('✅ MongoDB connected');
-
-    // Run migration if MIGRATE_IMAGES is set
-    if (process.env.MIGRATE_IMAGES === 'true') {
-      try {
-        await migrateProductImagesToCloudinary();
-        console.log('✅ Product image migration complete');
-      } catch (err) {
-        console.error('❌ Product image migration failed:', err);
-      }
-    }
 
     await loadCredentials(); // Load Stripe, PayPal, Mpesa, Google credentials
 
