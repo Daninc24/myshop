@@ -66,19 +66,13 @@ const getProduct = async (req, res) => {
 // Create product (admin only)
 const createProduct = async (req, res) => {
   try {
-    console.log('=== CREATE PRODUCT START ===');
-    console.log('Request body:', req.body);
-    console.log('Request files:', req.files);
-    
     // For multipart/form-data, fields come as strings in req.body
     const title = req.body.title;
     const description = req.body.description;
     const price = req.body.price;
     const category = req.body.category;
     const stock = req.body.stock;
-    
-    console.log('Extracted fields:', { title, description, price, category, stock });
-    
+
     // Validate required fields
     if (!title || !description || !price || !category || !stock) {
       return res.status(400).json({ 
@@ -92,39 +86,12 @@ const createProduct = async (req, res) => {
         }
       });
     }
-    
-    // Handle image uploads
+
+    // Handle image uploads (Cloudinary URLs)
     let imageUrls = [];
     if (req.files && req.files.length > 0) {
-      console.log('Processing uploaded files...');
-      
-      // Convert images to base64 to avoid CORS issues
-      const fs = require('fs');
-      imageUrls = req.files.map(file => {
-        const filePath = file.path;
-        const ext = file.originalname.split('.').pop().toLowerCase();
-        let mimeType = 'image/jpeg';
-        
-        if (ext === 'png') mimeType = 'image/png';
-        else if (ext === 'gif') mimeType = 'image/gif';
-        else if (ext === 'webp') mimeType = 'image/webp';
-        
-        try {
-          const imageBuffer = fs.readFileSync(filePath);
-          const base64Image = imageBuffer.toString('base64');
-          const dataUrl = `data:${mimeType};base64,${base64Image}`;
-          console.log('Generated base64 URL for:', file.originalname);
-          return dataUrl;
-        } catch (error) {
-          console.error('Error converting image to base64:', error);
-          // Fallback to regular URL
-          const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
-          const baseUrl = `${protocol}://${req.get('host')}`;
-          return `${baseUrl}/api/images/${file.filename}`;
-        }
-      });
+      imageUrls = req.files.map(file => file.path); // Cloudinary URL
     }
-    console.log('Final image URLs:', imageUrls);
 
     // Validate that we have at least one image
     if (imageUrls.length === 0) {
@@ -141,22 +108,10 @@ const createProduct = async (req, res) => {
       stock: parseInt(stock)
     };
 
-    console.log('Creating product with data:', productData);
-
     const product = new Product(productData);
-
-    console.log('Product object created, saving to database...');
     await product.save();
-    console.log('Product saved successfully:', product._id);
-    
     res.status(201).json(product);
-    console.log('=== CREATE PRODUCT SUCCESS ===');
   } catch (error) {
-    console.error('=== CREATE PRODUCT ERROR ===');
-    console.error('Error details:', error);
-    console.error('Error name:', error.name);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -165,14 +120,11 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { title, description, price, category, stock } = req.body;
-    
-    // Handle image uploads
+
+    // Handle image uploads (Cloudinary URLs)
     let imageUrls = [];
     if (req.files && req.files.length > 0) {
-      // Force HTTPS in production to prevent mixed content
-      const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
-      const baseUrl = `${protocol}://${req.get('host')}`;
-      imageUrls = req.files.map(file => `${baseUrl}/api/images/${file.filename}`);
+      imageUrls = req.files.map(file => file.path); // Cloudinary URL
     }
 
     const updateData = { 
@@ -215,7 +167,6 @@ const updateProduct = async (req, res) => {
 
     res.json(updatedProduct);
   } catch (error) {
-    console.error('Error updating product:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
