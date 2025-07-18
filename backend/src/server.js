@@ -125,34 +125,31 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-app.use(cors({
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5174',
+  'https://myshoppingcenters-8knn.vercel.app',
+  'https://myshoppingcenters.vercel.app',
+  'https://myshoppingcenter.vercel.app',
+  'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
+  'https://myshop-git-main-daniel-mailus-projects.vercel.app',
+  'https://myshop-hhfv.vercel.app',
+  'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app'
+];
+
+const corsOptions = {
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      process.env.FRONTEND_URL || 'http://localhost:5173',
-      'http://localhost:5174',
-      'https://myshoppingcenters-8knn.vercel.app',
-      'https://myshoppingcenters.vercel.app',
-      'https://myshoppingcenter.vercel.app',
-      'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
-      'https://myshop-git-main-daniel-mailus-projects.vercel.app',
-      'https://myshop-hhfv.vercel.app',
-      'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app'
-    ];
-    
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
-    // Check if origin is in allowed list or ends with .vercel.app
     if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
       return callback(null, true);
     }
-    
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cookie']
-}));
+};
+
+app.use(cors(corsOptions));
 
 // === ROUTES ===
 app.use('/api/auth', authRoutes);
@@ -180,13 +177,21 @@ app.options('/uploads/:filename', (req, res) => {
 });
 
 // Add CORS headers for /uploads before static middleware
+app.use('/uploads', cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}), express.static(path.join(__dirname, '../uploads')));
+
+// Fallback for old /uploads images: return 410 Gone if not found
 app.use('/uploads', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
-  next();
+  res.status(410).json({ error: 'This image is no longer available. Please re-upload.' });
 });
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/', (req, res) => {
   res.send('MyShopping Center API is running...');
