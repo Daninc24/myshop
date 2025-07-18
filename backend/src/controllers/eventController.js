@@ -33,33 +33,13 @@ exports.getEvent = async (req, res) => {
 // Create a new event
 exports.createEvent = async (req, res) => {
   try {
-    let imageUrl = '';
+    let imageUrl = req.body.image || '';
     if (req.file) {
-      // Convert image to base64 to avoid CORS issues
-      const fs = require('fs');
-      const ext = req.file.originalname.split('.').pop().toLowerCase();
-      let mimeType = 'image/jpeg';
-      
-      if (ext === 'png') mimeType = 'image/png';
-      else if (ext === 'gif') mimeType = 'image/gif';
-      else if (ext === 'webp') mimeType = 'image/webp';
-      
-      try {
-        const imageBuffer = fs.readFileSync(req.file.path);
-        const base64Image = imageBuffer.toString('base64');
-        imageUrl = `data:${mimeType};base64,${base64Image}`;
-        console.log('Generated base64 URL for event image:', req.file.originalname);
-      } catch (error) {
-        console.error('Error converting event image to base64:', error);
-        // Fallback to regular URL
-        const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
-        const baseUrl = `${protocol}://${req.get('host')}`;
-        imageUrl = `${baseUrl}/api/images/${req.file.filename}`;
-      }
+      imageUrl = req.file.path; // Cloudinary URL
     }
     const event = new Event({
       ...req.body,
-      image: imageUrl || req.body.image
+      image: imageUrl
     });
     await event.save();
     if (io) io.emit('event_created', event);
@@ -72,29 +52,9 @@ exports.createEvent = async (req, res) => {
 // Update an event
 exports.updateEvent = async (req, res) => {
   try {
-    let imageUrl = '';
+    let imageUrl = req.body.image || '';
     if (req.file) {
-      // Convert image to base64 to avoid CORS issues
-      const fs = require('fs');
-      const ext = req.file.originalname.split('.').pop().toLowerCase();
-      let mimeType = 'image/jpeg';
-      
-      if (ext === 'png') mimeType = 'image/png';
-      else if (ext === 'gif') mimeType = 'image/gif';
-      else if (ext === 'webp') mimeType = 'image/webp';
-      
-      try {
-        const imageBuffer = fs.readFileSync(req.file.path);
-        const base64Image = imageBuffer.toString('base64');
-        imageUrl = `data:${mimeType};base64,${base64Image}`;
-        console.log('Generated base64 URL for updated event image:', req.file.originalname);
-      } catch (error) {
-        console.error('Error converting updated event image to base64:', error);
-        // Fallback to regular URL
-        const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
-        const baseUrl = `${protocol}://${req.get('host')}`;
-        imageUrl = `${baseUrl}/api/images/${req.file.filename}`;
-      }
+      imageUrl = req.file.path; // Cloudinary URL
     }
     const updateData = {
       ...req.body,

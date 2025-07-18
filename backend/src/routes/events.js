@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const eventController = require('../controllers/eventController');
 const { auth, admin } = require('../middleware/auth');
-const multer = require('multer');
+const { upload } = require('../middleware/upload');
 const path = require('path');
 
 const storage = multer.diskStorage({

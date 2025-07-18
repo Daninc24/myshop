@@ -133,7 +133,7 @@ exports.uploadProfileImage = [
       if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
       const user = await User.findById(req.user._id);
       if (!user) return res.status(404).json({ message: 'User not found' });
-      user.profileImage = `/uploads/profiles/${req.file.filename}`;
+      user.profileImage = req.file.path; // Cloudinary URL
       await user.save();
       res.json({ profileImage: user.profileImage });
     } catch (error) {
