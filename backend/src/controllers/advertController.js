@@ -1,5 +1,6 @@
 const Advert = require('../models/Advert');
 const Product = require('../models/Product');
+const cloudinary = require('../utils/cloudinary'); // Add this import at the top
 
 // Admin: Create advert
 exports.createAdvert = async (req, res) => {
@@ -10,6 +11,10 @@ exports.createAdvert = async (req, res) => {
     let image = req.body.image;
     if (req.file) {
       image = req.file.path; // Cloudinary URL
+    } else if (image && image.startsWith('data:')) {
+      // If base64, upload to Cloudinary
+      const uploaded = await cloudinary.uploader.upload(image, { folder: 'adverts' });
+      image = uploaded.secure_url;
     }
     // Parse dates to ensure correct type
     const startDateParsed = startDate ? new Date(startDate) : undefined;
@@ -38,6 +43,10 @@ exports.updateAdvert = async (req, res) => {
     let image = req.body.image;
     if (req.file) {
       image = req.file.path; // Cloudinary URL
+    } else if (image && image.startsWith('data:')) {
+      // If base64, upload to Cloudinary
+      const uploaded = await cloudinary.uploader.upload(image, { folder: 'adverts' });
+      image = uploaded.secure_url;
     }
     // Parse dates to ensure correct type
     const startDateParsed = startDate ? new Date(startDate) : undefined;

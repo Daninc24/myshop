@@ -417,7 +417,6 @@ const POS = () => {
     }
     setAddProductLoading(true);
     try {
-      console.log('Submitting product with images:', addProductImages.length);
       const submitData = new FormData();
       submitData.append('title', addProductForm.title);
       submitData.append('description', addProductForm.description);
@@ -430,7 +429,7 @@ const POS = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
-      console.log('Product created successfully:', response.data);
+      console.log('Product created successfully:', response.data._id || 'No ID');
       setShowAddProduct(false);
       setAddProductForm({ title: '', description: '', price: '', category: '', stock: '' });
       setAddProductImages([]);
@@ -439,21 +438,17 @@ const POS = () => {
       
       // Refresh products
       const productsResponse = await axios.get('/products');
-      console.log('Refreshed products:', productsResponse.data);
+      console.log('Refreshed products count:', productsResponse.data.products?.length || productsResponse.data.length || 0);
       
       // Debug image URLs
       const products = productsResponse.data.products || productsResponse.data || [];
       products.forEach((product, index) => {
-        console.log(`Product ${index + 1}:`, {
-          title: product.title,
-          images: product.images,
-          imageUrls: product.images?.map(img => img)
-        });
+        console.log(`Product ${index + 1}`);
         
         // Test each image URL
         if (product.images && product.images.length > 0) {
           product.images.forEach((imgUrl, imgIndex) => {
-            console.log(`Testing image ${imgIndex + 1} for product ${index + 1}:`, imgUrl);
+            console.log(`Testing image ${imgIndex + 1} for product ${index + 1}`);
             // Create a test image element to see if it loads
             const testImg = new Image();
             testImg.onload = () => console.log(`✅ Image loaded successfully: ${imgUrl}`);
