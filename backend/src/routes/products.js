@@ -46,7 +46,7 @@ router.get('/best-selling', getBestSellingProducts);
 // Admin/manager: Get inventory logs
 router.get('/logs/:productId?', auth, admin, getInventoryLogs);
 
-router.get('/:id', getProduct);
+// Move /categories above /:id to prevent route conflict
 router.get('/categories', async (req, res) => {
   try {
     const categories = await Product.distinct('category');
@@ -56,9 +56,6 @@ router.get('/categories', async (req, res) => {
   }
 });
 
-// Admin only routes
-router.post('/', debugMiddleware, uploadMultiple.array('images', 5), debugAfterMulter, createProduct);
-router.put('/:id', auth, admin, uploadMultiple.array('images', 5), updateProduct);
-router.delete('/:id', auth, admin, deleteProduct);
+router.get('/:id', getProduct);
 
 module.exports = router; 
