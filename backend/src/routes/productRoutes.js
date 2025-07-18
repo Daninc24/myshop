@@ -8,6 +8,7 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
+  getBestSellingProducts,
   getInventoryLogs
 } = require('../controllers/productController');
 
@@ -34,6 +35,7 @@ const debugAfterMulter = (req, res, next) => {
 
 // Public routes
 router.get('/', getAllProducts);
+router.get('/best-selling', getBestSellingProducts);
 
 // Test route to verify routing is working (must come before /:id)
 router.get('/test', (req, res) => {
@@ -47,8 +49,20 @@ router.get('/logs/:productId?', auth, admin, getInventoryLogs);
 router.get('/:id', getProduct);
 
 // Admin routes
-router.post('/', debugMiddleware, uploadMultiple.array('images', 5), debugAfterMulter, createProduct);
-router.put('/:id', auth, admin, uploadMultiple.array('images', 5), updateProduct);
+router.post(
+  '/',
+  debugMiddleware,
+  uploadMultiple.array('images', 5),
+  debugAfterMulter,
+  createProduct
+);
+router.put(
+  '/:id',
+  auth,
+  admin,
+  uploadMultiple.array('images', 5),
+  updateProduct
+);
 router.delete('/:id', auth, admin, deleteProduct);
 
-module.exports = router; 
+module.exports = router;
