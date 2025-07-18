@@ -34,15 +34,16 @@ const debugAfterMulter = (req, res, next) => {
   next();
 };
 
+// Public routes
+router.get('/', getAllProducts);
+router.get('/best-selling', getBestSellingProducts);
+
 // Test route to verify routing is working (must come before /:id)
 router.get('/test', (req, res) => {
   console.log('=== TEST ROUTE HIT ===');
   res.json({ message: 'Test route working' });
 });
 
-// Public routes
-router.get('/', getAllProducts);
-router.get('/best-selling', getBestSellingProducts);
 // Admin/manager: Get inventory logs
 router.get('/logs/:productId?', auth, admin, getInventoryLogs);
 
@@ -58,4 +59,27 @@ router.get('/categories', async (req, res) => {
 
 router.get('/:id', getProduct);
 
-module.exports = router; 
+// Admin routes
+router.post(
+  '/',
+  auth,
+  admin,
+  debugMiddleware,
+  uploadMultiple.array('images', 5),
+  debugAfterMulter,
+  createProduct
+);
+
+router.put(
+  '/:id',
+  auth,
+  admin,
+  debugMiddleware,
+  uploadMultiple.array('images', 5),
+  debugAfterMulter,
+  updateProduct
+);
+
+router.delete('/:id', auth, admin, deleteProduct);
+
+module.exports = router;
