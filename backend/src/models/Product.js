@@ -4,7 +4,8 @@ const productSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, 'Product title is required'],
-    trim: true
+    trim: true,
+    index: true
   },
   description: {
     type: String,
@@ -13,7 +14,8 @@ const productSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: [true, 'Product price is required'],
-    min: 0
+    min: 0,
+    index: true
   },
   images: {
     type: [String],
@@ -22,7 +24,8 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Product category is required'],
-    trim: true
+    trim: true,
+    index: true
   },
   stock: {
     type: Number,
@@ -33,10 +36,11 @@ const productSchema = new mongoose.Schema({
   salesCount: {
     type: Number,
     default: 0,
-    min: 0
+    min: 0,
+    index: true
   }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Product', productSchema); 
+module.exports = mongoose.model('Product', productSchema);

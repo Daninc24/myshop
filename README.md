@@ -45,6 +45,7 @@ the project is hosted on vercel for frontend and render for the backendgit
 - npm or yarn
 - MongoDB (local or cloud)
 - [Stripe account](https://dashboard.stripe.com/register) for payments
+- [Cloudinary account](https://cloudinary.com/users/register/free) for image uploads
 
 ### 1. Clone the repository
 
@@ -65,11 +66,26 @@ npm start              # or: npm run dev
 
 **.env Example:**
 ```
+# Database
 MONGO_URI=your_mongodb_uri
+
+# Authentication
 JWT_SECRET=your_jwt_secret
-STRIPE_SECRET_KEY=your_stripe_secret
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Payment
+STRIPE_SECRET_KEY=your_stripe_secret
+STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+
+# Cloudinary (for image uploads)
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+# Server
+PORT=5000
+FRONTEND_URL=http://localhost:5173
 ```
 
 ### 3. Setup the Frontend
@@ -81,6 +97,24 @@ npm run dev
 ```
 
 The frontend will be available at [http://localhost:5173](http://localhost:5173) (default Vite port).
+
+### 4. Setup Cloudinary (Image Uploads)
+
+1. Create a free account at [Cloudinary](https://cloudinary.com/users/register/free)
+2. Verify your email address (this is crucial for API access)
+3. Go to your [Cloudinary Console Dashboard](https://cloudinary.com/console)
+4. Copy your **Cloud Name**, **API Key**, and **API Secret** from the dashboard
+5. Add these credentials to your `.env` file:
+   ```
+   CLOUDINARY_CLOUD_NAME=your_cloud_name_here
+   CLOUDINARY_API_KEY=your_api_key_here
+   CLOUDINARY_API_SECRET=your_api_secret_here
+   ```
+
+**Important Notes:**
+- Make sure your Cloudinary account is verified via email
+- The cloud name should match exactly what's shown in your dashboard
+- Keep your API secret secure and never commit it to version control
 
 ---
 

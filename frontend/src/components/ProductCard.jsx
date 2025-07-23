@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
@@ -34,6 +34,7 @@ const ProductCard = ({ product, small }) => {
       <img
         src={product.images && product.images[0]}
         alt={product.title}
+        loading="lazy"
         className={`rounded-2xl object-cover object-center mb-4 ${small ? 'w-16 h-16' : 'w-24 h-24'} group-hover:shadow-lg group-hover:ring-2 group-hover:ring-orange-400 transition-all`}
       />
       <h3 className="text-lg font-heading font-bold text-secondary mb-1 text-center line-clamp-2 group-hover:text-orange-600 transition-colors">{product.title}</h3>
@@ -43,4 +44,8 @@ const ProductCard = ({ product, small }) => {
   );
 };
 
-export default ProductCard; 
+// Memoize the component to prevent unnecessary re-renders
+export default memo(ProductCard, (prevProps, nextProps) => {
+  // Only re-render if product ID changes or small prop changes
+  return prevProps.product._id === nextProps.product._id && prevProps.small === nextProps.small;
+});

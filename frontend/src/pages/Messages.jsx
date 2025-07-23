@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { io } from 'socket.io-client';
 import { UserIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
+
+// Socket.io connection singleton to prevent multiple connections
+let socketInstance = null;
 
 axios.defaults.withCredentials = true;
 
@@ -78,17 +81,31 @@ const Messages = () => {
     }
   }, [messagedUsers, user, withUser]);
 
-  const fetchMessages = () => {
+  // Memoized fetch messages function with caching
+  const fetchMessages = useCallback(() => {
     if (!isValidUserId(withUser)) {
       setMessages([]);
       return;
     }
+    
     setLoading(true);
+    
     axios.get(`/users/messages?with=${withUser}`)
-      .then(res => setMessages(res.data.messages))
+      .then(res => {
+        // Only update if we have new messages
+        setMessages(prevMessages => {
+          const newMessages = res.data.messages;
+          if (prevMessages.length === newMessages.length && 
+              prevMessages.length > 0 && 
+              prevMessages[prevMessages.length - 1]._id === newMessages[newMessages.length - 1]._id) {
+            return prevMessages; // No change needed
+          }
+          return newMessages;
+        });
+      })
       .catch(() => setMessages([]))
       .finally(() => setLoading(false));
-  };
+  }, [withUser]);
 
   useEffect(() => {
     if (!isValidUserId(withUser)) {
@@ -98,89 +115,190 @@ const Messages = () => {
     fetchMessages();
   }, [withUser]);
 
+  // Reduced polling frequency when socket is connected
   useEffect(() => {
     if (!isValidUserId(withUser)) return;
-    const interval = setInterval(fetchMessages, 5000);
+    
+    // If socket is connected, poll less frequently as a fallback
+    const interval = setInterval(fetchMessages, 
+      socketRef.current && socketRef.current.connected ? 15000 : 5000);
+    
     return () => clearInterval(interval);
-  }, [withUser]);
+  }, [withUser, fetchMessages]);
 
-  useEffect(() => {
-    if (!user) return;
-    if (socketRef.current) return;
-    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com', {
-      withCredentials: true,
-      transports: ['websocket'],
-    });
-    socketRef.current = socket;
-    socket.on('new_message', (msg) => {
-      if (
-        (msg.sender === user._id && msg.receiver === withUser) ||
-        (msg.sender === withUser && msg.receiver === user._id)
-      ) {
-        setMessages(prev => [...prev, msg]);
-      }
-    });
-    socket.on('typing', ({ from, to }) => {
-      if (to === user._id && from === withUser) setOtherTyping(true);
-    });
-    socket.on('stop_typing', ({ from, to }) => {
-      if (to === user._id && from === withUser) setOtherTyping(false);
-    });
-    socket.on('online_users', (users) => {
-      setOnlineUsers(users);
-    });
-    socket.on('messages_read', ({ from, to }) => {
-      if (from === withUser && to === user._id) {
-        setMessages(prev =>
-          prev.map(m =>
-            m.sender === user._id && m.receiver === withUser ? { ...m, read: true } : m
-          )
-        );
-      }
-    });
-    socket.emit('get_online_users');
-    return () => {
-      socket.disconnect();
-      socketRef.current = null;
-    };
+  // Memoize socket event handlers to prevent unnecessary re-renders
+  const handleNewMessage = useCallback((msg) => {
+    if (!user || !withUser) return;
+    if (
+      (msg.sender === user._id && msg.receiver === withUser) ||
+      (msg.sender === withUser && msg.receiver === user._id)
+    ) {
+      setMessages(prev => {
+        // Prevent duplicate messages
+        if (prev.some(m => m._id === msg._id)) return prev;
+        return [...prev, msg];
+      });
+    }
   }, [user, withUser]);
 
-  const handleTyping = (e) => {
+  const handleTypingEvent = useCallback(({ from, to }) => {
+    if (to === user?._id && from === withUser) setOtherTyping(true);
+  }, [user, withUser]);
+
+  const handleStopTypingEvent = useCallback(({ from, to }) => {
+    if (to === user?._id && from === withUser) setOtherTyping(false);
+  }, [user, withUser]);
+
+  const handleOnlineUsers = useCallback((users) => {
+    setOnlineUsers(users);
+  }, []);
+
+  const handleMessagesRead = useCallback(({ from, to }) => {
+    if (!user || !withUser) return;
+    if (from === withUser && to === user._id) {
+      setMessages(prev =>
+        prev.map(m =>
+          m.sender === user._id && m.receiver === withUser ? { ...m, read: true } : m
+        )
+      );
+    }
+  }, [user, withUser]);
+
+  // Socket connection with reconnection logic
+  useEffect(() => {
+    if (!user) return;
+    
+    // Use singleton pattern for socket connection
+    if (!socketInstance) {
+      socketInstance = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com', {
+        withCredentials: true,
+        transports: ['websocket'],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000,
+      });
+    }
+    
+    socketRef.current = socketInstance;
+    
+    // Register event handlers
+    socketInstance.on('new_message', handleNewMessage);
+    socketInstance.on('typing', handleTypingEvent);
+    socketInstance.on('stop_typing', handleStopTypingEvent);
+    socketInstance.on('online_users', handleOnlineUsers);
+    socketInstance.on('messages_read', handleMessagesRead);
+    
+    // Connection status events
+    socketInstance.on('connect', () => {
+
+      socketInstance.emit('get_online_users');
+    });
+    
+    socketInstance.on('disconnect', () => {
+
+    });
+    
+    socketInstance.on('connect_error', (err) => {
+      console.error('Connection error:', err.message);
+    });
+    
+    // Request online users when component mounts
+    if (socketInstance.connected) {
+      socketInstance.emit('get_online_users');
+    }
+    
+    return () => {
+      // Remove event listeners but don't disconnect
+      socketInstance.off('new_message', handleNewMessage);
+      socketInstance.off('typing', handleTypingEvent);
+      socketInstance.off('stop_typing', handleStopTypingEvent);
+      socketInstance.off('online_users', handleOnlineUsers);
+      socketInstance.off('messages_read', handleMessagesRead);
+    };
+  }, [user, withUser, handleNewMessage, handleTypingEvent, handleStopTypingEvent, handleOnlineUsers, handleMessagesRead]);
+
+  // Debounced typing handler with useCallback for better performance
+  const handleTyping = useCallback((e) => {
     setMessage(e.target.value);
     if (!socketRef.current || !withUser) return;
+    
+    // Only emit typing event if not already typing
     if (!isTyping) {
       setIsTyping(true);
       socketRef.current.emit('typing', { to: withUser });
     }
+    
+    // Clear existing timeout and set a new one
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
-      socketRef.current.emit('stop_typing', { to: withUser });
+      if (socketRef.current && socketRef.current.connected) {
+        socketRef.current.emit('stop_typing', { to: withUser });
+      }
     }, 1200);
-  };
+  }, [withUser, isTyping]);
 
-  const handleSend = async (e) => {
+  // Memoized send handler with error handling and optimistic updates
+  const handleSend = useCallback(async (e) => {
     e.preventDefault();
     if (!message.trim()) return;
+    
+    const trimmedMessage = message.trim();
+    const receiver = withUser;
+    const tempId = Date.now().toString();
+    
+    // Create temporary message for optimistic update
+    const tempMessage = {
+      _id: tempId,
+      sender: user._id,
+      receiver,
+      content: trimmedMessage,
+      timestamp: new Date().toISOString(),
+      read: false,
+      isOptimistic: true
+    };
+    
+    // Optimistically update UI
+    setMessages(prev => [...prev, tempMessage]);
+    setMessage('');
+    
     try {
-      const receiver = withUser;
+      // Send via socket if connected
       if (socketRef.current && socketRef.current.connected) {
-        socketRef.current.emit('send_message', { receiver, content: message });
+        socketRef.current.emit('send_message', { receiver, content: trimmedMessage });
       }
-      const res = await axios.post('/users/messages', { receiver, content: message });
-      setMessages([...messages, res.data.data]);
-      setMessage('');
+      
+      // Also send via HTTP for persistence
+      const res = await axios.post('/users/messages', { receiver, content: trimmedMessage });
+      
+      // Replace optimistic message with real one
+      setMessages(prev => prev.map(msg => 
+        msg._id === tempId ? res.data.data : msg
+      ));
+      
       success('Message sent');
-    } catch {
+    } catch (err) {
+      // Mark optimistic message as failed
+      setMessages(prev => prev.map(msg => 
+        msg._id === tempId ? { ...msg, failed: true } : msg
+      ));
       error('Failed to send message');
     }
-  };
+  }, [message, withUser, user, success, error]);
 
-  // Sidebar: conversations (admin: all users, user: just admin)
-  const sidebarConversations = user?.role === 'admin' ? messagedUsers : users.filter(u => u._id === adminId);
-  const currentContact = user?.role === 'admin'
-    ? messagedUsers.find(u => u._id === withUser)
-    : users.find(u => u._id === adminId);
+  // Memoized derived state to prevent unnecessary recalculations
+  const sidebarConversations = useMemo(() => 
+    user?.role === 'admin' ? messagedUsers : users.filter(u => u._id === adminId),
+  [user, messagedUsers, users, adminId]);
+  
+  const currentContact = useMemo(() => 
+    user?.role === 'admin'
+      ? messagedUsers.find(u => u._id === withUser)
+      : users.find(u => u._id === adminId),
+  [user, messagedUsers, users, withUser, adminId]);
 
   return (
     <div className="flex flex-col md:flex-row max-w-5xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden min-h-[70vh] my-8 border border-orange-100">

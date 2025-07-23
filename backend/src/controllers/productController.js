@@ -5,7 +5,7 @@ const InventoryLog = require('../models/InventoryLog');
 // Get all products
 const getAllProducts = async (req, res) => {
   try {
-    const { search, category } = req.query;
+    const { search, category, page = 1, limit = 12, sort = 'createdAt', order = 'desc' } = req.query;
     let query = {};
 
     if (search) {
@@ -18,21 +18,46 @@ const getAllProducts = async (req, res) => {
       query.category = category;
     }
 
-    const products = await Product.find(query).sort({ createdAt: -1 });
+    // Calculate pagination values
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+    
+    // Prepare sort options
+    const sortOptions = {};
+    sortOptions[sort] = order === 'desc' ? -1 : 1;
+    
+    // Get total count for pagination info
+    const total = await Product.countDocuments(query);
+    
+    // Execute query with pagination and sorting
+    const products = await Product.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limitNum)
+      .lean(); // Use lean() for better performance when you don't need Mongoose document methods
     
     // Migrate old products that have 'image' field instead of 'images'
     const migratedProducts = products.map(product => {
       if (product.image && !product.images) {
-        // This is an old product with single image
         return {
-          ...product.toObject(),
+          ...product,
           images: [product.image]
         };
       }
       return product;
     });
     
-    res.json(migratedProducts);
+    // Return pagination metadata along with products
+    res.json({
+      products: migratedProducts,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        pages: Math.ceil(total / limitNum)
+      }
+    });
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -42,7 +67,7 @@ const getAllProducts = async (req, res) => {
 // Get single product
 const getProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).lean();
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
@@ -51,7 +76,7 @@ const getProduct = async (req, res) => {
     let responseProduct = product;
     if (product.image && !product.images) {
       responseProduct = {
-        ...product.toObject(),
+        ...product,
         images: [product.image]
       };
     }
@@ -188,8 +213,26 @@ const deleteProduct = async (req, res) => {
 
 const getBestSellingProducts = async (req, res) => {
   try {
-    const products = await Product.find().sort({ salesCount: -1 }).limit(8);
-    res.json(products);
+    const { limit = 8 } = req.query;
+    const limitNum = parseInt(limit);
+    
+    const products = await Product.find()
+      .sort({ salesCount: -1 })
+      .limit(limitNum)
+      .lean();
+      
+    // Migrate old products that have 'image' field instead of 'images'
+    const migratedProducts = products.map(product => {
+      if (product.image && !product.images) {
+        return {
+          ...product,
+          images: [product.image]
+        };
+      }
+      return product;
+    });
+    
+    res.json(migratedProducts);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -208,16 +251,6 @@ const getInventoryLogs = async (req, res) => {
   }
 };
 
-console.log("EXPORTING productController:", {
-  getAllProducts: typeof getAllProducts,
-  getProduct: typeof getProduct,
-  createProduct: typeof createProduct,
-  updateProduct: typeof updateProduct,
-  deleteProduct: typeof deleteProduct,
-  getBestSellingProducts: typeof getBestSellingProducts,
-  getInventoryLogs: typeof getInventoryLogs
-});
-
 module.exports = {
   getAllProducts,
   getProduct,
@@ -226,4 +259,4 @@ module.exports = {
   deleteProduct,
   getBestSellingProducts,
   getInventoryLogs
-}; 
+};

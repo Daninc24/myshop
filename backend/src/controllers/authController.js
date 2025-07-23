@@ -33,10 +33,10 @@ const loginSchema = Joi.object({
 // Register user
 const register = async (req, res) => {
   try {
-    console.log('Register payload:', req.body); // Debug: log registration payload
+
     const { error } = registerSchema.validate(req.body);
     if (error) {
-      console.log('Joi validation error:', error.details[0].message); // Debug: log Joi error
+
       return res.status(400).json({ message: error.details[0].message });
     }
 
@@ -162,4 +162,4 @@ module.exports = {
   login,
   getProfile,
   logout
-}; 
+};

@@ -201,7 +201,7 @@ const Home = () => {
   const fetchNewArrivals = async () => {
     try {
       const response = await axios.get('/products');
-      console.log('New Arrivals count:', (response.data || []).length);
+      
       setNewArrivals((response.data || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4));
     } catch (err) {
       console.error('Error fetching new arrivals:', err);
@@ -212,9 +212,12 @@ const Home = () => {
   // Fetch best selling
   const fetchBestSelling = async () => {
     try {
-      const response = await axios.get('/products/best-selling');
-      console.log('Best Selling count:', (response.data || []).length);
-      setBestSelling(response.data || []);
+      // Use the optimized endpoint with pagination, limit to 8 products
+      const response = await axios.get('/products/best-selling', {
+        params: { limit: 8 }
+      });
+      
+      setBestSelling(response.data.products || []);
     } catch (err) {
       console.error('Error fetching best selling:', err);
       setBestSelling([]);
@@ -818,4 +821,4 @@ const Home = () => {
   );
 };
 
-export default Home; 
+export default Home;

@@ -102,7 +102,7 @@ const POS = () => {
       axios.get('/users')
         .then(res => setAllUsers(res.data.users || []))
         .catch((error) => {
-          console.log('Users fetch error:', error.response?.status);
+    
           setAllUsers([]);
         })
         .finally(() => setUsersLoading(false));
@@ -114,7 +114,7 @@ const POS = () => {
     axios.get('/products')
       .then(res => setProducts(res.data.products || res.data || []))
       .catch((error) => {
-        console.log('Products fetch error:', error.response?.status);
+  
         setProducts([]);
       });
   }, []);
@@ -429,7 +429,7 @@ const POS = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
-      console.log('Product created successfully:', response.data._id || 'No ID');
+
       setShowAddProduct(false);
       setAddProductForm({ title: '', description: '', price: '', category: '', stock: '' });
       setAddProductImages([]);
@@ -438,21 +438,21 @@ const POS = () => {
       
       // Refresh products
       const productsResponse = await axios.get('/products');
-      console.log('Refreshed products count:', productsResponse.data.products?.length || productsResponse.data.length || 0);
+      
       
       // Debug image URLs
       const products = productsResponse.data.products || productsResponse.data || [];
       products.forEach((product, index) => {
-        console.log(`Product ${index + 1}`);
+
         
         // Test each image URL
         if (product.images && product.images.length > 0) {
           product.images.forEach((imgUrl, imgIndex) => {
-            console.log(`Testing image ${imgIndex + 1} for product ${index + 1}`);
+  
             // Create a test image element to see if it loads
             const testImg = new Image();
-            testImg.onload = () => console.log(`✅ Image loaded successfully: ${imgUrl}`);
-            testImg.onerror = () => console.log(`❌ Image failed to load: ${imgUrl}`);
+            testImg.onload = () => {};
+          testImg.onerror = () => {};
             testImg.src = imgUrl;
           });
         }
@@ -1066,4 +1066,4 @@ const POS = () => {
   );
 };
 
-export default POS; 
+export default POS;

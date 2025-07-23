@@ -18,15 +18,21 @@ import { Helmet } from 'react-helmet';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-  const [sortBy, setSortBy] = useState('name');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [viewMode, setViewMode] = useState('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    pages: 0
+  });
   const { showToast } = useToast();
   const categories = [
     { id: 'all', name: 'All Categories' },
@@ -73,16 +79,67 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
-
-  useEffect(() => {
-    filterAndSortProducts();
-  }, [products, searchTerm, selectedCategory, priceRange, sortBy]);
+  }, [searchTerm, selectedCategory, priceRange, sortBy, sortOrder, pagination.page, pagination.limit]);
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get('/products');
-      setProducts(response.data || []);
+      // Convert UI sort options to API parameters
+      let sort = 'createdAt';
+      let order = 'desc';
+      
+      switch (sortBy) {
+        case 'name':
+          sort = 'title';
+          order = 'asc';
+          break;
+        case 'name-desc':
+          sort = 'title';
+          order = 'desc';
+          break;
+        case 'price':
+          sort = 'price';
+          order = 'asc';
+          break;
+        case 'price-desc':
+          sort = 'price';
+          order = 'desc';
+          break;
+        case 'newest':
+          sort = 'createdAt';
+          order = 'desc';
+          break;
+        default:
+          sort = 'createdAt';
+          order = 'desc';
+      }
+      
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append('page', pagination.page);
+      params.append('limit', pagination.limit);
+      params.append('sort', sort);
+      params.append('order', order);
+      
+      if (searchTerm) {
+        params.append('search', searchTerm);
+      }
+      
+      if (selectedCategory !== 'all') {
+        params.append('category', selectedCategory);
+      }
+      
+      // Price range filters would need to be implemented on the backend
+      // For now, we'll filter them client-side after fetching
+      
+      const response = await axios.get(`/products?${params.toString()}`);
+      setProducts(response.data.products || []);
+      setPagination(response.data.pagination || {
+        page: 1,
+        limit: 12,
+        total: 0,
+        pages: 0
+      });
     } catch (error) {
       showToast('Error fetching products', 'error');
       setProducts([]);
@@ -90,57 +147,34 @@ const Products = () => {
       setLoading(false);
     }
   };
-
-  const filterAndSortProducts = () => {
-    let filtered = [...(products || [])];
-
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(product =>
-        product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Category filter
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(product => product.category === selectedCategory);
-    }
-
-    // Price range filter
+  
+  // Client-side price filtering (until backend supports it)
+  const getFilteredProducts = () => {
+    let filtered = [...products];
+    
+    // Price range filter (client-side for now)
     if (priceRange.min !== '') {
       filtered = filtered.filter(product => product.price >= parseFloat(priceRange.min));
     }
     if (priceRange.max !== '') {
       filtered = filtered.filter(product => product.price <= parseFloat(priceRange.max));
     }
-
-    // Sort products
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return a.title.localeCompare(b.title);
-        case 'name-desc':
-          return b.title.localeCompare(a.title);
-        case 'price':
-          return a.price - b.price;
-        case 'price-desc':
-          return b.price - a.price;
-        case 'newest':
-          return new Date(b.createdAt) - new Date(a.createdAt);
-        default:
-          return 0;
-      }
-    });
-
-    setFilteredProducts(filtered);
+    
+    return filtered;
   };
 
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedCategory('all');
     setPriceRange({ min: '', max: '' });
-    setSortBy('name');
+    setSortBy('createdAt');
+    setSortOrder('desc');
+    setPagination(prev => ({ ...prev, page: 1 }));
+  };
+  
+  const handlePageChange = (newPage) => {
+    setPagination(prev => ({ ...prev, page: newPage }));
+    window.scrollTo(0, 0);
   };
 
   if (loading) return <LoadingSpinner />;
@@ -234,8 +268,8 @@ const Products = () => {
 
           {/* Products Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 animate-fade-in">
-            {filteredProducts && filteredProducts.length > 0 ? (
-              filteredProducts.map(product => (
+            {getFilteredProducts().length > 0 ? (
+              getFilteredProducts().map(product => (
                 <ProductCard key={product._id} product={product} altText={product.title} />
               ))
             ) : (
@@ -244,10 +278,60 @@ const Products = () => {
               </div>
             )}
           </div>
+          
+          {/* Pagination Controls */}
+          {pagination.pages > 1 && (
+            <div className="flex justify-center mt-12 gap-2">
+              <button 
+                onClick={() => handlePageChange(Math.max(1, pagination.page - 1))}
+                disabled={pagination.page === 1}
+                className={`px-4 py-2 rounded-md ${pagination.page === 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-primary text-white hover:bg-primary-dark'}`}
+              >
+                Previous
+              </button>
+              
+              {/* Page Numbers */}
+              <div className="flex gap-2">
+                {[...Array(pagination.pages).keys()].map(i => {
+                  const pageNum = i + 1;
+                  // Only show a window of pages around current page
+                  if (
+                    pageNum === 1 || 
+                    pageNum === pagination.pages || 
+                    (pageNum >= pagination.page - 2 && pageNum <= pagination.page + 2)
+                  ) {
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`w-10 h-10 rounded-md ${pageNum === pagination.page ? 'bg-primary text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  } else if (
+                    pageNum === pagination.page - 3 || 
+                    pageNum === pagination.page + 3
+                  ) {
+                    return <span key={pageNum} className="self-center">...</span>;
+                  }
+                  return null;
+                })}
+              </div>
+              
+              <button 
+                onClick={() => handlePageChange(Math.min(pagination.pages, pagination.page + 1))}
+                disabled={pagination.page === pagination.pages}
+                className={`px-4 py-2 rounded-md ${pagination.page === pagination.pages ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-primary text-white hover:bg-primary-dark'}`}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </>
   );
 };
 
-export default Products; 
+export default Products;

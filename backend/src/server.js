@@ -1,8 +1,11 @@
+// Load environment variables first, before any other imports
+const dotenv = require('dotenv');
+dotenv.config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const path = require('path');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -20,8 +23,6 @@ const requestId = require('./middleware/requestId');
 const securityHeaders = require('./middleware/security');
 const { uploadMultiple } = require('./middleware/upload');
 
-dotenv.config();
-
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orders');
@@ -36,6 +37,8 @@ const customerRoutes = require('./routes/customers');
 const couponRoutes = require('./routes/coupons');
 const advertsRoutes = require('./routes/adverts');
 const testimonialsRoutes = require('./routes/testimonials');
+
+const cloudinaryStatusRoute = require('./routes/cloudinaryStatusRoute');
 
 const { credentialCache, loadCredentials } = require('./utils/credentialCache');
 
@@ -73,12 +76,16 @@ const io = new Server(server, {
 const onlineUsers = new Set();
 
 // === SOCKET.IO ===
+// Implement connection pooling with a Map to store user connections
+const userSocketMap = new Map();
+
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.headers.cookie?.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
     if (!token) return next(new Error('No token'));
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('-password');
+    // Use lean() for better performance
+    const user = await User.findById(decoded.userId).select('-password').lean();
     if (!user) return next(new Error('Invalid user'));
     socket.user = user;
     next();
@@ -89,23 +96,68 @@ io.use(async (socket, next) => {
 
 io.on('connection', (socket) => {
   const userId = socket.user._id.toString();
+  
+  // Store socket in the user socket map for connection pooling
+  if (!userSocketMap.has(userId)) {
+    userSocketMap.set(userId, new Set());
+  }
+  userSocketMap.get(userId).add(socket.id);
+  
   socket.join(userId);
   onlineUsers.add(userId);
-  io.emit('online_users', Array.from(onlineUsers));
+  
+  // Throttle online users broadcast to reduce unnecessary emissions
+  const broadcastOnlineUsers = throttle(() => {
+    io.emit('online_users', Array.from(onlineUsers));
+  }, 1000);
+  
+  broadcastOnlineUsers();
+
+  // Implement debounce for typing events to reduce socket traffic
+  const typingDebounceMap = new Map();
 
   socket.on('send_message', async ({ receiver, content }) => {
     if (!receiver || !content) return;
-    const message = await Message.create({ sender: userId, receiver, content });
-    io.to(receiver).emit('new_message', message);
-    io.to(userId).emit('new_message', message);
+    try {
+      const message = await Message.create({ sender: userId, receiver, content });
+      io.to(receiver).emit('new_message', message);
+      io.to(userId).emit('new_message', message);
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to send message' });
+    }
   });
 
   socket.on('typing', ({ to }) => {
-    if (to) io.to(to).emit('typing', { from: userId, to });
+    if (!to) return;
+    
+    // Implement debouncing for typing events
+    const debounceKey = `${userId}-${to}`;
+    if (!typingDebounceMap.has(debounceKey)) {
+      io.to(to).emit('typing', { from: userId, to });
+      
+      typingDebounceMap.set(debounceKey, setTimeout(() => {
+        typingDebounceMap.delete(debounceKey);
+      }, 2000)); // 2 second debounce
+    } else {
+      // Reset the timeout
+      clearTimeout(typingDebounceMap.get(debounceKey));
+      typingDebounceMap.set(debounceKey, setTimeout(() => {
+        typingDebounceMap.delete(debounceKey);
+      }, 2000));
+    }
   });
 
   socket.on('stop_typing', ({ to }) => {
-    if (to) io.to(to).emit('stop_typing', { from: userId, to });
+    if (!to) return;
+    
+    // Clear any existing debounce timeout
+    const debounceKey = `${userId}-${to}`;
+    if (typingDebounceMap.has(debounceKey)) {
+      clearTimeout(typingDebounceMap.get(debounceKey));
+      typingDebounceMap.delete(debounceKey);
+    }
+    
+    io.to(to).emit('stop_typing', { from: userId, to });
   });
 
   socket.on('get_online_users', () => {
@@ -113,10 +165,35 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    onlineUsers.delete(userId);
-    io.emit('online_users', Array.from(onlineUsers));
+    // Remove socket from user socket map
+    if (userSocketMap.has(userId)) {
+      const userSockets = userSocketMap.get(userId);
+      userSockets.delete(socket.id);
+      
+      // Only remove user from online users if they have no active connections
+      if (userSockets.size === 0) {
+        userSocketMap.delete(userId);
+        onlineUsers.delete(userId);
+        broadcastOnlineUsers();
+      }
+    } else {
+      onlineUsers.delete(userId);
+      broadcastOnlineUsers();
+    }
   });
 });
+
+// Utility function for throttling
+function throttle(func, delay) {
+  let lastCall = 0;
+  return function(...args) {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      return func(...args);
+    }
+  };
+}
 
 app.use(securityHeaders);
 app.use(requestId);
@@ -167,6 +244,8 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/adverts', advertsRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
 
+app.use('/api/cloudinary', cloudinaryStatusRoute);
+
 // Handle OPTIONS requests for image uploads
 app.options('/uploads/:filename', (req, res) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -206,45 +285,15 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.post('/test-upload', uploadMultiple.array('images', 5), (req, res) => {
-  try {
-    if (req.files && req.files.length > 0) {
-      // Force HTTPS in production
-      const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
-      const baseUrl = `${protocol}://${req.get('host')}`;
-      const imageUrls = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
-      res.json({
-        message: 'Upload test successful',
-        files: req.files.map(f => f.filename),
-        urls: imageUrls
-      });
-    } else {
-      res.json({
-        message: 'No files uploaded',
-        files: []
-      });
-    }
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
 
-app.get('/api/test-products', async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.json(products);
-  } catch (error) {
-    console.error('Error in /api/test-products:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
+
+
 
 // Alternative image serving route without CORS restrictions
 app.get('/api/images/:filename', (req, res) => {
   const filename = req.params.filename;
   const filePath = path.join(__dirname, '../uploads', filename);
-  console.log('Serving image via API route:', filename);
+  
   
   const fs = require('fs');
   
@@ -266,7 +315,7 @@ app.get('/api/images/:filename', (req, res) => {
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
     
-    console.log('API image served successfully:', filename);
+
   } else {
     console.error('API image not found:', filePath);
     res.status(404).json({ error: 'Image not found', filename });
@@ -281,37 +330,7 @@ app.options('/api/images/:filename', (req, res) => {
   res.status(200).end();
 });
 
-// Test image serving with different approach
-app.get('/test-image/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const filePath = path.join(__dirname, '../uploads', filename);
-  console.log('Testing image access:', filename);
-  console.log('File path:', filePath);
-  
-  // Use fs to read and serve the file directly
-  const fs = require('fs');
-  
-  if (fs.existsSync(filePath)) {
-    const ext = path.extname(filename).toLowerCase();
-    let contentType = 'image/jpeg'; // default
-    
-    if (ext === '.png') contentType = 'image/png';
-    else if (ext === '.gif') contentType = 'image/gif';
-    else if (ext === '.webp') contentType = 'image/webp';
-    
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Content-Type', contentType);
-    res.header('Cache-Control', 'public, max-age=31536000');
-    
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-    
-    console.log('Test image served successfully:', filename);
-  } else {
-    console.error('Test image not found:', filePath);
-    res.status(404).json({ error: 'Test image not found', filename });
-  }
-});
+
 
 app.use('*', (req, res) => {
   res.status(404).json({

@@ -8,7 +8,7 @@ router.get('/', auth, admin, getAllUsers);
 
 // Self or admin: Get messages (move above parameterized routes)
 router.get('/messages', auth, (req, res, next) => {
-  console.log('=== ROUTE HANDLER: /api/users/messages ===');
+
   next();
 }, getMessages);
 
@@ -42,4 +42,4 @@ router.get('/messages/all', auth, admin, getAllMessages);
 // Admin or manager: Update user salary
 router.put('/:id/salary', auth, updateUserSalary);
 
-module.exports = router; 
+module.exports = router;
