@@ -38,7 +38,7 @@ const couponRoutes = require('./routes/coupons');
 const advertsRoutes = require('./routes/adverts');
 const testimonialsRoutes = require('./routes/testimonials');
 
-const cloudinaryStatusRoute = require('./routes/cloudinaryStatusRoute');
+
 
 const { credentialCache, loadCredentials } = require('./utils/credentialCache');
 
@@ -244,7 +244,7 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/adverts', advertsRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
 
-app.use('/api/cloudinary', cloudinaryStatusRoute);
+
 
 // Handle OPTIONS requests for image uploads
 app.options('/uploads/:filename', (req, res) => {
@@ -364,10 +364,7 @@ passport.deserializeUser(async (id, done) => {
     const PORT = process.env.PORT || 5000;
     const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/myshoppingcenter';
 
-    await mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(MONGO_URI);
 
     console.log('✅ MongoDB connected');
 
