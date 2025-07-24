@@ -2,6 +2,20 @@
 const dotenv = require('dotenv');
 dotenv.config();
 
+process.on('uncaughtException', (err) => {
+  console.error(`Uncaught Exception: ${err.message}`);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error(`Unhandled Rejection: ${err.message}`);
+  // Log the full error object for more details
+  console.error(err);
+  server.close(() => {
+    process.exit(1);
+  });
+});
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
