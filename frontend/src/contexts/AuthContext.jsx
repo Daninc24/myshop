@@ -18,8 +18,7 @@ export const AuthProvider = ({ children }) => {
   const { error: showError } = useToast();
 
   // Configure axios defaults
-  let apiBase = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com/api';
-  if (apiBase.endsWith('/api')) apiBase = apiBase.slice(0, -4);
+  const apiBase = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com/api';
   axios.defaults.baseURL = apiBase;
   axios.defaults.withCredentials = true;
 
