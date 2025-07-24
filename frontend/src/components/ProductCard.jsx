@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { ShoppingCartIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { getOptimizedImageUrl } from '../utils/imageUtils';
 
 const ProductCard = ({ product, small }) => {
   const { addToCart, currency, convertPrice } = useCart();
@@ -32,10 +33,10 @@ const ProductCard = ({ product, small }) => {
         <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">Deal</span>
       )}
       <img
-        src={product.images && product.images[0]}
+        src={getOptimizedImageUrl(product.images && product.images[0])}
         alt={product.title}
         loading="lazy"
-        srcSet={`${product.images && product.images[0]}?size=small 100w, ${product.images && product.images[0]}?size=medium 200w, ${product.images && product.images[0]}?size=large 400w`}
+        srcSet={`${getOptimizedImageUrl(product.images && product.images[0])}?size=small 100w, ${getOptimizedImageUrl(product.images && product.images[0])}?size=medium 200w, ${getOptimizedImageUrl(product.images && product.images[0])}?size=large 400w`}
         sizes="(max-width: 600px) 100px, 200px"
         className={`rounded-2xl object-cover object-center mb-4 ${small ? 'w-16 h-16' : 'w-24 h-24'} group-hover:shadow-lg group-hover:ring-2 group-hover:ring-orange-400 transition-all`}
       />

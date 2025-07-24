@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { PencilIcon, TrashIcon, PlusIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { getOptimizedImageUrl } from '../utils/imageUtils';
 
 const AdminProducts = () => {
   const { isManagerOrAdmin } = useAuth();
@@ -257,7 +258,7 @@ const AdminProducts = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-2">
                   {imagePreviews.map((preview, idx) => (
                     <div key={idx} className="relative">
-                      <img src={preview} alt={`Preview ${idx + 1}`} className="image-preview w-full h-32" />
+                      <img src={getOptimizedImageUrl(preview)} alt={`Preview ${idx + 1}`} className="image-preview w-full h-32" />
                       <button type="button" onClick={() => removeImage(idx)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"><XMarkIcon className="h-4 w-4" /></button>
                     </div>
                   ))}
@@ -278,7 +279,7 @@ const AdminProducts = () => {
           <div key={product._id} className="card flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
               {product.images && product.images[0] && (
-                <img src={product.images[0]} alt={product.title} className="image-preview" />
+                <img src={getOptimizedImageUrl(product.images[0])} alt={product.title} className="image-preview" />
               )}
               <div>
                 <h2 className="text-lg font-heading font-bold text-secondary mb-1">{product.title}</h2>
@@ -300,4 +301,4 @@ const AdminProducts = () => {
   );
 };
 
-export default AdminProducts; 
+export default AdminProducts;

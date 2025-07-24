@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { getOptimizedImageUrl } from '../utils/imageUtils';
 import { 
   ShoppingCartIcon, 
   UserIcon, 
@@ -167,7 +168,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto py-10 animate-fade-in">
-        <h1 className="text-3xl font-heading font-bold text-secondary mb-8">Admin Dashboard</h1>
+        <h1 className="text-3xl font-heading font-bold text-secondary mb-8">Admin Dashboard Overview</h1>
         {/* Admin Shortcuts */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-10">
           <Link to="/pos" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">

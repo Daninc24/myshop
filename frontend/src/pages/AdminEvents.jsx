@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { getOptimizedImageUrl } from '../utils/imageUtils';
 
 const emptyEvent = {
   title: '',
@@ -112,7 +113,7 @@ const AdminEvents = () => {
           <label className="font-medium">Image Upload</label>
           <input type="file" accept="image/*" onChange={handleImageChange} className="file-upload-area" />
           {imagePreview && (
-            <div className="mt-2"><img src={imagePreview} alt="Preview" className="image-preview" /></div>
+            <div className="mt-2"><img src={getOptimizedImageUrl(imagePreview)} alt="Preview" className="image-preview" /></div>
           )}
         </div>
         <button type="submit" className="btn-primary md:col-span-2">
@@ -128,7 +129,7 @@ const AdminEvents = () => {
         <div className="space-y-4">
           {events.map(event => (
             <div key={event._id} className="card flex flex-col md:flex-row items-center gap-4">
-              {event.image && <img src={event.image} alt={event.title} className="image-preview mr-0 md:mr-6 mb-4 md:mb-0" />}
+              {event.image && <img src={getOptimizedImageUrl(event.image)} alt={event.title} className="image-preview mr-0 md:mr-6 mb-4 md:mb-0" />}
               <div className="flex-1">
                 <h3 className="text-lg font-heading font-bold mb-1 text-secondary">{event.title}</h3>
                 <div className="text-gray-500 text-sm mb-2">{new Date(event.date).toLocaleString()}</div>
@@ -147,4 +148,4 @@ const AdminEvents = () => {
   );
 };
 
-export default AdminEvents; 
+export default AdminEvents;

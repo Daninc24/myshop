@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
+import { getOptimizedImageUrl } from '../utils/imageUtils';
 
 const emptyAdvert = {
   title: '',
@@ -19,7 +20,7 @@ const advertTemplates = [
     name: 'Classic',
     render: ({ title, message, image, product }) => (
       <div className="border rounded p-4 bg-white flex gap-4 items-center">
-        {image && <img src={image} alt="Advert" className="w-24 h-24 object-cover rounded" />}
+        {image && <img src={getOptimizedImageUrl(image)} alt="Advert" className="w-24 h-24 object-cover rounded" />}
         <div>
           <h2 className="text-xl font-bold">{title}</h2>
           <p className="text-gray-700">{message}</p>
@@ -33,7 +34,7 @@ const advertTemplates = [
     name: 'Banner',
     render: ({ title, message, image }) => (
       <div className="relative h-32 flex items-center justify-center bg-blue-100 rounded overflow-hidden">
-        {image && <img src={image} alt="Advert" className="absolute inset-0 w-full h-full object-cover opacity-40" />}
+        {image && <img src={getOptimizedImageUrl(image)} alt="Advert" className="absolute inset-0 w-full h-full object-cover opacity-40" />}
         <div className="relative z-10 text-center">
           <h2 className="text-2xl font-bold text-blue-900 drop-shadow">{title}</h2>
           <p className="text-blue-800 mt-1">{message}</p>
@@ -46,7 +47,7 @@ const advertTemplates = [
     name: 'Card',
     render: ({ title, message, image }) => (
       <div className="bg-gradient-to-br from-pink-100 to-yellow-100 rounded-lg p-4 flex flex-col items-center">
-        {image && <img src={image} alt="Advert" className="w-20 h-20 object-cover rounded-full mb-2" />}
+        {image && <img src={getOptimizedImageUrl(image)} alt="Advert" className="w-20 h-20 object-cover rounded-full mb-2" />}
         <h2 className="text-lg font-bold text-pink-700">{title}</h2>
         <p className="text-sm text-gray-700">{message}</p>
       </div>
@@ -57,7 +58,7 @@ const advertTemplates = [
     name: 'Left Image Banner',
     render: ({ title, message, image, product }) => (
       <div className="flex items-center bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg p-4 gap-4">
-        {image && <img src={image} alt="Advert" className="w-28 h-28 object-cover rounded-lg shadow-lg" />}
+        {image && <img src={getOptimizedImageUrl(image)} alt="Advert" className="w-28 h-28 object-cover rounded-lg shadow-lg" />}
         <div>
           <h2 className="text-2xl font-bold mb-1">{title}</h2>
           <p className="text-white mb-2">{message}</p>
@@ -71,7 +72,7 @@ const advertTemplates = [
     name: 'CTA Card',
     render: ({ title, message, image, product }) => (
       <div className="bg-white border-2 border-pink-400 rounded-xl p-6 flex flex-col items-center shadow-md">
-        {image && <img src={image} alt="Advert" className="w-24 h-24 object-cover rounded-full border-4 border-pink-200 mb-2" />}
+        {image && <img src={getOptimizedImageUrl(image)} alt="Advert" className="w-24 h-24 object-cover rounded-full border-4 border-pink-200 mb-2" />}
         <h2 className="text-xl font-bold text-pink-700 mb-1">{title}</h2>
         <p className="text-gray-700 mb-2">{message}</p>
         {product && <span className="text-xs text-pink-600 mb-2">{product}</span>}
@@ -228,7 +229,7 @@ const AdminAdverts = () => {
         <div className="flex flex-col gap-1">
           <label className="font-medium">Image</label>
           <input type="file" accept="image/*" onChange={handleImageChange} className="file-upload-area" />
-          {imagePreview && <img src={imagePreview} alt="Preview" className="image-preview mt-2" />}
+          {imagePreview && <img src={getOptimizedImageUrl(imagePreview)} alt="Preview" className="image-preview mt-2" />}
         </div>
         <input type="date" name="startDate" value={form.startDate} onChange={handleChange} className="input-field" required />
         <input type="date" name="endDate" value={form.endDate} onChange={handleChange} className="input-field" required />
@@ -275,7 +276,7 @@ const AdminAdverts = () => {
               <XMarkIcon className="h-6 w-6" />
             </button>
             <h2 className="text-2xl font-bold mb-2">{selectedAdvert.title}</h2>
-            {selectedAdvert.image && <img src={selectedAdvert.image} alt="Advert" className="w-full h-48 object-cover rounded mb-3" />}
+            {selectedAdvert.image && <img src={getOptimizedImageUrl(selectedAdvert.image)} alt="Advert" className="w-full h-48 object-cover rounded mb-3" />}
             <div className="mb-2 text-gray-700">{selectedAdvert.message}</div>
             <div className="mb-2 text-sm text-gray-500">Product: {getProductTitle(selectedAdvert.product, products)}</div>
             <div className="mb-2 text-sm text-gray-500">Start: {selectedAdvert.startDate ? new Date(selectedAdvert.startDate).toLocaleDateString() : '-'}</div>
@@ -292,4 +293,4 @@ const AdminAdverts = () => {
   );
 };
 
-export default AdminAdverts; 
+export default AdminAdverts;

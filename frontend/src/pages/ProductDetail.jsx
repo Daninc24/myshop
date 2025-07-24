@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { Helmet } from 'react-helmet';
+import { getOptimizedImageUrl } from '../utils/imageUtils';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -94,11 +95,11 @@ const ProductDetail = () => {
         <meta property="og:description" content={product ? product.description : 'View product details, images, price, and stock at MyShopping Center.'} />
         <meta property="og:type" content="product" />
         <meta property="og:url" content={`https://myshoppingcenter.com/products/${product ? product._id : ''}`} />
-        <meta property="og:image" content={product && product.images && product.images[0] ? product.images[0] : 'https://myshoppingcenter.com/logo.png'} />
+        <meta property="og:image" content={getOptimizedImageUrl(product && product.images && product.images[0]) || 'https://myshoppingcenter.com/logo.png'} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={product ? `${product.title} - MyShopping Center` : 'Product - MyShopping Center'} />
         <meta name="twitter:description" content={product ? product.description : 'View product details, images, price, and stock at MyShopping Center.'} />
-        <meta name="twitter:image" content={product && product.images && product.images[0] ? product.images[0] : 'https://myshoppingcenter.com/logo.png'} />
+        <meta name="twitter:image" content={getOptimizedImageUrl(product && product.images && product.images[0]) || 'https://myshoppingcenter.com/logo.png'} />
         <link rel="canonical" href={`https://myshoppingcenter.com/products/${product ? product._id : ''}`} />
         {product && (
           <script type="application/ld+json">{`
@@ -107,7 +108,7 @@ const ProductDetail = () => {
               "@type": "Product",
               "name": "${product.title}",
               "image": [
-                "${product.images && product.images[0] ? product.images[0] : 'https://myshoppingcenter.com/logo.png'}"
+                "${getOptimizedImageUrl(product.images && product.images[0]) || 'https://myshoppingcenter.com/logo.png'}"
               ],
               "description": "${product.description}",
               "sku": "${product._id}",
@@ -157,7 +158,7 @@ const ProductDetail = () => {
             {/* Main Image */}
             <div className="relative w-full mb-4">
               <img
-                src={product.images && product.images[selectedImage] ? product.images[selectedImage] : 'https://myshoppingcenter.com/logo.png'}
+                src={getOptimizedImageUrl(product.images && product.images[selectedImage]) || 'https://myshoppingcenter.com/logo.png'}
                 alt={product.title + ' main image'}
                 className="w-full h-96 object-contain rounded-2xl bg-white"
               />
@@ -168,7 +169,7 @@ const ProductDetail = () => {
                 {product.images.map((img, idx) => (
                   <img
                     key={idx}
-                    src={img}
+                    src={getOptimizedImageUrl(img)}
                     alt={product.title + ' thumbnail ' + (idx + 1)}
                     className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer ${selectedImage === idx ? 'border-orange-500' : 'border-gray-200'}`}
                     onClick={() => setSelectedImage(idx)}
