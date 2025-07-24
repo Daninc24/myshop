@@ -213,6 +213,17 @@ const ProductDetail = () => {
                 <ShoppingCartIcon className="h-5 w-5" />
                 <span>{addingToCart ? 'Adding...' : 'Add to Cart'}</span>
               </button>
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(`I'm interested in your product: ${product.title} (ID: ${product._id})`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary flex items-center justify-center space-x-2 w-full mt-4"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.408 3.481 2.241 2.24 3.481 5.226 3.481 8.407 0 6.556-5.334 11.891-11.891 11.891h-.003zm.78-1.858l1.413-5.183c-.733-1.328-1.141-2.818-1.14-4.343.003-5.275 4.306-9.578 9.58-9.578 2.515.001 4.867.974 6.657 2.762 1.791 1.791 2.762 4.143 2.762 6.656 0 5.275-4.305 9.579-9.579 9.579l-.004-.001s-3.295-1.18-4.244-1.543zm6.597-1.889c-1.176-2.365-2.917-4.107-5.28-5.276l-.48-.236c-.96-.472-1.54-.957-1.54-1.54s.58-1.068 1.54-1.54l.48-.236c2.365-1.176 4.107-2.917 5.276-5.28l.236-.48c.472-.96.957-1.54 1.54-1.54s1.068.58 1.54 1.54l.236.48c1.176 2.365 2.917 4.107 5.28 5.276l.48.236c.96.472 1.54.957 1.54 1.54s-.58 1.068-1.54 1.54l-.48-.236c-2.365 1.176-4.107 2.917-5.276 5.28l-.236.48c-.472.96-.957 1.54-1.54 1.54s-1.068-.58-1.54-1.54l-.236-.48z"/>
+                </svg>
+                <span>Chat on WhatsApp</span>
+              </a>
 
               {product.stock === 0 && (
                 <p className="text-red-500 text-center">Out of Stock</p>
@@ -246,4 +257,4 @@ const ProductDetail = () => {
   );
 };
 
-export default ProductDetail; 
+export default ProductDetail;
