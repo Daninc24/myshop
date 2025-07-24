@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
+      console.log('Sending login data:', { email, password });
       const response = await axios.post('/auth/login', { email, password });
       setUser(response.data.user);
       return { success: true };
