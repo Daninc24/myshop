@@ -50,6 +50,7 @@ const io = new Server(server, {
     origin: function (origin, callback) {
       const allowedOrigins = [
         process.env.FRONTEND_URL || 'http://localhost:5173',
+        'http://localhost:5173/',
         'http://localhost:5174',
         'https://myshoppingcenters-8knn.vercel.app',
         'https://myshoppingcenters.vercel.app',
@@ -209,6 +210,7 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5173/',
   'http://localhost:5174',
   'https://myshoppingcenters-8knn.vercel.app',
   'https://myshoppingcenters.vercel.app',
