@@ -35,6 +35,7 @@ const AdminDashboard = () => {
     totalProducts: 0,
     totalUsers: 0,
     totalRevenue: 0,
+    totalPageViews: 0,
     recentOrders: [],
     lowStockProducts: [],
     topProducts: [],
@@ -71,6 +72,7 @@ const AdminDashboard = () => {
         totalProducts: res.data.totalProducts,
         totalUsers: res.data.totalUsers,
         totalRevenue: res.data.totalSales,
+        totalPageViews: res.data.totalPageViews,
         monthlyRevenue,
         usersByMonth: res.data.usersByMonth
       });
@@ -211,21 +213,11 @@ const AdminDashboard = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Stats Cards */}
-          <div className="card flex flex-col items-center gap-2">
-            <ShoppingCartIcon className="h-8 w-8 text-primary mb-2" />
-            <span className="text-2xl font-heading font-bold text-secondary">{stats.totalOrders}</span>
-            <span className="text-gray-500">Orders</span>
-          </div>
-          <div className="card flex flex-col items-center gap-2">
-            <UserIcon className="h-8 w-8 text-primary mb-2" />
-            <span className="text-2xl font-heading font-bold text-secondary">{stats.totalUsers}</span>
-            <span className="text-gray-500">Users</span>
-          </div>
-          <div className="card flex flex-col items-center gap-2">
-            <CurrencyDollarIcon className="h-8 w-8 text-primary mb-2" />
-            <span className="text-2xl font-heading font-bold text-secondary">${stats.totalRevenue.toLocaleString()}</span>
-            <span className="text-gray-500">Revenue</span>
-          </div>
+          <StatCard title="Total Orders" value={stats.totalOrders} icon={ShoppingCartIcon} change={10} changeType="up" />
+           <StatCard title="Total Users" value={stats.totalUsers} icon={UserIcon} change={12} changeType="up" />
+           <StatCard title="Total Products" value={stats.totalProducts} icon={CubeIcon} change={5} changeType="up" />
+           <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toLocaleString()}`} icon={CurrencyDollarIcon} change={8} changeType="up" />
+           <StatCard title="Total Page Views" value={stats.totalPageViews} icon={EyeIcon} change={10} changeType="up" />
         </div>
         {/* Charts and Recent Activity */}
         <div className="card mb-8">
@@ -266,4 +258,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;

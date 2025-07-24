@@ -37,6 +37,7 @@ const customerRoutes = require('./routes/customers');
 const couponRoutes = require('./routes/coupons');
 const advertsRoutes = require('./routes/adverts');
 const testimonialsRoutes = require('./routes/testimonials');
+const pageViewRoutes = require('./routes/pageViews');
 
 
 
@@ -243,6 +244,7 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/adverts', advertsRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
+app.use('/api/pageviews', pageViewRoutes);
 
 
 

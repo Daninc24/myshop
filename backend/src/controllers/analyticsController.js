@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const PageView = require('../models/PageView');
 const parseTimeRange = (range) => {
   const now = new Date();
   let start;
@@ -30,6 +31,7 @@ exports.getAnalytics = async (req, res) => {
     const totalUsers = await User.countDocuments({ createdAt: { $gte: startDate, $lte: now } });
     const totalOrders = await Order.countDocuments({ createdAt: { $gte: startDate, $lte: now } });
     const totalProducts = await Product.countDocuments();
+    const totalPageViews = await PageView.countDocuments({ timestamp: { $gte: startDate, $lte: now } });
     const totalSalesAgg = await Order.aggregate([
       { $match: { createdAt: { $gte: startDate, $lte: now } } },
       { $group: { _id: null, total: { $sum: '$totalAmount' } } }
@@ -66,10 +68,11 @@ exports.getAnalytics = async (req, res) => {
       totalOrders,
       totalProducts,
       totalSales,
+      totalPageViews,
       salesByMonth,
       usersByMonth
     });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching analytics', error: error.message });
   }
-}; 
+};

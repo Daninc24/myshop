@@ -35,6 +35,8 @@ const ProductCard = ({ product, small }) => {
         src={product.images && product.images[0]}
         alt={product.title}
         loading="lazy"
+        srcSet={`${product.images && product.images[0]}?size=small 100w, ${product.images && product.images[0]}?size=medium 200w, ${product.images && product.images[0]}?size=large 400w`}
+        sizes="(max-width: 600px) 100px, 200px"
         className={`rounded-2xl object-cover object-center mb-4 ${small ? 'w-16 h-16' : 'w-24 h-24'} group-hover:shadow-lg group-hover:ring-2 group-hover:ring-orange-400 transition-all`}
       />
       <h3 className="text-lg font-heading font-bold text-secondary mb-1 text-center line-clamp-2 group-hover:text-orange-600 transition-colors">{product.title}</h3>

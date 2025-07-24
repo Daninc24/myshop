@@ -460,6 +460,8 @@ const Home = () => {
         <img
           src={HERO_IMAGE}
           alt="Gambia Market Hero - MyShopping Center"
+          srcSet={`${HERO_IMAGE}?size=small 600w, ${HERO_IMAGE}?size=medium 1200w, ${HERO_IMAGE}?size=large 1920w`}
+          sizes="100vw"
           className="absolute inset-0 w-full h-full object-cover object-center z-0"
         />
         {/* Overlay for better text visibility */}
