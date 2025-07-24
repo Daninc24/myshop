@@ -56,8 +56,12 @@ const io = new Server(server, {
         'https://myshoppingcenter.vercel.app',
         'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
         'https://myshop-git-main-daniel-mailus-projects.vercel.app',
+        'https://*.vercel.app',
         'https://myshop-hhfv.vercel.app',
-        'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app'
+        'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app',
+      'https://myshop-git-main-daniel-mailus-projects.vercel.app',
+      'https://*.vercel.app',
+        'https://myshop-git-main-daniel-mailus-projects.vercel.app'
       ];
       
       // Allow requests with no origin
