@@ -32,7 +32,8 @@ function useDebounce(value, delay) {
 const getAdvertImageUrl = (image) => {
   if (!image) return '';
   if (image.startsWith('/uploads')) {
-    return `https://myshop-hhfv.onrender.com${image}`;
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com';
+    return `${baseUrl}${image}`;
   }
   return image;
 };
@@ -521,7 +522,7 @@ const Home = () => {
                   {Template ? Template({
                     title: ad.title,
                     message: ad.message,
-                    image: ad.image,
+                    image: ad.images[0],
                     product: ad.product?.title || ad.product?.name,
                     productId: ad.product?._id || ad.product
                   }) : null}
