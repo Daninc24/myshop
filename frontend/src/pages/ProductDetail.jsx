@@ -149,29 +149,29 @@ const ProductDetail = () => {
         {/* Product Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Product Image */}
-          <div className="space-y-4">
+          <div className="flex flex-col items-center">
+            {/* Main Image */}
+            <div className="relative w-full mb-4">
+              <img
+                src={product.images && product.images[selectedImage] ? product.images[selectedImage] : 'https://myshoppingcenter.com/logo.png'}
+                alt={product.title + ' main image'}
+                className="w-full h-96 object-contain rounded-2xl bg-white"
+              />
+            </div>
             {/* Thumbnail Gallery */}
             {product.images && product.images.length > 1 && (
-              <div className="flex gap-4 mb-4">
+              <div className="flex flex-wrap justify-center gap-2">
                 {product.images.map((img, idx) => (
                   <img
                     key={idx}
                     src={img}
-                    alt={product.title + ' image ' + (idx + 1)}
-                    className={`w-24 h-24 object-cover rounded-lg border-2 cursor-pointer ${selectedImage === idx ? 'border-orange-500' : 'border-gray-200'}`}
+                    alt={product.title + ' thumbnail ' + (idx + 1)}
+                    className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer ${selectedImage === idx ? 'border-orange-500' : 'border-gray-200'}`}
                     onClick={() => setSelectedImage(idx)}
                   />
                 ))}
               </div>
             )}
-            {/* Main Image */}
-            <div className="relative">
-              <img
-                src={product.images && product.images[selectedImage] ? product.images[selectedImage] : 'https://myshoppingcenter.com/logo.png'}
-                alt={product.title + ' main image'}
-                className="w-full h-96 object-contain rounded-2xl bg-white mb-6"
-              />
-            </div>
           </div>
 
           {/* Product Info */}
@@ -186,15 +186,14 @@ const ProductDetail = () => {
               <span className="text-sm text-gray-500">Stock: {product.stock}</span>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex items-center space-x-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Quantity
-                </label>
+                <label htmlFor="quantity" className="sr-only">Quantity</label>
                 <select
+                  id="quantity"
                   value={quantity}
                   onChange={(e) => setQuantity(parseInt(e.target.value))}
-                  className="input-field w-32"
+                  className="input-field w-24"
                   disabled={product.stock === 0}
                 >
                   {[...Array(Math.min(10, product.stock))].map((_, i) => (
