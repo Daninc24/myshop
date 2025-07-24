@@ -45,6 +45,34 @@ const { credentialCache, loadCredentials } = require('./utils/credentialCache');
 
 const app = express();
 const server = http.createServer(app);
+app.use(cors({
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      process.env.FRONTEND_URL || 'http://localhost:5173',
+      'http://localhost:5173/',
+      'http://localhost:5174',
+      'https://myshoppingcenters-8knn.vercel.app',
+      'https://myshoppingcenters.vercel.app',
+      'https://myshoppingcenter.vercel.app',
+      'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
+      'https://myshop-git-main-daniel-mailus-projects.vercel.app',
+      'https://*.vercel.app',
+      'https://myshop-hhfv.vercel.app',
+      'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app',
+      'https://myshop-git-main-daniel-mailus-projects.vercel.app'
+    ];
+
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}));
+
 const io = new Server(server, {
   cors: {
     origin: function (origin, callback) {

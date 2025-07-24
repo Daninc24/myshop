@@ -9,7 +9,7 @@ if (!sessionId) {
 
 export const recordPageView = async (path) => {
   try {
-    await axios.post('/api/pageviews', {
+    await axios.post('/pageviews', {
       sessionId,
       path,
     });
