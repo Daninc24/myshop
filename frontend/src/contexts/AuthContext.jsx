@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   // Configure axios defaults
   let apiBase = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com/api';
   if (apiBase.endsWith('/api')) apiBase = apiBase.slice(0, -4);
-  axios.defaults.baseURL = apiBase + '/api';
+  axios.defaults.baseURL = apiBase;
   axios.defaults.withCredentials = true;
 
   // Check if user is logged in on mount
