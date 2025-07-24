@@ -1,5 +1,5 @@
-const Advert = require('../models/Advert');
 const Product = require('../models/Product');
+const Advert = require('../models/Advert');
 const cloudinary = require('../utils/cloudinary'); // Add this import at the top
 
 // Admin: Create advert
@@ -103,6 +103,7 @@ exports.getActiveAdverts = async (req, res) => {
 
     res.json({ adverts });
   } catch (error) {
+    console.error('Error in getActiveAdverts:', error);
     res.status(500).json({ message: 'Error fetching active adverts', error: error.message });
   }
 };
