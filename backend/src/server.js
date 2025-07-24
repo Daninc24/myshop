@@ -415,7 +415,7 @@ passport.deserializeUser(async (id, done) => {
 // === START SERVER ===
 (async () => {
   try {
-    const PORT = process.env.PORT || 5000;
+    const PORT = process.env.PORT || 5002;
     const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/myshoppingcenter';
 
     await mongoose.connect(MONGO_URI);

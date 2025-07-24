@@ -161,6 +161,7 @@ const ProductDetail = () => {
                 src={getOptimizedImageUrl(product.images && product.images[selectedImage]) || 'https://myshoppingcenter.com/logo.png'}
                 alt={product.title + ' main image'}
                 className="w-full h-96 object-contain rounded-2xl bg-white"
+                loading="lazy"
               />
             </div>
             {/* Thumbnail Gallery */}
@@ -173,6 +174,7 @@ const ProductDetail = () => {
                     alt={product.title + ' thumbnail ' + (idx + 1)}
                     className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer ${selectedImage === idx ? 'border-orange-500' : 'border-gray-200'}`}
                     onClick={() => setSelectedImage(idx)}
+                    loading="lazy"
                   />
                 ))}
               </div>

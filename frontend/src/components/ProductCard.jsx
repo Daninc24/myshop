@@ -20,12 +20,6 @@ const ProductCard = ({ product, small, viewMode = 'grid' }) => {
     }
   };
 
-  const handleAddToCart = (e) => {
-    e.preventDefault();
-    addToCart(product._id, 1);
-    success(`${product.title} added to cart!`);
-  };
-
   return (
     <Link to={`/products/${product._id}`} className={`card relative animate-fade-in focus:outline-none focus:ring-2 focus:ring-primary group ${viewMode === 'grid' ? 'flex flex-col items-center p-8 transition-transform duration-200 hover:scale-105 hover:shadow-strong' : 'flex flex-row items-center p-4 transition-shadow duration-200 hover:shadow-strong'}`} tabIndex={0}>
       {/* Deal Badge */}
@@ -50,14 +44,7 @@ const ProductCard = ({ product, small, viewMode = 'grid' }) => {
       </div>
       <div className={`${viewMode === 'grid' ? 'w-full' : 'flex flex-col items-end gap-2'}`}>
         <span className="btn-primary w-full mt-2 text-center">View Details</span>
-        <button
-          onClick={handleAddToCart}
-          className="btn-secondary w-full flex items-center justify-center gap-2 mt-2"
-          aria-label="Add to cart"
-        >
-          <ShoppingCartIcon className="h-5 w-5" />
-          {viewMode === 'grid' && 'Add to Cart'}
-        </button>
+
       </div>
     </Link>
   );
