@@ -280,7 +280,7 @@ const Home = () => {
       });
       socketRef.current = socket;
       socket.on('connect_error', (err) => {
-        error('Real-time connection failed. Some live features may not work.');
+        // error('Real-time connection failed. Some live features may not work.');
       });
       socket.on('event_created', (event) => {
         fetchEvents();
