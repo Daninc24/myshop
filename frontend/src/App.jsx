@@ -41,7 +41,7 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <Router>
+
         <ToastProvider>
           <AuthProvider>
             <CartProvider>
@@ -187,7 +187,7 @@ function App() {
             </CartProvider>
           </AuthProvider>
         </ToastProvider>
-      </Router>
+
     </ErrorBoundary>
   );
 }
