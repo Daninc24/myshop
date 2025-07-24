@@ -32,8 +32,10 @@ function useDebounce(value, delay) {
 const getAdvertImageUrl = (image) => {
   if (!image) return '';
   if (image.startsWith('/uploads')) {
-    const baseUrl = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com';
-    return `${baseUrl}${image}`;
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com/api';
+    // Extract filename from /uploads/filename and use /api/images/filename
+    const filename = image.split('/').pop();
+    return `${baseUrl}/images/${filename}`;
   }
   return image;
 };
