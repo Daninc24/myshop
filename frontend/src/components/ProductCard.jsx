@@ -36,7 +36,11 @@ const ProductCard = ({ product, small }) => {
         src={getOptimizedImageUrl(product.images && product.images[0])}
         alt={product.title}
         loading="lazy"
-        srcSet={`${getOptimizedImageUrl(product.images && product.images[0])}?size=small 100w, ${getOptimizedImageUrl(product.images && product.images[0])}?size=medium 200w, ${getOptimizedImageUrl(product.images && product.images[0])}?size=large 400w`}
+        srcSet={
+                      (product.images && product.images[0] && product.images[0].startsWith('data:image'))
+                        ? getOptimizedImageUrl(product.images[0])
+                        : `${getOptimizedImageUrl(product.images && product.images[0])}?size=small 100w, ${getOptimizedImageUrl(product.images && product.images[0])}?size=medium 200w, ${getOptimizedImageUrl(product.images && product.images[0])}?size=large 400w`
+                    }
         sizes="(max-width: 600px) 100px, 200px"
         className={`rounded-2xl object-cover object-center mb-4 ${small ? 'w-16 h-16' : 'w-24 h-24'} group-hover:shadow-lg group-hover:ring-2 group-hover:ring-orange-400 transition-all`}
       />
