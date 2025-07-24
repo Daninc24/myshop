@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
     } catch (error) {
       setUser(null);
-      if (error.response && error.response.status === 401 && window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+      if (error.response && error.response.status === 401 && window.location.pathname !== '/login' && window.location.pathname !== '/register' && !window.location.pathname.startsWith('/products/')) {
         showError('You are not logged in. Please log in to access your account.');
       }
     } finally {
@@ -106,4 +106,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-}; 
+};

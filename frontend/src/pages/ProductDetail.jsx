@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useCart } from '../contexts/CartContext';
+import { useToast } from '../contexts/ToastContext';
 import { Helmet } from 'react-helmet';
 
 const ProductDetail = () => {
@@ -13,6 +14,7 @@ const ProductDetail = () => {
   const [addingToCart, setAddingToCart] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const { addToCart, currency, convertPrice } = useCart();
+  const { error: showError } = useToast();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -20,7 +22,7 @@ const ProductDetail = () => {
         const response = await axios.get(`/products/${id}`);
         setProduct(response.data);
       } catch (error) {
-        // Remove all console.error statements
+        showError('Failed to load product details.');
       } finally {
         setLoading(false);
       }
@@ -47,6 +49,8 @@ const ProductDetail = () => {
     const result = await addToCart(product._id, quantity);
     if (result.success) {
       setQuantity(1);
+    } else {
+      showError(result.error || 'Failed to add product to cart.');
     }
     setAddingToCart(false);
   };
