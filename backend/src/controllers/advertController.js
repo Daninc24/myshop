@@ -7,9 +7,9 @@ exports.createAdvert = async (req, res) => {
   try {
 
     const { title, message, product, startDate, endDate, active, template } = req.body;
-    let image = '';
-    if (req.file) {
-      image = req.file.path; // Cloudinary URL
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = req.files.map(file => file.path); // Cloudinary URLs
     }
     // Parse dates to ensure correct type
     const startDateParsed = startDate ? new Date(startDate) : undefined;
@@ -18,7 +18,7 @@ exports.createAdvert = async (req, res) => {
       title,
       message,
       product,
-      image,
+      images,
       startDate: startDateParsed,
       endDate: endDateParsed,
       active,
@@ -35,9 +35,9 @@ exports.updateAdvert = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, message, product, startDate, endDate, active, template } = req.body;
-    let image = '';
-    if (req.file) {
-      image = req.file.path; // Cloudinary URL
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = req.files.map(file => file.path); // Cloudinary URLs
     }
     // Parse dates to ensure correct type
     const startDateParsed = startDate ? new Date(startDate) : undefined;
@@ -48,7 +48,7 @@ exports.updateAdvert = async (req, res) => {
         title,
         message,
         product,
-        image,
+        images,
         startDate: startDateParsed,
         endDate: endDateParsed,
         active,

@@ -258,19 +258,23 @@ app.options('/uploads/:filename', (req, res) => {
 // Add CORS headers for /uploads before static middleware
 app.use('/uploads', cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+    const allowedOrigins = [
+      process.env.FRONTEND_URL || 'http://localhost:5173',
+      'https://myshop-hhfv.onrender.com',
+      'https://myshop-hhfv.vercel.app'
+    ];
+    
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));
   },
-  credentials: true,
+  methods: 'GET',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Length', 'Content-Type']
 }), express.static(path.join(__dirname, '../uploads')));
 
-// Fallback for old /uploads images: return 410 Gone if not found
-app.use('/uploads', (req, res, next) => {
-  res.status(410).json({ error: 'This image is no longer available. Please re-upload.' });
-});
+// Fallback removed to prevent conflicts
 
 app.get('/', (req, res) => {
   res.send('MyShopping Center API is running...');

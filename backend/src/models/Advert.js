@@ -4,7 +4,7 @@ const advertSchema = new mongoose.Schema({
   title: { type: String, required: true },
   message: { type: String, required: true },
   product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  image: { type: String, default: '' },
+  images: { type: [String], default: [] },
   template: { type: String, default: 'classic' },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
@@ -13,4 +13,4 @@ const advertSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Advert', advertSchema); 
+module.exports = mongoose.model('Advert', advertSchema);

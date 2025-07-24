@@ -49,15 +49,7 @@ const getAllProducts = async (req, res) => {
     });
     
     // Return pagination metadata along with products
-    res.json({
-      products: migratedProducts,
-      pagination: {
-        total,
-        page: pageNum,
-        limit: limitNum,
-        pages: Math.ceil(total / limitNum)
-      }
-    });
+    res.json(migratedProducts);
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
