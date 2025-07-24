@@ -1,11 +1,11 @@
-import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { ShoppingCartIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { getOptimizedImageUrl } from '../utils/imageUtils';
+import { memo } from 'react';
 
-const ProductCard = ({ product, small }) => {
+const ProductCard = ({ product, small, viewMode = 'grid' }) => {
   const { addToCart, currency, convertPrice } = useCart();
   const { success } = useToast();
 
@@ -16,7 +16,7 @@ const ProductCard = ({ product, small }) => {
       case 'EUR': return '€';
       case 'GBP': return '£';
       case 'GMD': return 'D';
-      default: return cur + ' ';
+      default: return cur + ' '; 
     }
   };
 
@@ -27,7 +27,7 @@ const ProductCard = ({ product, small }) => {
   };
 
   return (
-    <Link to={`/products/${product._id}`} className={`card flex flex-col items-center transition-transform duration-200 hover:scale-105 hover:shadow-strong relative ${small ? 'p-4' : 'p-8'} animate-fade-in focus:outline-none focus:ring-2 focus:ring-primary group`} tabIndex={0}>
+    <Link to={`/products/${product._id}`} className={`card relative animate-fade-in focus:outline-none focus:ring-2 focus:ring-primary group ${viewMode === 'grid' ? 'flex flex-col items-center p-8 transition-transform duration-200 hover:scale-105 hover:shadow-strong' : 'flex flex-row items-center p-4 transition-shadow duration-200 hover:shadow-strong'}`} tabIndex={0}>
       {/* Deal Badge */}
       {product.isDeal && (
         <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">Deal</span>
@@ -42,11 +42,23 @@ const ProductCard = ({ product, small }) => {
                         : `${getOptimizedImageUrl(product.images && product.images[0])}?size=small 100w, ${getOptimizedImageUrl(product.images && product.images[0])}?size=medium 200w, ${getOptimizedImageUrl(product.images && product.images[0])}?size=large 400w`
                     }
         sizes="(max-width: 600px) 100px, 200px"
-        className={`rounded-2xl object-cover object-center mb-4 ${small ? 'w-16 h-16' : 'w-24 h-24'} group-hover:shadow-lg group-hover:ring-2 group-hover:ring-orange-400 transition-all`}
+        className={`${viewMode === 'grid' ? (small ? 'w-16 h-16' : 'w-24 h-24 mb-4') : 'w-20 h-20 mr-4'} rounded-2xl object-cover object-center group-hover:shadow-lg group-hover:ring-2 group-hover:ring-orange-400 transition-all`}
       />
-      <h3 className="text-lg font-heading font-bold text-secondary mb-1 text-center line-clamp-2 group-hover:text-orange-600 transition-colors">{product.title}</h3>
-      <p className="text-primary font-semibold text-xl mb-2">{getCurrencySymbol(currency)}{convertPrice(product.price).toFixed(2)}</p>
-      <span className="btn-primary w-full mt-2 text-center">View Details</span>
+      <div className={`${viewMode === 'grid' ? 'text-center' : 'flex-grow'}`}>
+        <h3 className={`font-heading font-bold text-secondary ${viewMode === 'grid' ? 'text-lg mb-1 line-clamp-2' : 'text-base mb-0.5 line-clamp-1'} group-hover:text-orange-600 transition-colors`}>{product.title}</h3>
+        <p className={`text-primary font-semibold ${viewMode === 'grid' ? 'text-xl mb-2' : 'text-lg'}`}>{getCurrencySymbol(currency)}{convertPrice(product.price).toFixed(2)}</p>
+      </div>
+      <div className={`${viewMode === 'grid' ? 'w-full' : 'flex flex-col items-end gap-2'}`}>
+        <span className="btn-primary w-full mt-2 text-center">View Details</span>
+        <button
+          onClick={handleAddToCart}
+          className="btn-secondary w-full flex items-center justify-center gap-2 mt-2"
+          aria-label="Add to cart"
+        >
+          <ShoppingCartIcon className="h-5 w-5" />
+          {viewMode === 'grid' && 'Add to Cart'}
+        </button>
+      </div>
     </Link>
   );
 };
@@ -54,5 +66,5 @@ const ProductCard = ({ product, small }) => {
 // Memoize the component to prevent unnecessary re-renders
 export default memo(ProductCard, (prevProps, nextProps) => {
   // Only re-render if product ID changes or small prop changes
-  return prevProps.product._id === nextProps.product._id && prevProps.small === nextProps.small;
+  return prevProps.product._id === nextProps.product._id && prevProps.small === nextProps.small && prevProps.viewMode === nextProps.viewMode;
 });

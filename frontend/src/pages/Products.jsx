@@ -16,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Helmet } from 'react-helmet';
 
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -223,54 +224,148 @@ const Products = () => {
             <MagnifyingGlassIcon className="h-7 w-7 text-primary mr-2" />
             <h2 className="text-3xl font-heading font-bold text-secondary">Browse Products</h2>
           </div>
-          <div className="flex flex-wrap gap-4 mb-6">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="input-field max-w-xs"
-            />
-            <select
-              value={selectedCategory}
-              onChange={e => setSelectedCategory(e.target.value)}
-              className="input-field max-w-xs"
-            >
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-            <input
-              type="number"
-              placeholder="Min price"
-              value={priceRange.min}
-              onChange={e => setPriceRange({ ...priceRange, min: e.target.value })}
-              className="input-field max-w-xs"
-            />
-            <input
-              type="number"
-              placeholder="Max price"
-              value={priceRange.max}
-              onChange={e => setPriceRange({ ...priceRange, max: e.target.value })}
-              className="input-field max-w-xs"
-            />
-            <select
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value)}
-              className="input-field max-w-xs"
-            >
-              {sortOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-            <button onClick={clearFilters} className="btn-secondary ml-2">Clear Filters</button>
+          {/* Filter and Sort Controls */} 
+          <div className="flex flex-col md:flex-row gap-4 mb-6 items-center justify-between">
+            {/* Search and Desktop Filters */} 
+            <div className="flex flex-wrap gap-4 w-full md:w-auto">
+              <div className="relative flex-grow">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="input-field pr-10 w-full"
+                />
+                <MagnifyingGlassIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              </div>
+              {/* Desktop-only filters */} 
+              <select
+                value={selectedCategory}
+                onChange={e => setSelectedCategory(e.target.value)}
+                className="input-field hidden md:block"
+              >
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+              <select
+                value={sortBy}
+                onChange={e => setSortBy(e.target.value)}
+                className="input-field hidden md:block"
+              >
+                {sortOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Mobile Filter/Sort Button and View Mode */} 
+            <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+              <button
+                onClick={() => setShowFilters(true)}
+                className="btn-secondary md:hidden flex items-center gap-2 flex-grow justify-center"
+              >
+                <FunnelIcon className="h-5 w-5" />
+                Filters & Sort
+              </button>
+
+              {/* View Mode Toggle */} 
+              <div className="flex bg-gray-200 rounded-xl p-1">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-500'}`}
+                  aria-label="Grid view"
+                >
+                  <Squares2X2Icon className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-500'}`}
+                  aria-label="List view"
+                >
+                  <ListBulletIcon className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 animate-fade-in">
+          {/* Mobile Filters Modal/Sidebar */} 
+          {showFilters && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end md:hidden">
+              <div className="bg-surface w-full max-w-sm h-full shadow-lg p-6 animate-slide-in-right overflow-y-auto">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-2xl font-heading font-bold text-secondary">Filters & Sort</h3>
+                  <button onClick={() => setShowFilters(false)} className="text-gray-500 hover:text-gray-700">
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <label htmlFor="mobile-category" className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <select
+                      id="mobile-category"
+                      value={selectedCategory}
+                      onChange={e => setSelectedCategory(e.target.value)}
+                      className="input-field w-full"
+                    >
+                      {categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="mobile-min-price" className="block text-sm font-medium text-gray-700 mb-2">Min Price</label>
+                    <input
+                      id="mobile-min-price"
+                      type="number"
+                      placeholder="Min price"
+                      value={priceRange.min}
+                      onChange={e => setPriceRange({ ...priceRange, min: e.target.value })}
+                      className="input-field w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="mobile-max-price" className="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
+                    <input
+                      id="mobile-max-price"
+                      type="number"
+                      placeholder="Max price"
+                      value={priceRange.max}
+                      onChange={e => setPriceRange({ ...priceRange, max: e.target.value })}
+                      className="input-field w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="mobile-sort-by" className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                    <select
+                      id="mobile-sort-by"
+                      value={sortBy}
+                      onChange={e => setSortBy(e.target.value)}
+                      className="input-field w-full"
+                    >
+                      {sortOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <button onClick={() => { clearFilters(); setShowFilters(false); }} className="btn-secondary w-full mt-4">
+                    Clear Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Products Grid/List */}
+          <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 animate-fade-in' : 'flex flex-col gap-4 animate-fade-in'}>
             {getFilteredProducts().length > 0 ? (
               getFilteredProducts().map(product => (
-                <ProductCard key={product._id} product={product} altText={product.title} />
+                <ProductCard key={product._id} product={product} altText={product.title} viewMode={viewMode} />
               ))
             ) : (
               <div className="col-span-full text-center py-16">
