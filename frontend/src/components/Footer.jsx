@@ -108,10 +108,38 @@ const Footer = () => {
   <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
         {/* Brand & Newsletter */}
         {/* Latest Events & Promotions */}
-        <div className="flex flex-col gap-3 md:col-span-1">
-          <h3 className="text-lg font-heading font-bold mb-2">Latest Events & Promotions</h3>
-          <EventsPreview />
-        </div>
+        <div className="flex flex-col gap-2 md:col-span-1 items-center sm:items-start">
+  <h3 className="text-lg font-heading font-bold mb-2">Rate Our Service</h3>
+  <div className="flex items-center gap-2 mb-2">
+    {[1,2,3,4,5].map(star => (
+      <button
+        key={star}
+        onClick={() => handleRate(star)}
+        className={`text-2xl ${userRating >= star ? 'text-primary' : 'text-gray-300'} focus:outline-none transition-colors`}
+        aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+      >
+        ★
+      </button>
+    ))}
+  </div>
+  <input
+    type="text"
+    placeholder="Your name (optional)"
+    value={userName}
+    onChange={e => setUserName(e.target.value)}
+    className="input-field max-w-xs w-full mb-2"
+  />
+  <textarea
+    placeholder="Leave a message..."
+    value={userMessage}
+    onChange={e => setUserMessage(e.target.value)}
+    className="input-field max-w-xs w-full mb-2"
+    rows={2}
+  />
+  <button onClick={handleSubmit} className="btn-primary w-full max-w-xs">Submit Rating</button>
+  {submitted && <div className="text-success font-medium mt-2">Thank you for your feedback!</div>}
+  <div className="text-sm text-gray-500 mt-2">Average rating: <span className="font-bold text-primary">{averageRating.toFixed(1)}</span> ({ratingCount} ratings)</div>
+</div>
         {/* Store Location Map */}
         <div className="flex flex-col gap-3 md:col-span-1">
           <h3 className="text-lg font-heading font-bold mb-2">Our Location</h3>
@@ -181,39 +209,6 @@ const Footer = () => {
   <span className="bg-white rounded shadow p-1"><img src="/icons/mastercard.svg" alt="MasterCard" className="w-8 h-6" /></span>
   <span className="bg-white rounded shadow p-1"><img src="/icons/paypal.svg" alt="PayPal" className="w-8 h-6" /></span>
 </div>
-        </div>
-        {/* Service Rating */}
-        <div className="flex flex-col gap-2 items-center sm:items-end">
-          <h3 className="text-lg font-heading font-bold mb-2">Rate Our Service</h3>
-          <div className="flex items-center gap-2 mb-2">
-            {[1,2,3,4,5].map(star => (
-              <button
-                key={star}
-                onClick={() => handleRate(star)}
-                className={`text-2xl ${userRating >= star ? 'text-primary' : 'text-gray-300'} focus:outline-none transition-colors`}
-                aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
-              >
-                ★
-              </button>
-            ))}
-          </div>
-          <input
-  type="text"
-  placeholder="Your name (optional)"
-  value={userName}
-  onChange={e => setUserName(e.target.value)}
-  className="input-field max-w-xs w-full mb-2"
-/>
-          <textarea
-  placeholder="Leave a message..."
-  value={userMessage}
-  onChange={e => setUserMessage(e.target.value)}
-  className="input-field max-w-xs w-full mb-2"
-  rows={2}
-/>
-          <button onClick={handleSubmit} className="btn-primary w-full max-w-xs">Submit Rating</button>
-          {submitted && <div className="text-success font-medium mt-2">Thank you for your feedback!</div>}
-          <div className="text-sm text-gray-500 mt-2">Average rating: <span className="font-bold text-primary">{averageRating.toFixed(1)}</span> ({ratingCount} ratings)</div>
         </div>
       </div>
       <div className="border-t border-yellow-300 mt-6 pt-2 text-center text-xs text-yellow-100 flex flex-col sm:flex-row justify-between items-center gap-2">
