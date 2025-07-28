@@ -2,7 +2,9 @@ import React from 'react';
 import { Squares2X2Icon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
-const CategoryDropdown = ({ categories, onClose, show, desktop, loading, error }) => {
+import categories from '../utils/categories';
+
+const CategoryDropdown = ({ onClose, show, desktop, loading, error }) => {
   // Keyboard navigation: close on Escape
   React.useEffect(() => {
     if (!show) return;

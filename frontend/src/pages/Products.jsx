@@ -17,11 +17,29 @@ import {
 import { Helmet } from 'react-helmet';
 
 
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState('');
+  const params = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Sync selectedCategory/subcategory with URL params
+  useEffect(() => {
+    if (location.pathname.startsWith('/category/')) {
+      const { categoryId, subcategoryId } = params;
+      setSelectedCategory(categoryId || 'all');
+      setSelectedSubcategory(subcategoryId || '');
+    } else {
+      setSelectedCategory('all');
+      setSelectedSubcategory('');
+    }
+  }, [params, location.pathname]);
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
@@ -80,7 +98,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [searchTerm, selectedCategory, priceRange, sortBy, sortOrder, pagination.page, pagination.limit]);
+  }, [searchTerm, selectedCategory, selectedSubcategory, priceRange, sortBy, sortOrder, pagination.page, pagination.limit]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -152,7 +170,36 @@ const Products = () => {
   // Client-side price filtering (until backend supports it)
   const getFilteredProducts = () => {
     let filtered = [...products];
-    
+
+    // Category filter
+    if (selectedCategory && selectedCategory !== 'all') {
+      filtered = filtered.filter(product => {
+        // Product category can be string or object; support both
+        if (!product.category) return false;
+        if (typeof product.category === 'string') {
+          return product.category === selectedCategory;
+        }
+        if (typeof product.category === 'object') {
+          return product.category.id === selectedCategory || product.category.name === selectedCategory;
+        }
+        return false;
+      });
+    }
+    // Subcategory filter
+    if (selectedSubcategory) {
+      filtered = filtered.filter(product => {
+        if (!product.subcategory) return false;
+        // subcategory can be string or object
+        if (typeof product.subcategory === 'string') {
+          return product.subcategory === selectedSubcategory;
+        }
+        if (typeof product.subcategory === 'object') {
+          return product.subcategory.id === selectedSubcategory || product.subcategory.name === selectedSubcategory;
+        }
+        return false;
+      });
+    }
+
     // Price range filter (client-side for now)
     if (priceRange.min !== '') {
       filtered = filtered.filter(product => product.price >= parseFloat(priceRange.min));
@@ -160,13 +207,13 @@ const Products = () => {
     if (priceRange.max !== '') {
       filtered = filtered.filter(product => product.price <= parseFloat(priceRange.max));
     }
-    
     return filtered;
   };
 
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedCategory('all');
+    setSelectedSubcategory('');
     setPriceRange({ min: '', max: '' });
     setSortBy('createdAt');
     setSortOrder('desc');
