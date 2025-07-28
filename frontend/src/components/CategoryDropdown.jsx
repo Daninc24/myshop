@@ -17,7 +17,9 @@ const CategoryDropdown = ({ onClose, show, desktop }) => {
 
   return (
     <div
-      className={`absolute ${desktop ? 'left-0 mt-2 w-56' : 'right-0 mt-2 w-full'} bg-white border border-blue-400 rounded-xl shadow-2xl z-50 transition-opacity max-h-80 overflow-y-auto`}
+      className={desktop
+        ? 'fixed left-0 top-[64px] w-screen bg-white border-b border-blue-400 shadow-2xl z-[9999] transition-opacity max-h-[350px] overflow-y-auto rounded-none'
+        : 'absolute right-0 mt-2 w-full bg-white border border-blue-400 rounded-xl shadow-2xl z-50 transition-opacity max-h-80 overflow-y-auto'}
       role="menu"
       aria-label="Categories"
       tabIndex={-1}
