@@ -96,51 +96,61 @@ const Navbar = () => {
               <ShoppingBagIcon className="h-7 w-7" />
             </Link>
             {/* Categories Dropdown */}
-            <div className="relative group">
-              <button
-                className="text-yellow-400 hover:text-yellow-300 bg-blue-800 hover:bg-blue-700 p-2 rounded-xl transition-colors flex items-center justify-center focus:outline-none border border-blue-700 shadow"
-                title="Categories"
-                aria-haspopup="true"
-                aria-expanded="false"
-                tabIndex={0}
-              >
-                <Squares2X2Icon className="h-7 w-7" />
-              </button>
-              <div className="absolute left-0 mt-2 w-56 bg-white border border-blue-200 rounded-xl shadow-lg z-40 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity max-h-80 overflow-y-auto">
-                {categories.map(cat =>
-  cat.subcategories ? (
-    <div key={cat.id} className="group relative">
-      <button
-        className="flex justify-between items-center w-full px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
-        type="button"
-      >
-        <span>{cat.name}</span>
-        <svg className="ml-2 h-4 w-4 text-gray-400 group-hover:text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-      </button>
-      <div className="absolute left-full top-0 mt-0 ml-1 w-52 bg-white border border-blue-200 rounded-xl shadow-lg z-50 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity max-h-80 overflow-y-auto">
-        {cat.subcategories.map(sub => (
-          <Link
-            key={sub.id}
-            to={`/products?category=${encodeURIComponent(cat.id)}&subcategory=${encodeURIComponent(sub.id)}`}
-            className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
-          >
-            {sub.name}
-          </Link>
-        ))}
-      </div>
-    </div>
-  ) : (
-    <Link
-      key={cat.id}
-      to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
-      className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
-    >
-      {cat.name}
-    </Link>
-  )
-)}
-              </div>
+            <div className="relative" onMouseEnter={() => setShowCategoryMenu(true)} onMouseLeave={() => setShowCategoryMenu(false)}>
+  <button
+    className="text-yellow-400 hover:text-yellow-300 bg-blue-800 hover:bg-blue-700 p-2 rounded-xl transition-colors flex items-center justify-center focus:outline-none border border-blue-700 shadow"
+    title="Categories"
+    aria-haspopup="true"
+    aria-expanded={showCategoryMenu}
+    tabIndex={0}
+    onClick={() => setShowCategoryMenu(v => !v)}
+    onFocus={() => setShowCategoryMenu(true)}
+  >
+    <Squares2X2Icon className="h-7 w-7" />
+  </button>
+  {showCategoryMenu && (
+    <div className="absolute left-0 mt-2 w-56 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 transition-opacity max-h-80 overflow-y-auto">
+      {categories.length === 0 && (
+        <div className="px-4 py-2 text-gray-400">No categories</div>
+      )}
+      {categories.map(cat =>
+        cat.subcategories && cat.subcategories.length > 0 ? (
+          <div key={cat.id} className="group relative">
+            <button
+              className="flex justify-between items-center w-full px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
+              type="button"
+              tabIndex={0}
+            >
+              <span>{cat.name}</span>
+              <svg className="ml-2 h-4 w-4 text-gray-400 group-hover:text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+            </button>
+            <div className="absolute left-full top-0 mt-0 ml-1 w-52 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 transition-opacity max-h-80 overflow-y-auto hidden group-hover:block group-focus-within:block">
+              {cat.subcategories.map(sub => (
+                <Link
+                  key={sub.id}
+                  to={`/products?category=${encodeURIComponent(cat.id)}&subcategory=${encodeURIComponent(sub.id)}`}
+                  className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
+                  onClick={() => setShowCategoryMenu(false)}
+                >
+                  {sub.name}
+                </Link>
+              ))}
             </div>
+          </div>
+        ) : (
+          <Link
+            key={cat.id}
+            to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
+            className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
+            onClick={() => setShowCategoryMenu(false)}
+          >
+            {cat.name}
+          </Link>
+        )
+      )}
+    </div>
+  )}
+</div>
             {/* Messages Icon */}
             {user && (
               <Link to="/messages" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="Messages">
@@ -249,7 +259,7 @@ const Navbar = () => {
           {/* Categories Dropdown */}
           <div className="relative group">
             <button
-              className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center w-full"
+              className="block px-3 py-2 rounded-xl text-yellow-400 bg-blue-900 hover:bg-blue-800 hover:text-yellow-300 focus:bg-yellow-100 focus:text-yellow-700 flex items-center justify-center w-full transition-colors"
               title="Categories"
               aria-haspopup="true"
               aria-expanded="false"
@@ -262,17 +272,45 @@ const Navbar = () => {
               <Squares2X2Icon className="h-7 w-7" />
             </button>
             {showCategoryMenu && (
-              <div className="absolute left-0 mt-2 w-56 bg-surface border border-gray-100 rounded-xl shadow-strong z-40">
-                {categories.map(cat => (
-                  <Link
-                    key={cat.id}
-                    to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
-                    className="block px-4 py-2 text-gray-800 dark:text-gray-100 hover:bg-primary/10 hover:text-primary rounded-xl text-sm"
-                    onClick={() => { setIsMobileMenuOpen(false); setShowCategoryMenu(false); }}
-                  >
-                    {cat.name}
-                  </Link>
-                ))}
+              <div className="absolute left-0 mt-2 w-56 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto">
+                {categories.length === 0 && (
+                  <div className="px-4 py-2 text-gray-400">No categories</div>
+                )}
+                {categories.map(cat =>
+                  cat.subcategories && cat.subcategories.length > 0 ? (
+                    <div key={cat.id} className="group relative">
+                      <button
+                        className="flex justify-between items-center w-full px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
+                        type="button"
+                        tabIndex={0}
+                      >
+                        <span>{cat.name}</span>
+                        <svg className="ml-2 h-4 w-4 text-gray-400 group-hover:text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                      </button>
+                      <div className="absolute left-full top-0 mt-0 ml-1 w-52 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto hidden group-hover:block group-focus-within:block">
+                        {cat.subcategories.map(sub => (
+                          <Link
+                            key={sub.id}
+                            to={`/products?category=${encodeURIComponent(cat.id)}&subcategory=${encodeURIComponent(sub.id)}`}
+                            className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
+                            onClick={() => { setIsMobileMenuOpen(false); setShowCategoryMenu(false); }}
+                          >
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <Link
+                      key={cat.id}
+                      to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
+                      className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
+                      onClick={() => { setIsMobileMenuOpen(false); setShowCategoryMenu(false); }}
+                    >
+                      {cat.name}
+                    </Link>
+                  )
+                )}
               </div>
             )}
           </div>
