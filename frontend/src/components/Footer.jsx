@@ -183,7 +183,7 @@ const Footer = () => {
         <div className="flex flex-col gap-2">
           <h3 className="text-lg font-heading font-bold mb-2">Quick Links</h3>
           <a href="/" className="hover:text-yellow-400 transition-colors">Home</a>
-          <a href="/products" className="hover:text-yellow-400 transition-colors">Shop</a>
+          <a href="/products" className="hover:text-yellow-400 transition-colors">Products</a>
           <a href="/about" className="hover:text-yellow-400 transition-colors">About Us</a>
           <a href="/contact" className="hover:text-yellow-400 transition-colors">Contact</a>
           <a href="/faq" className="hover:text-yellow-400 transition-colors">FAQ</a>
