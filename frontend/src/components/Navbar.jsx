@@ -23,7 +23,7 @@ const Navbar = () => {
       setError(null);
       try {
         const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-        const res = await fetch(`${API_BASE}/api/categories`);
+        const res = await fetch(`${API_BASE}/categories`);
         if (!res.ok) {
           const text = await res.text();
           console.error('Failed to fetch categories:', res.status, text);
