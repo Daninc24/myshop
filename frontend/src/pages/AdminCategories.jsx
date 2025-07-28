@@ -53,11 +53,24 @@ export default function AdminCategories() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    // Filter out empty subcategories
+    const filteredSubs = (form.subcategories || []).filter(
+      sub => sub.name && sub.id
+    );
+    // Check for duplicate subcategory IDs
+    const ids = filteredSubs.map(sub => sub.id);
+    const hasDupes = ids.length !== new Set(ids).size;
+    if (hasDupes) {
+      setError('Duplicate subcategory IDs are not allowed');
+      setLoading(false);
+      return;
+    }
     try {
+      const submitData = { ...form, subcategories: filteredSubs };
       if (editingId) {
-        await axios.put(`/api/categories/${editingId}`, form);
+        await axios.put(`/api/categories/${editingId}`, submitData);
       } else {
-        await axios.post('/api/categories', form);
+        await axios.post('/api/categories', submitData);
       }
       fetchCategories();
       resetForm();
@@ -66,6 +79,7 @@ export default function AdminCategories() {
     }
     setLoading(false);
   };
+
 
   const handleEdit = (cat) => {
     setForm({ ...cat, subcategories: cat.subcategories || [] });
