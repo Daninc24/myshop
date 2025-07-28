@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCartIcon, ShoppingBagIcon, UserIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, CreditCardIcon, Squares2X2Icon, HomeIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, UserPlusIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
-// import categories from '../utils/categories';
+import categories from '../utils/categories';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { io } from 'socket.io-client';
@@ -12,37 +12,7 @@ import CategoryDropdown from './CategoryDropdown';
 const Navbar = () => {
   // ...existing hooks
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  // Use VITE_API_BASE_URL in deployment, fallback to relative /api in dev
-  // Use VITE_API_BASE_URL in deployment, fallback to relative /api in dev
-  useEffect(() => {
-    const loadCategories = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-        const res = await fetch(`${API_BASE}/api/categories`);
-        if (!res.ok) {
-          const text = await res.text();
-          console.error('Failed to fetch categories:', res.status, text);
-          setError('Failed to fetch categories');
-          setCategories([]);
-          setLoading(false);
-          return;
-        }
-        const data = await res.json();
-        setCategories(data.categories || []);
-      } catch (err) {
-        console.error('Categories fetch error:', err);
-        setError('Error fetching categories');
-        setCategories([]);
-      }
-      setLoading(false);
-    };
-    loadCategories();
-  }, []);
+
 
   // Initialize currency from localStorage
   useEffect(() => {
