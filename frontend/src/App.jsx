@@ -121,6 +121,12 @@ function App() {
                         <AdminProducts />
                       </AdminRoute>
                     } />
+                    <Route path="/admin/categories" element={
+                      <AdminRoute>
+                        <SEO title="My Shop - Admin Categories" description="Manage categories and subcategories in My Shop." name="My Shop" type="website" />
+                        <AdminCategories />
+                      </AdminRoute>
+                    } />
                     <Route path="/admin/orders" element={
                       <AdminRoute>
                         <SEO title="My Shop - Admin Orders" description="Manage orders in My Shop." name="My Shop" type="website" />
