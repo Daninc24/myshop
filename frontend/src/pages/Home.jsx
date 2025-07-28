@@ -545,27 +545,9 @@ const Home = () => {
         </section>
       )}
       {/* Responsive Grid: Sidebar + Main Content */}
-      <div className="md:grid md:grid-cols-5 gap-8">
-        {/* Sidebar: Categories (desktop only) */}
-        <aside className="md:col-span-1 hidden md:block">
-          <div className="bg-white rounded-2xl shadow-lg p-4 h-fit sticky top-24 self-start">
-            <h3 className="text-lg font-bold text-orange-700 mb-4">Categories</h3>
-            <ul className="space-y-2">
-              {categories.map(category => (
-                <li key={category.id}>
-                  <button
-                    onClick={() => setSelectedCategory(category.id)}
-                    className={`w-full text-left px-3 py-2 rounded-lg font-medium transition-colors ${selectedCategory === category.id ? 'bg-orange-600 text-white' : 'text-gray-900 hover:bg-orange-100'}`}
-                  >
-                    {category.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
+      <div className="md:grid md:grid-cols-1 gap-8">
         {/* Main Content */}
-        <main className="md:col-span-4 flex flex-col gap-8">
+        <main className="flex flex-col gap-8">
           {/* Mobile: Horizontal Category Bar (improved) */}
           <div className="md:hidden w-full overflow-x-auto flex gap-2 py-2 mb-4 sticky top-0 z-20 bg-white shadow-sm border-b border-orange-100">
             {categories.map(category => (

@@ -59,7 +59,7 @@ const Navbar = () => {
   const posRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
 
   return (
-    <nav className="bg-gradient-to-r from-blue-700 via-purple-700 to-yellow-400 shadow-strong sticky top-0 z-50 border-b border-yellow-300 dark:from-gray-900 dark:via-blue-900 dark:to-yellow-600 transition-colors duration-300">
+    <nav className="bg-blue-900 shadow-2xl sticky top-0 z-50 border-b border-yellow-400 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-18 items-center">
           {/* Logo and Brand */}
@@ -91,7 +91,7 @@ const Navbar = () => {
             {/* Categories Dropdown */}
             <div className="relative group">
               <button
-                className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center focus:outline-none"
+                className="text-yellow-400 hover:text-yellow-300 bg-blue-800 hover:bg-blue-700 p-2 rounded-xl transition-colors flex items-center justify-center focus:outline-none border border-blue-700 shadow"
                 title="Categories"
                 aria-haspopup="true"
                 aria-expanded="false"
@@ -99,12 +99,12 @@ const Navbar = () => {
               >
                 <Squares2X2Icon className="h-7 w-7" />
               </button>
-              <div className="absolute left-0 mt-2 w-56 bg-surface border border-gray-100 rounded-xl shadow-strong z-40 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
+              <div className="absolute left-0 mt-2 w-56 bg-white border border-blue-200 rounded-xl shadow-lg z-40 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
                 {categories.map(cat => (
                   <Link
                     key={cat.id}
                     to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
-                    className="block px-4 py-2 text-gray-800 dark:text-gray-100 hover:bg-primary/10 hover:text-primary rounded-xl text-sm"
+                    className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
                   >
                     {cat.name}
                   </Link>
