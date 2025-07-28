@@ -147,7 +147,7 @@ const Footer = () => {
             <a href={twitterLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/twitter.svg" alt="Twitter" className="w-6 h-6" /></a>
             <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/whatsapp.svg" alt="WhatsApp" className="w-6 h-6" /></a>
           </div>
-          <button onClick={toggleDarkMode} className="mt-4 px-4 py-2 rounded-lg border dark:border-gray-600 text-xs bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Toggle Dark Mode</button>
+          
         </div>
         {/* Quick Links */}
         {/* Quick Links */}
