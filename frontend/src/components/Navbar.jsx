@@ -15,7 +15,7 @@ const Navbar = () => {
   // Use VITE_API_BASE_URL in deployment, fallback to relative /api in dev
   useEffect(() => {
     const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-    fetch(`${API_BASE}/categories`)
+    fetch(`${API_BASE}/api/categories`)
       .then(async res => {
         if (!res.ok) {
           const text = await res.text();
