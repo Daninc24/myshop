@@ -31,6 +31,7 @@ import AdminInventoryLogs from './pages/AdminInventoryLogs';
 import AdminPerformanceDashboard from './pages/AdminPerformanceDashboard';
 import AdminAdverts from './pages/AdminAdverts';
 import SEO from './components/SEO';
+import FAQ from './pages/FAQ';
 
 function App() {
   const location = useLocation();
