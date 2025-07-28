@@ -11,6 +11,7 @@ import CategoryDropdown from './CategoryDropdown';
 
 const Navbar = () => {
   const location = useLocation();
+  const [dropdownHover, setDropdownHover] = useState(false);
   // ...existing hooks
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
 
@@ -111,7 +112,16 @@ const Navbar = () => {
               <ShoppingBagIcon className="h-7 w-7" />
             </Link>
             {/* Categories Dropdown */}
-            <div className="relative" onMouseEnter={() => setShowCategoryMenu(true)} onMouseLeave={() => setShowCategoryMenu(false)}>
+            <div
+  className="relative"
+  onMouseEnter={() => { setShowCategoryMenu(true); setDropdownHover(true); }}
+  onMouseLeave={() => {
+    setDropdownHover(false);
+    setTimeout(() => {
+      if (!dropdownHover) setShowCategoryMenu(false);
+    }, 120);
+  }}
+>
   <button
     className="text-yellow-400 hover:text-yellow-300 bg-blue-800 hover:bg-blue-700 p-2 rounded-xl transition-colors flex items-center justify-center focus:outline-none border border-blue-700 shadow"
     title="Categories"
@@ -124,7 +134,16 @@ const Navbar = () => {
     <Squares2X2Icon className="h-7 w-7" />
   </button>
   {showCategoryMenu && (
-    <div className="absolute left-0 mt-2 w-56 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 transition-opacity max-h-80 overflow-y-auto">
+    <div
+      className="absolute left-0 mt-2 w-56 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 transition-opacity max-h-80 overflow-y-auto"
+      onMouseEnter={() => setDropdownHover(true)}
+      onMouseLeave={() => {
+        setDropdownHover(false);
+        setTimeout(() => {
+          if (!dropdownHover) setShowCategoryMenu(false);
+        }, 120);
+      }}
+    >
       {categories.length === 0 && (
         <div className="px-4 py-2 text-gray-400">No categories</div>
       )}
