@@ -33,9 +33,11 @@ export default function AdminCategories() {
 
   const handleSubInput = (idx, e) => {
     const updatedSubs = [...form.subcategories];
+    if (!updatedSubs[idx]) updatedSubs[idx] = { name: '', id: '' };
     updatedSubs[idx][e.target.name] = e.target.value;
     setForm({ ...form, subcategories: updatedSubs });
   };
+
 
   const addSubcategory = () => {
     setForm({ ...form, subcategories: [...form.subcategories, { ...emptySubcategory }] });
