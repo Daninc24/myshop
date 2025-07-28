@@ -56,7 +56,7 @@ const Navbar = () => {
   const posRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
 
   return (
-    <nav className="bg-blue-900 shadow-strong sticky top-0 z-50 border-b border-blue-800 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
+    <nav className="bg-gradient-to-r from-blue-700 via-purple-700 to-yellow-400 shadow-strong sticky top-0 z-50 border-b border-yellow-300 dark:from-gray-900 dark:via-blue-900 dark:to-yellow-600 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-18 items-center">
           {/* Logo and Brand */}
@@ -71,33 +71,33 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors"
+              className="text-white hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors"
             >
               Home
             </Link>
             <Link
               to="/products"
-              className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors"
+              className="text-white hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors"
             >
               Products
             </Link>
             {/* Messages Link for all authenticated users */}
             {user && (
-              <Link to="/messages" className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors flex items-center gap-2">
+              <Link to="/messages" className="text-white hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors flex items-center gap-2">
                 <ChatBubbleLeftRightIcon className="h-6 w-6" />
                 <span>Messages</span>
               </Link>
             )}
             {/* POS Link for allowed roles */}
             {user && posRoles.includes(user.role) && (
-              <Link to="/pos" className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors flex items-center gap-2">
+              <Link to="/pos" className="text-white hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors flex items-center gap-2">
                 <CreditCardIcon className="h-6 w-6" />
                 <span>POS</span>
               </Link>
             )}
             {/* Admin Dashboard Link */}
             {user?.role === 'admin' && (
-              <Link to="/admin" className="text-secondary hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors">
+              <Link to="/admin" className="text-white hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors">
                 Admin Dashboard
               </Link>
             )}
@@ -117,7 +117,7 @@ const Navbar = () => {
 
             {/* Cart Icon */}
             <Link to="/cart" className="relative group">
-              <ShoppingCartIcon className="h-7 w-7 text-secondary group-hover:text-primary transition-colors" />
+              <ShoppingCartIcon className="h-7 w-7 text-white group-hover:text-primary transition-colors" />
               {cartItemCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-soft">
                   {cartItemCount}
@@ -137,12 +137,12 @@ const Navbar = () => {
               </>
             ) : (
               <div className="relative group ml-2">
-                <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-secondary hover:text-primary font-medium focus:outline-none">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-white hover:text-primary font-medium focus:outline-none">
                   <UserIcon className="h-6 w-6" />
                   <span className="hidden md:inline">{user.name?.split(' ')[0] || 'Account'}</span>
                 </button>
                 <div className="absolute right-0 mt-2 w-40 bg-surface border border-gray-100 rounded-xl shadow-strong z-20 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
-                  <Link to="/profile" className="block px-4 py-2 text-secondary hover:bg-gray-50 rounded-t-xl">Profile</Link>
+                  <Link to="/profile" className="block px-4 py-2 text-white hover:bg-gray-50 rounded-t-xl">Profile</Link>
                   <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50 rounded-b-xl">Logout</button>
                 </div>
               </div>
@@ -154,7 +154,7 @@ const Navbar = () => {
             {/* Mobile menu toggle button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-xl text-secondary hover:text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+              className="inline-flex items-center justify-center p-2 rounded-xl text-white hover:text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
             >
               <span className="sr-only">Open main menu</span>
               {isMobileMenuOpen ? (
@@ -175,14 +175,14 @@ const Navbar = () => {
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <Link
             to="/"
-            className="block px-3 py-2 rounded-xl text-base font-medium text-secondary hover:bg-gray-100"
+            className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Home
           </Link>
           <Link
             to="/products"
-            className="block px-3 py-2 rounded-xl text-base font-medium text-secondary hover:bg-gray-100"
+            className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Products
@@ -190,7 +190,7 @@ const Navbar = () => {
           {user && (
             <Link
               to="/messages"
-              className="block px-3 py-2 rounded-xl text-base font-medium text-secondary hover:bg-gray-100 flex items-center gap-2"
+              className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100 flex items-center gap-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <ChatBubbleLeftRightIcon className="h-6 w-6" />
@@ -200,7 +200,7 @@ const Navbar = () => {
           {user && posRoles.includes(user.role) && (
             <Link
               to="/pos"
-              className="block px-3 py-2 rounded-xl text-base font-medium text-secondary hover:bg-gray-100 flex items-center gap-2"
+              className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100 flex items-center gap-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <CreditCardIcon className="h-6 w-6" />
@@ -210,7 +210,7 @@ const Navbar = () => {
           {user?.role === 'admin' && (
             <Link
               to="/admin"
-              className="block px-3 py-2 rounded-xl text-base font-medium text-secondary hover:bg-gray-100"
+              className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Admin Dashboard
@@ -231,7 +231,7 @@ const Navbar = () => {
           </div>
           <Link
             to="/cart"
-            className="block px-3 py-2 rounded-xl text-base font-medium text-secondary hover:bg-gray-100 flex items-center gap-2"
+            className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100 flex items-center gap-2"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <ShoppingCartIcon className="h-6 w-6" />
@@ -258,7 +258,7 @@ const Navbar = () => {
             <div className="pt-2">
               <Link
                 to="/profile"
-                className="block px-3 py-2 rounded-xl text-base font-medium text-secondary hover:bg-gray-100"
+                className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Profile
