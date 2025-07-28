@@ -12,12 +12,26 @@ const Navbar = () => {
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [categories, setCategories] = useState([]);
   // Use VITE_API_BASE_URL in deployment, fallback to relative /api in dev
+  // Use VITE_API_BASE_URL in deployment, fallback to relative /api in dev
   useEffect(() => {
     const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
     fetch(`${API_BASE}/api/categories`)
-      .then(res => res.json())
-      .then(data => setCategories(data.categories || []))
-      .catch(() => setCategories([]));
+      .then(async res => {
+        if (!res.ok) {
+          const text = await res.text();
+          console.error('Failed to fetch categories:', res.status, text);
+          setCategories([]);
+          return;
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (data) setCategories(data.categories || []);
+      })
+      .catch(err => {
+        console.error('Categories fetch error:', err);
+        setCategories([]);
+      });
   }, []);
   const { user, logout } = useAuth();
   const { cart } = useCart();
