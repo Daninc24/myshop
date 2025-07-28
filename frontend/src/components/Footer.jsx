@@ -1,13 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const whatsappNumber = '254791991154'; // Replace with your WhatsApp number (country code + number, no + sign)
+const EventsPreview = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await axios.get('/events?upcoming=true');
+        setEvents(Array.isArray(res.data) ? res.data.slice(0, 3) : []);
+      } catch (err) {
+        setError('Could not load events');
+        setEvents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
+
+  if (loading) return <div className="text-gray-400 dark:text-gray-500 text-xs">Loading events…</div>;
+  if (error) return <div className="text-red-500 text-xs">{error}</div>;
+  if (!events.length) return <div className="text-gray-400 dark:text-gray-500 text-xs">No upcoming events.</div>;
+
+  return (
+    <ul className="space-y-1 text-sm">
+      {events.map(event => (
+        <li key={event._id || event.title}>
+          <span className="font-medium text-primary">{event.title}</span>
+          {event.date && (
+            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">{new Date(event.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          )}
+          {event.link ? (
+            <a href={event.link} target="_blank" rel="noopener noreferrer" className="ml-2 underline hover:text-primary">More Info</a>
+          ) : null}
+        </li>
+      ))}
+      <li>
+        <a href="/events" className="underline hover:text-primary text-xs">See all events &rarr;</a>
+      </li>
+    </ul>
+  );
+};
+
+const whatsappNumber = '254791991154';
 const whatsappLink = `https://wa.me/${whatsappNumber}`;
-const phoneNumber = '+254791991154'; // Replace with your phone number
-const email = 'info@myshoppingcenter.com'; // Replace with your email
-const facebookLink = 'https://facebook.com/myshoppingcenter'; // Replace with your Facebook page
-const twitterLink = 'https://twitter.com/myshoppingcenter'; // Replace with your Twitter profile
+const phoneNumber = '+254791991154';
+const email = 'info@myshoppingcenter.com';
+const facebookLink = 'https://facebook.com/myshoppingcenter';
+const twitterLink = 'https://twitter.com/myshoppingcenter';
 const eventsLink = '/events';
+
+// Dark mode utility
+const toggleDarkMode = () => {
+  document.documentElement.classList.toggle('dark');
+};
+
+const mapEmbedUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.16228411687!2d36.821946!3d-1.292066!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d2d5555555%3A0x5b7f5e5e5e5e5e5e!2sNairobi!5e0!3m2!1sen!2ske!4v1620000000000!5m2!1sen!2ske';
+
 
 const Footer = () => {
   // Service rating state
@@ -49,15 +103,38 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-surface border-t border-gray-100 mt-12 py-12 px-4 text-secondary">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
+    <footer className="bg-surface border-t border-gray-100 dark:bg-gray-900 dark:text-gray-200 mt-12 py-12 px-4 text-secondary transition-colors duration-300">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-10">
         {/* Brand & Newsletter */}
+        {/* Latest Events & Promotions */}
+        <div className="flex flex-col gap-3 md:col-span-1">
+          <h3 className="text-lg font-heading font-bold mb-2">Latest Events & Promotions</h3>
+          <EventsPreview />
+        </div>
+        {/* Store Location Map */}
+        <div className="flex flex-col gap-3 md:col-span-1">
+          <h3 className="text-lg font-heading font-bold mb-2">Our Location</h3>
+          <div className="rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700">
+            <iframe
+              src={mapEmbedUrl}
+              width="100%"
+              height="150"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Store Location"
+              className="w-full h-40 md:h-32"
+            ></iframe>
+          </div>
+          <span className="text-xs text-gray-500 dark:text-gray-400">Nairobi, Kenya</span>
+        </div>
         <div className="flex flex-col gap-4 md:col-span-1">
           <div className="flex items-center gap-3 mb-2">
             <img src="/logo192.png" alt="Logo" className="w-10 h-10 rounded-xl shadow-lg" />
-            <span className="font-heading text-2xl font-bold text-primary">MyShopping Center</span>
+            <span className="font-heading text-2xl font-bold text-primary dark:text-yellow-400">MyShopping Center</span>
           </div>
-          <p className="text-gray-500 mb-2">Your one-stop shop for everything awesome. Enjoy seamless shopping, fast delivery, and great deals!</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-2">Your one-stop shop for everything awesome. Enjoy seamless shopping, fast delivery, and great deals!</p>
           <form className="flex flex-col gap-2" onSubmit={e => { e.preventDefault(); alert('Subscribed!'); }}>
             <label htmlFor="newsletter" className="font-medium">Subscribe to our newsletter</label>
             <div className="flex gap-2">
@@ -70,7 +147,9 @@ const Footer = () => {
             <a href={twitterLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><img src="/icons/twitter.svg" alt="Twitter" className="w-6 h-6" /></a>
             <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><img src="/icons/whatsapp.svg" alt="WhatsApp" className="w-6 h-6" /></a>
           </div>
+          <button onClick={toggleDarkMode} className="mt-4 px-4 py-2 rounded-lg border dark:border-gray-600 text-xs bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Toggle Dark Mode</button>
         </div>
+        {/* Quick Links */}
         {/* Quick Links */}
         <div className="flex flex-col gap-2">
           <h3 className="text-lg font-heading font-bold mb-2">Quick Links</h3>
