@@ -103,7 +103,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-surface border-t border-gray-100 dark:bg-gray-900 dark:text-gray-200 mt-12 py-12 px-4 text-secondary transition-colors duration-300">
+    <footer className="bg-blue-900 border-t border-blue-800 dark:bg-gray-900 dark:text-gray-100 mt-12 py-12 px-4 text-white transition-colors duration-300">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-10">
         {/* Brand & Newsletter */}
         {/* Latest Events & Promotions */}
@@ -131,9 +131,9 @@ const Footer = () => {
         </div>
         <div className="flex flex-col gap-4 md:col-span-1">
           <div className="flex items-center gap-3 mb-2">
-            <img src="/logo192.png" alt="Logo" className="w-10 h-10 rounded-xl shadow-lg" />
-            <span className="font-heading text-2xl font-bold text-primary dark:text-yellow-400">MyShopping Center</span>
-          </div>
+  <img src="/images/logo-footer.svg" alt="Logo" className="w-12 h-12 rounded-xl shadow-lg bg-white p-1" />
+  <span className="font-heading text-2xl font-bold text-yellow-400 drop-shadow">MyShopping Center</span>
+</div>
           <p className="text-gray-500 dark:text-gray-400 mb-2">Your one-stop shop for everything awesome. Enjoy seamless shopping, fast delivery, and great deals!</p>
           <form className="flex flex-col gap-2" onSubmit={e => { e.preventDefault(); alert('Subscribed!'); }}>
             <label htmlFor="newsletter" className="font-medium">Subscribe to our newsletter</label>
@@ -143,9 +143,9 @@ const Footer = () => {
             </div>
           </form>
           <div className="flex gap-3 mt-4">
-            <a href={facebookLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><img src="/icons/facebook.svg" alt="Facebook" className="w-6 h-6" /></a>
-            <a href={twitterLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><img src="/icons/twitter.svg" alt="Twitter" className="w-6 h-6" /></a>
-            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform"><img src="/icons/whatsapp.svg" alt="WhatsApp" className="w-6 h-6" /></a>
+            <a href={facebookLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/facebook.svg" alt="Facebook" className="w-6 h-6" /></a>
+            <a href={twitterLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/twitter.svg" alt="Twitter" className="w-6 h-6" /></a>
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/whatsapp.svg" alt="WhatsApp" className="w-6 h-6" /></a>
           </div>
           <button onClick={toggleDarkMode} className="mt-4 px-4 py-2 rounded-lg border dark:border-gray-600 text-xs bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Toggle Dark Mode</button>
         </div>
@@ -153,12 +153,12 @@ const Footer = () => {
         {/* Quick Links */}
         <div className="flex flex-col gap-2">
           <h3 className="text-lg font-heading font-bold mb-2">Quick Links</h3>
-          <a href="/" className="hover:text-primary transition-colors">Home</a>
-          <a href="/products" className="hover:text-primary transition-colors">Shop</a>
-          <a href="/about" className="hover:text-primary transition-colors">About Us</a>
-          <a href="/contact" className="hover:text-primary transition-colors">Contact</a>
-          <a href="/faq" className="hover:text-primary transition-colors">FAQ</a>
-          <a href={eventsLink} className="hover:text-primary transition-colors">Events</a>
+          <a href="/" className="hover:text-yellow-400 transition-colors">Home</a>
+          <a href="/products" className="hover:text-yellow-400 transition-colors">Shop</a>
+          <a href="/about" className="hover:text-yellow-400 transition-colors">About Us</a>
+          <a href="/contact" className="hover:text-yellow-400 transition-colors">Contact</a>
+          <a href="/faq" className="hover:text-yellow-400 transition-colors">FAQ</a>
+          <a href={eventsLink} className="hover:text-yellow-400 transition-colors">Events</a>
         </div>
         {/* Contact Info */}
         <div className="flex flex-col gap-2">
@@ -176,10 +176,10 @@ const Footer = () => {
             <span>Nairobi, Kenya</span>
           </div>
           <div className="flex gap-2 mt-2">
-            <img src="/icons/visa.svg" alt="Visa" className="w-8 h-6" />
-            <img src="/icons/mastercard.svg" alt="MasterCard" className="w-8 h-6" />
-            <img src="/icons/paypal.svg" alt="PayPal" className="w-8 h-6" />
-          </div>
+  <span className="bg-white rounded shadow p-1"><img src="/icons/visa.svg" alt="Visa" className="w-8 h-6" /></span>
+  <span className="bg-white rounded shadow p-1"><img src="/icons/mastercard.svg" alt="MasterCard" className="w-8 h-6" /></span>
+  <span className="bg-white rounded shadow p-1"><img src="/icons/paypal.svg" alt="PayPal" className="w-8 h-6" /></span>
+</div>
         </div>
         {/* Service Rating */}
         <div className="flex flex-col gap-4 items-center md:items-end">
@@ -215,7 +215,7 @@ const Footer = () => {
           <div className="text-sm text-gray-500 mt-2">Average rating: <span className="font-bold text-primary">{averageRating.toFixed(1)}</span> ({ratingCount} ratings)</div>
         </div>
       </div>
-      <div className="border-t border-gray-200 mt-10 pt-6 text-center text-xs text-gray-400 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div className="border-t border-blue-800 mt-10 pt-6 text-center text-xs text-blue-200 flex flex-col md:flex-row justify-between items-center gap-4">
         <span>&copy; {new Date().getFullYear()} MyShopping Center. All rights reserved.</span>
         <a href="#top" className="text-primary hover:underline">Back to Top ↑</a>
       </div>

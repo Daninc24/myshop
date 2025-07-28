@@ -38,7 +38,7 @@ const advertTemplates = [
       productId ? (
         <Link to={`/products/${productId}`} className="block group">
           <div className="card flex gap-6 items-center mb-6 animate-fade-in group-hover:shadow-lg transition-shadow">
-            {image && <img src={getOptimizedImageUrl(image)} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-2xl shadow-soft" />}
+            <img src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-2xl shadow-soft" />
             <div>
               <h2 className="text-2xl font-heading font-bold text-secondary mb-1 group-hover:text-primary transition-colors">{title}</h2>
               <p className="text-gray-700 mb-2">{message}</p>
@@ -48,7 +48,7 @@ const advertTemplates = [
         </Link>
       ) : (
         <div className="card flex gap-6 items-center mb-6 animate-fade-in">
-          {image && <img src={getOptimizedImageUrl(image)} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-2xl shadow-soft" />}
+          <img src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-2xl shadow-soft" />
           <div>
             <h2 className="text-2xl font-heading font-bold text-secondary mb-1">{title}</h2>
             <p className="text-gray-700 mb-2">{message}</p>
@@ -61,7 +61,7 @@ const advertTemplates = [
     id: 'banner',
     render: ({ title, message, image }) => (
       <div className="relative h-36 flex items-center justify-center bg-primary-light rounded-2xl overflow-hidden mb-6 animate-slide-in">
-        {image && <img src={getOptimizedImageUrl(image)} alt={title ? `Advert: ${title}` : 'Advert'} className="absolute inset-0 w-full h-full object-cover opacity-30" />}
+        <img src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="absolute inset-0 w-full h-full object-cover opacity-30" />
         <div className="relative z-10 text-center">
           <h2 className="text-3xl font-heading font-bold text-primary drop-shadow mb-1">{title}</h2>
           <p className="text-primary-dark text-lg">{message}</p>
@@ -73,7 +73,7 @@ const advertTemplates = [
     id: 'card',
     render: ({ title, message, image }) => (
       <div className="bg-gradient-to-br from-primary-light to-accent-light rounded-2xl p-6 flex flex-col items-center mb-6 animate-bounce-in">
-        {image && <img src={getOptimizedImageUrl(image)} alt={title ? `Advert: ${title}` : 'Advert'} className="w-24 h-24 object-cover rounded-full mb-3 shadow-soft" />}
+        <img src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-24 h-24 object-cover rounded-full mb-3 shadow-soft" />
         <h2 className="text-xl font-heading font-bold text-primary mb-1">{title}</h2>
         <p className="text-base text-secondary mb-1">{message}</p>
       </div>
@@ -83,7 +83,7 @@ const advertTemplates = [
     id: 'left-image',
     render: ({ title, message, image, product }) => (
       <div className="flex items-center bg-gradient-to-r from-accent to-primary text-white rounded-2xl p-6 gap-6 mb-6 animate-slide-in">
-        {image && <img src={getOptimizedImageUrl(image)} alt={title ? `Advert: ${title}` : 'Advert'} className="w-32 h-32 object-cover rounded-2xl shadow-strong" />}
+        <img src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-32 h-32 object-cover rounded-2xl shadow-strong" />
         <div>
           <h2 className="text-2xl font-heading font-bold mb-1">{title}</h2>
           <p className="text-white mb-2">{message}</p>
