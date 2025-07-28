@@ -52,7 +52,7 @@ const couponRoutes = require('./routes/coupons');
 const advertsRoutes = require('./routes/adverts');
 const testimonialsRoutes = require('./routes/testimonials');
 const pageViewRoutes = require('./routes/pageViews');
-
+const categoryRoutes = require('./routes/categoryRoutes');
 
 
 const { credentialCache, loadCredentials } = require('./utils/credentialCache');
@@ -293,8 +293,7 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/adverts', advertsRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
 app.use('/api/pageviews', pageViewRoutes);
-
-
+app.use('/api/categories', categoryRoutes);
 
 // Handle OPTIONS requests for image uploads
 app.options('/uploads/:filename', (req, res) => {

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCartIcon, ShoppingBagIcon, UserIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, CreditCardIcon, Squares2X2Icon, HomeIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, UserPlusIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
-import categories from '../utils/categories';
+// import categories from '../utils/categories';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { io } from 'socket.io-client';
@@ -10,6 +11,13 @@ import axios from 'axios';
 const Navbar = () => {
   // ...existing hooks
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(data => setCategories(data.categories || []))
+      .catch(() => setCategories([]));
+  }, []);
   const { user, logout } = useAuth();
   const { cart } = useCart();
   const { currency, setCurrency } = useCart();
@@ -99,16 +107,39 @@ const Navbar = () => {
               >
                 <Squares2X2Icon className="h-7 w-7" />
               </button>
-              <div className="absolute left-0 mt-2 w-56 bg-white border border-blue-200 rounded-xl shadow-lg z-40 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
-                {categories.map(cat => (
-                  <Link
-                    key={cat.id}
-                    to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
-                    className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
-                  >
-                    {cat.name}
-                  </Link>
-                ))}
+              <div className="absolute left-0 mt-2 w-56 bg-white border border-blue-200 rounded-xl shadow-lg z-40 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity max-h-80 overflow-y-auto">
+                {categories.map(cat =>
+  cat.subcategories ? (
+    <div key={cat.id} className="group relative">
+      <button
+        className="flex justify-between items-center w-full px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
+        type="button"
+      >
+        <span>{cat.name}</span>
+        <svg className="ml-2 h-4 w-4 text-gray-400 group-hover:text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+      </button>
+      <div className="absolute left-full top-0 mt-0 ml-1 w-52 bg-white border border-blue-200 rounded-xl shadow-lg z-50 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity max-h-80 overflow-y-auto">
+        {cat.subcategories.map(sub => (
+          <Link
+            key={sub.id}
+            to={`/products?category=${encodeURIComponent(cat.id)}&subcategory=${encodeURIComponent(sub.id)}`}
+            className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
+          >
+            {sub.name}
+          </Link>
+        ))}
+      </div>
+    </div>
+  ) : (
+    <Link
+      key={cat.id}
+      to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
+      className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
+    >
+      {cat.name}
+    </Link>
+  )
+)}
               </div>
             </div>
             {/* Messages Icon */}
