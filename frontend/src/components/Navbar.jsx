@@ -62,12 +62,7 @@ const Navbar = () => {
           {/* Logo and Brand */}
           <div className="flex items-center gap-3">
             <Link to="/" className="flex-shrink-0 flex items-center gap-2">
-              <div className="h-10 w-10 bg-primary rounded-2xl flex items-center justify-center shadow-strong">
-                <span className="text-white font-bold text-2xl">M</span>
-              </div>
-              <span className="ml-2 text-2xl font-heading font-bold text-secondary hidden sm:block">
-                MyShopping
-              </span>
+              <img src="/images/logo-footer.svg" alt="MyShop Logo" className="h-12 w-12" />
             </Link>
           </div>
 

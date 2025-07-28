@@ -79,7 +79,11 @@ exports.deleteAdvert = async (req, res) => {
 exports.listAdverts = async (req, res) => {
   try {
     const adverts = await Advert.find().populate('product');
-    res.json({ adverts });
+    const advertsWithImage = adverts.map(ad => ({
+      ...ad.toObject(),
+      image: ad.images && ad.images.length > 0 ? ad.images[0] : ''
+    }));
+    res.json({ adverts: advertsWithImage });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching adverts', error: error.message });
   }
@@ -105,7 +109,11 @@ exports.getActiveAdverts = async (req, res) => {
     });
     const adverts = allAdverts.filter(ad => ad.active && (!ad.startDate || ad.startDate <= now) && (!ad.endDate || ad.endDate >= now));
 
-    res.json({ adverts });
+    const advertsWithImage = adverts.map(ad => ({
+      ...ad.toObject(),
+      image: ad.images && ad.images.length > 0 ? ad.images[0] : ''
+    }));
+    res.json({ adverts: advertsWithImage });
   } catch (error) {
     console.error('Error in getActiveAdverts:', error);
     res.status(500).json({ message: 'Error fetching active adverts', error: error.message });
