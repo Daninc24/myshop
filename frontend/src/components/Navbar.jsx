@@ -11,8 +11,10 @@ const Navbar = () => {
   // ...existing hooks
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [categories, setCategories] = useState([]);
+  // Use VITE_API_BASE_URL in deployment, fallback to relative /api in dev
   useEffect(() => {
-    fetch('/api/categories')
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+    fetch(`${API_BASE}/api/categories`)
       .then(res => res.json())
       .then(data => setCategories(data.categories || []))
       .catch(() => setCategories([]));
