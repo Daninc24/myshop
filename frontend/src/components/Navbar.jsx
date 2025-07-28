@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCartIcon, ShoppingBagIcon, UserIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, CreditCardIcon, Squares2X2Icon, HomeIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, UserPlusIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import categories from '../utils/categories';
@@ -7,7 +7,6 @@ import { useCart } from '../contexts/CartContext';
 // Lazy-load socket.io-client
 import axios from 'axios';
 
-import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 const CategoryDropdown = React.lazy(() => import('./CategoryDropdown'));
 
 const Navbar = () => {
