@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCartIcon, ShoppingBagIcon, UserIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, CreditCardIcon, Squares2X2Icon, HomeIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, UserPlusIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 // import categories from '../utils/categories';
@@ -7,6 +7,8 @@ import { useCart } from '../contexts/CartContext';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 
+import CategoryDropdown from './CategoryDropdown';
+
 const Navbar = () => {
   // ...existing hooks
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
@@ -14,24 +16,30 @@ const Navbar = () => {
   // Use VITE_API_BASE_URL in deployment, fallback to relative /api in dev
   // Use VITE_API_BASE_URL in deployment, fallback to relative /api in dev
   useEffect(() => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-    fetch(`${API_BASE}/api/categories`)
-      .then(async res => {
+    const loadCategories = async () => {
+      try {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+        const res = await fetch(`${API_BASE}/api/categories`);
         if (!res.ok) {
           const text = await res.text();
           console.error('Failed to fetch categories:', res.status, text);
           setCategories([]);
           return;
         }
-        return res.json();
-      })
-      .then(data => {
-        if (data) setCategories(data.categories || []);
-      })
-      .catch(err => {
+        const data = await res.json();
+        setCategories(data.categories || []);
+      } catch (err) {
         console.error('Categories fetch error:', err);
         setCategories([]);
-      });
+      }
+    };
+    loadCategories();
+  }, []);
+
+  // Initialize currency from localStorage
+  useEffect(() => {
+    const savedCurrency = localStorage.getItem('currency');
+    if (savedCurrency) setCurrency(savedCurrency);
   }, []);
   const { user, logout } = useAuth();
   const { cart } = useCart();
@@ -77,7 +85,7 @@ const Navbar = () => {
     navigate('/login');
   };
 
-  const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const cartItemCount = useMemo(() => cart.reduce((total, item) => total + item.quantity, 0), [cart]);
 
   const posRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
 
@@ -273,63 +281,14 @@ const Navbar = () => {
             <ShoppingBagIcon className="h-7 w-7" />
           </Link>
           {/* Categories Dropdown */}
-          <div className="relative group">
-            <button
-              className="block px-3 py-2 rounded-xl text-yellow-400 bg-blue-900 hover:bg-blue-800 hover:text-yellow-300 focus:bg-yellow-100 focus:text-yellow-700 flex items-center justify-center w-full transition-colors"
-              title="Categories"
-              aria-haspopup="true"
-              aria-expanded="false"
-              tabIndex={0}
-              onClick={e => {
-                e.stopPropagation();
-                setShowCategoryMenu(m => !m);
-              }}
-            >
-              <Squares2X2Icon className="h-7 w-7" />
-            </button>
-            {showCategoryMenu && (
-              <div className="absolute left-0 mt-2 w-56 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto">
-                {categories.length === 0 && (
-                  <div className="px-4 py-2 text-gray-400">No categories</div>
-                )}
-                {categories.map(cat =>
-                  cat.subcategories && cat.subcategories.length > 0 ? (
-                    <div key={cat.id} className="group relative">
-                      <button
-                        className="flex justify-between items-center w-full px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
-                        type="button"
-                        tabIndex={0}
-                      >
-                        <span>{cat.name}</span>
-                        <svg className="ml-2 h-4 w-4 text-gray-400 group-hover:text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                      </button>
-                      <div className="absolute left-full top-0 mt-0 ml-1 w-52 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto hidden group-hover:block group-focus-within:block">
-                        {cat.subcategories.map(sub => (
-                          <Link
-                            key={sub.id}
-                            to={`/products?category=${encodeURIComponent(cat.id)}&subcategory=${encodeURIComponent(sub.id)}`}
-                            className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
-                            onClick={() => { setIsMobileMenuOpen(false); setShowCategoryMenu(false); }}
-                          >
-                            {sub.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <Link
-                      key={cat.id}
-                      to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
-                      className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
-                      onClick={() => { setIsMobileMenuOpen(false); setShowCategoryMenu(false); }}
-                    >
-                      {cat.name}
-                    </Link>
-                  )
-                )}
-              </div>
-            )}
-          </div>
+          <CategoryDropdown
+            categories={categories}
+            onClose={() => setShowCategoryMenu(false)}
+            show={showCategoryMenu}
+            desktop={false}
+            loading={loading}
+            error={error}
+          />
           {user && (
             <Link
               to="/messages"
