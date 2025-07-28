@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const EventsPreview = () => {
@@ -184,10 +185,10 @@ const Footer = () => {
           <h3 className="text-lg font-heading font-bold mb-2">Quick Links</h3>
           <a href="/" className="hover:text-yellow-400 transition-colors">Home</a>
           <a href="/products" className="hover:text-yellow-400 transition-colors">Products</a>
-          <a href="/about" className="hover:text-yellow-400 transition-colors">About Us</a>
-          <a href="/contact" className="hover:text-yellow-400 transition-colors">Contact</a>
-          <a href="/faq" className="hover:text-yellow-400 transition-colors">FAQ</a>
-          <a href={eventsLink} className="hover:text-yellow-400 transition-colors">Events</a>
+          <Link to="/about" className="hover:text-yellow-400 transition-colors">About Us</Link>
+          <Link to="/contact" className="hover:text-yellow-400 transition-colors">Contact</Link>
+          <Link to="/faq" className="hover:text-yellow-400 transition-colors">FAQ</Link>
+          <Link to="/events" className="hover:text-yellow-400 transition-colors">Events</Link>
         </div>
         {/* Contact Info */}
         <div className="flex flex-col gap-2">
