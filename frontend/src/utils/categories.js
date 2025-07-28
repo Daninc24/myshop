@@ -1,0 +1,37 @@
+// Centralized categories array for Navbar, Home, Products, etc.
+const categories = [
+  { id: 'all', name: 'All Products' },
+  { id: 'Electronics', name: 'Electronics' },
+  { id: 'Computers & Laptops', name: 'Computers & Laptops' },
+  { id: 'Mobile Phones', name: 'Mobile Phones' },
+  { id: 'Accessories', name: 'Accessories' },
+  { id: 'Home & Kitchen', name: 'Home & Kitchen' },
+  { id: 'Sports', name: 'Sports' },
+  { id: 'Fashion', name: 'Fashion' },
+  { id: 'Beauty', name: 'Beauty & Personal Care' },
+  { id: 'Toys', name: 'Toys & Games' },
+  { id: 'Books', name: 'Books' },
+  { id: 'Automotive', name: 'Automotive' },
+  { id: 'Groceries', name: 'Groceries' },
+  { id: 'Health', name: 'Health & Wellness' },
+  { id: 'Office', name: 'Office Supplies' },
+  { id: 'Garden', name: 'Garden & Outdoors' },
+  { id: 'Pets', name: 'Pet Supplies' },
+  { id: 'Baby', name: 'Baby & Kids' },
+  { id: 'Music', name: 'Music & Instruments' },
+  { id: 'Art', name: 'Art & Craft' },
+  { id: 'Jewelry', name: 'Jewelry' },
+  { id: 'Shoes', name: 'Shoes' },
+  { id: 'Bags', name: 'Bags & Luggage' },
+  { id: 'Watches', name: 'Watches' },
+  { id: 'Phones', name: 'Phones & Tablets' },
+  { id: 'Cameras', name: 'Cameras & Photography' },
+  { id: 'Gaming', name: 'Gaming' },
+  { id: 'Stationery', name: 'Stationery' },
+  { id: 'Food', name: 'Food & Beverages' },
+  { id: 'Tools', name: 'Tools & Hardware' },
+  { id: 'Travel', name: 'Travel' },
+  { id: 'Fitness', name: 'Fitness & Exercise' }
+];
+
+export default categories;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCartIcon, UserIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, CreditCardIcon } from '@heroicons/react/24/outline';
+import { ShoppingCartIcon, UserIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, CreditCardIcon, Squares2X2Icon, HomeIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, UserPlusIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import categories from '../utils/categories';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { io } from 'socket.io-client';
@@ -62,46 +63,70 @@ const Navbar = () => {
           {/* Logo and Brand */}
           <div className="flex items-center gap-2 md:gap-4 min-w-0">
             <Link to="/" className="flex-shrink-0 flex items-center gap-2 md:gap-3 min-w-0">
-  <img src="/images/logo-footer.svg" alt="MyShop Logo" className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white shadow-lg p-1" aria-label="MyShopping Center Logo" />
-  <span className="hidden sm:inline font-heading text-xl sm:text-2xl font-bold text-yellow-400 drop-shadow">MyShopping Center</span>
-</Link>
+              <img src="/images/logo-footer.svg" alt="MyShop Logo" className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white shadow-lg p-1" aria-label="MyShopping Center Logo" />
+              <span className="hidden sm:inline font-heading text-xl sm:text-2xl font-bold text-yellow-400 drop-shadow">MyShopping Center</span>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
+            {/* Home Icon */}
             <Link
               to="/"
-              className="text-white hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors"
+              className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center"
+              title="Home"
             >
-              Home
+              <HomeIcon className="h-7 w-7" />
             </Link>
+            {/* Products Icon */}
             <Link
               to="/products"
-              className="text-white hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors"
+              className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center"
+              title="Products"
             >
-              Products
+              <ShoppingBagIcon className="h-7 w-7" />
             </Link>
-            {/* Messages Link for all authenticated users */}
+            {/* Categories Dropdown */}
+            <div className="relative group">
+              <button
+                className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center focus:outline-none"
+                title="Categories"
+                aria-haspopup="true"
+                aria-expanded="false"
+                tabIndex={0}
+              >
+                <Squares2X2Icon className="h-7 w-7" />
+              </button>
+              <div className="absolute left-0 mt-2 w-56 bg-surface border border-gray-100 rounded-xl shadow-strong z-40 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
+                {categories.map(cat => (
+                  <Link
+                    key={cat.id}
+                    to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
+                    className="block px-4 py-2 text-gray-800 dark:text-gray-100 hover:bg-primary/10 hover:text-primary rounded-xl text-sm"
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            {/* Messages Icon */}
             {user && (
-              <Link to="/messages" className="text-white hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors flex items-center gap-2">
-                <ChatBubbleLeftRightIcon className="h-6 w-6" />
-                <span>Messages</span>
+              <Link to="/messages" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="Messages">
+                <ChatBubbleLeftRightIcon className="h-7 w-7" />
               </Link>
             )}
-            {/* POS Link for allowed roles */}
+            {/* POS Icon */}
             {user && posRoles.includes(user.role) && (
-              <Link to="/pos" className="text-white hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors flex items-center gap-2">
-                <CreditCardIcon className="h-6 w-6" />
-                <span>POS</span>
+              <Link to="/pos" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="POS">
+                <CreditCardIcon className="h-7 w-7" />
               </Link>
             )}
-            {/* Admin Dashboard Link */}
+            {/* Admin Dashboard Icon */}
             {user?.role === 'admin' && (
-              <Link to="/admin" className="text-white hover:text-primary px-4 py-2 rounded-xl text-base font-medium transition-colors">
-                Admin Dashboard
+              <Link to="/admin" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="Admin Dashboard">
+                <Cog6ToothIcon className="h-7 w-7" />
               </Link>
             )}
-
             {/* Currency Selector */}
             <select
               value={currency}
@@ -116,7 +141,7 @@ const Navbar = () => {
             </select>
 
             {/* Cart Icon */}
-            <Link to="/cart" className="relative group">
+            <Link to="/cart" className="relative group" title="Cart">
               <ShoppingCartIcon className="h-7 w-7 text-white group-hover:text-primary transition-colors" />
               {cartItemCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-soft">
@@ -124,22 +149,20 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
-
             {/* User Controls */}
             {!user ? (
               <>
-                <Link to="/login" className="btn-primary px-5 py-2 text-base font-semibold rounded-xl ml-2">
-                  Login
+                <Link to="/login" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="Login">
+                  <ArrowRightOnRectangleIcon className="h-7 w-7" />
                 </Link>
-                <Link to="/register" className="btn-secondary px-5 py-2 text-base font-semibold rounded-xl ml-2">
-                  Register
+                <Link to="/register" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="Register">
+                  <UserPlusIcon className="h-7 w-7" />
                 </Link>
               </>
             ) : (
               <div className="relative group ml-2">
-                <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-white hover:text-primary font-medium focus:outline-none">
-                  <UserIcon className="h-6 w-6" />
-                  <span className="hidden md:inline">{user.name?.split(' ')[0] || 'Account'}</span>
+                <button className="flex items-center gap-2 p-2 rounded-xl text-white hover:text-primary focus:outline-none" title="Account">
+                  <UserIcon className="h-7 w-7" />
                 </button>
                 <div className="absolute right-0 mt-2 w-40 bg-surface border border-gray-100 rounded-xl shadow-strong z-20 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
                   <Link to="/profile" className="block px-4 py-2 text-white hover:bg-gray-50 rounded-t-xl">Profile</Link>
@@ -173,47 +196,82 @@ const Navbar = () => {
         className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} bg-surface shadow-lg`}
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          {/* Home Icon */}
           <Link
             to="/"
-            className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100"
+            className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
             onClick={() => setIsMobileMenuOpen(false)}
+            title="Home"
           >
-            Home
+            <HomeIcon className="h-7 w-7" />
           </Link>
+          {/* Products Icon */}
           <Link
             to="/products"
-            className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100"
+            className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
             onClick={() => setIsMobileMenuOpen(false)}
+            title="Products"
           >
-            Products
+            <ShoppingBagIcon className="h-7 w-7" />
           </Link>
+          {/* Categories Dropdown */}
+          <div className="relative group">
+            <button
+              className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center w-full"
+              title="Categories"
+              aria-haspopup="true"
+              aria-expanded="false"
+              tabIndex={0}
+              onClick={e => {
+                e.stopPropagation();
+                setShowCategoryMenu(m => !m);
+              }}
+            >
+              <Squares2X2Icon className="h-7 w-7" />
+            </button>
+            {showCategoryMenu && (
+              <div className="absolute left-0 mt-2 w-56 bg-surface border border-gray-100 rounded-xl shadow-strong z-40">
+                {categories.map(cat => (
+                  <Link
+                    key={cat.id}
+                    to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
+                    className="block px-4 py-2 text-gray-800 dark:text-gray-100 hover:bg-primary/10 hover:text-primary rounded-xl text-sm"
+                    onClick={() => { setIsMobileMenuOpen(false); setShowCategoryMenu(false); }}
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
           {user && (
             <Link
               to="/messages"
-              className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100 flex items-center gap-2"
+              className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
               onClick={() => setIsMobileMenuOpen(false)}
+              title="Messages"
             >
-              <ChatBubbleLeftRightIcon className="h-6 w-6" />
-              <span>Messages</span>
+              <ChatBubbleLeftRightIcon className="h-7 w-7" />
             </Link>
           )}
           {user && posRoles.includes(user.role) && (
             <Link
               to="/pos"
-              className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100 flex items-center gap-2"
+              className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
               onClick={() => setIsMobileMenuOpen(false)}
+              title="POS"
             >
-              <CreditCardIcon className="h-6 w-6" />
-              <span>POS</span>
+              <CreditCardIcon className="h-7 w-7" />
             </Link>
           )}
           {user?.role === 'admin' && (
             <Link
               to="/admin"
-              className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100"
+              className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
               onClick={() => setIsMobileMenuOpen(false)}
+              title="Admin Dashboard"
             >
-              Admin Dashboard
+              <Cog6ToothIcon className="h-7 w-7" />
             </Link>
           )}
           <div className="border-t border-gray-100 pt-2">
@@ -231,46 +289,55 @@ const Navbar = () => {
           </div>
           <Link
             to="/cart"
-            className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100 flex items-center gap-2"
+            className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center relative"
             onClick={() => setIsMobileMenuOpen(false)}
+            title="Cart"
           >
-            <ShoppingCartIcon className="h-6 w-6" />
-            <span>Cart ({cartItemCount})</span>
+            <ShoppingCartIcon className="h-7 w-7" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-soft">
+                {cartItemCount}
+              </span>
+            )}
           </Link>
           {!user ? (
-            <div className="pt-2">
+            <div className="pt-2 flex gap-2">
               <Link
                 to="/login"
-                className="block w-full text-center btn-primary px-3 py-2 rounded-xl text-base font-medium mb-2"
+                className="block w-full text-center text-white hover:text-primary px-3 py-2 rounded-xl flex items-center justify-center"
                 onClick={() => setIsMobileMenuOpen(false)}
+                title="Login"
               >
-                Login
+                <ArrowRightOnRectangleIcon className="h-7 w-7 mx-auto" />
               </Link>
               <Link
                 to="/register"
-                className="block w-full text-center btn-secondary px-3 py-2 rounded-xl text-base font-medium"
+                className="block w-full text-center text-white hover:text-primary px-3 py-2 rounded-xl flex items-center justify-center"
                 onClick={() => setIsMobileMenuOpen(false)}
+                title="Register"
               >
-                Register
+                <UserPlusIcon className="h-7 w-7 mx-auto" />
               </Link>
             </div>
           ) : (
-            <div className="pt-2">
+            <div className="pt-2 flex gap-2">
               <Link
                 to="/profile"
-                className="block px-3 py-2 rounded-xl text-base font-medium text-white hover:bg-gray-100"
+                className="block w-full text-center text-white hover:text-primary px-3 py-2 rounded-xl flex items-center justify-center"
                 onClick={() => setIsMobileMenuOpen(false)}
+                title="Profile"
               >
-                Profile
+                <UserIcon className="h-7 w-7 mx-auto" />
               </Link>
               <button
                 onClick={() => {
                   handleLogout();
                   setIsMobileMenuOpen(false);
                 }}
-                className="block w-full text-left px-3 py-2 rounded-xl text-base font-medium text-red-600 hover:bg-gray-100"
+                className="block w-full text-center px-3 py-2 rounded-xl text-red-600 hover:text-primary flex items-center justify-center"
+                title="Logout"
               >
-                Logout
+                <ArrowLeftOnRectangleIcon className="h-7 w-7 mx-auto" />
               </button>
             </div>
           )}
