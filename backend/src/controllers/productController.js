@@ -48,7 +48,11 @@ const getAllProducts = async (req, res) => {
       return product;
     });
     
-    // Return pagination metadata along with products
+    // If query is for new arrivals (no search/category/pagination), return array for compatibility
+    if (!search && (!category || category === 'all') && pageNum === 1 && limitNum === 12 && !req.query.sort && !req.query.order) {
+      return res.json(migratedProducts);
+    }
+    // Return pagination metadata along with products (default)
     res.json({
       products: migratedProducts,
       pagination: {
