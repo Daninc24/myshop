@@ -13,25 +13,33 @@ const Navbar = () => {
   // ...existing hooks
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   // Use VITE_API_BASE_URL in deployment, fallback to relative /api in dev
   // Use VITE_API_BASE_URL in deployment, fallback to relative /api in dev
   useEffect(() => {
     const loadCategories = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
         const res = await fetch(`${API_BASE}/api/categories`);
         if (!res.ok) {
           const text = await res.text();
           console.error('Failed to fetch categories:', res.status, text);
+          setError('Failed to fetch categories');
           setCategories([]);
+          setLoading(false);
           return;
         }
         const data = await res.json();
         setCategories(data.categories || []);
       } catch (err) {
         console.error('Categories fetch error:', err);
+        setError('Error fetching categories');
         setCategories([]);
       }
+      setLoading(false);
     };
     loadCategories();
   }, []);
