@@ -6,6 +6,7 @@ import { CartProvider } from './contexts/CartContext';
 import { ToastProvider } from './contexts/ToastContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
+import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
@@ -48,7 +49,9 @@ function App() {
           <AuthProvider>
             <CartProvider>
               <div className="min-h-screen bg-gray-50">
-                <Navbar />
+                <ErrorBoundary>
+  <Navbar />
+</ErrorBoundary>
                 <main className="container mx-auto px-4 py-8">
                   <Routes>
                     {/* Public Routes */}
