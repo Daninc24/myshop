@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import categories from '../utils/categories';
 
-const CategoryDropdown = ({ onClose, show, desktop, loading, error }) => {
+const CategoryDropdown = ({ onClose, show, desktop }) => {
   // Keyboard navigation: close on Escape
   React.useEffect(() => {
     if (!show) return;
@@ -22,9 +22,7 @@ const CategoryDropdown = ({ onClose, show, desktop, loading, error }) => {
       aria-label="Categories"
       tabIndex={-1}
     >
-      {loading && <div className="px-4 py-2 text-gray-400">Loading...</div>}
-      {error && <div className="px-4 py-2 text-red-500">{error}</div>}
-      {!loading && !error && categories.length === 0 && (
+      {categories.length === 0 && (
         <div className="px-4 py-2 text-gray-400">No categories</div>
       )}
       {categories.map(cat =>
