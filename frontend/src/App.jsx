@@ -27,6 +27,7 @@ import AdminEvents from './pages/AdminEvents';
 import POS from './pages/POS';
 import AdminUsers from './pages/AdminUsers';
 import AdminSalesReport from './pages/AdminSalesReport';
+import AdminCategories from './pages/AdminCategories';
 import AdminInventoryLogs from './pages/AdminInventoryLogs';
 import AdminPerformanceDashboard from './pages/AdminPerformanceDashboard';
 import AdminAdverts from './pages/AdminAdverts';
