@@ -4,7 +4,31 @@ import { Link } from 'react-router-dom';
 
 import categories from '../utils/categories';
 
-const CategoryDropdown = ({ onClose, show, desktop }) => {
+const CategoryDropdown = ({
+  show,
+  categories,
+  onClose,
+  desktop,
+  loading,
+  error,
+}) => {
+  // Show loading state
+  if (loading) {
+    return (
+      <div className={`absolute z-50 ${desktop ? 'top-12' : 'top-0 left-0 w-full h-screen'} bg-white p-4 shadow-xl`}>
+        <p className="text-gray-500 text-center">Loading categories...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`absolute z-50 ${desktop ? 'top-12' : 'top-0 left-0 w-full h-screen'} bg-white p-4 shadow-xl`}>
+        <p className="text-red-500 text-center">Failed to load categories</p>
+      </div>
+    );
+  }
+
   // Keyboard navigation: close on Escape
   React.useEffect(() => {
     if (!show) return;

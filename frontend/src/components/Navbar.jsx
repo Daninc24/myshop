@@ -7,12 +7,13 @@ import { useCart } from '../contexts/CartContext';
 // Lazy-load socket.io-client
 import axios from 'axios';
 
-import CategoryDropdown from './CategoryDropdown';
+import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
+const CategoryDropdown = React.lazy(() => import('./CategoryDropdown'));
 
 const Navbar = () => {
   const location = useLocation();
   const [dropdownHover, setDropdownHover] = useState(false);
-  // ...existing hooks
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
 
   // Collapse category menu on route change
@@ -25,19 +26,28 @@ const Navbar = () => {
   // Initialize currency from localStorage
   useEffect(() => {
     const savedCurrency = localStorage.getItem('currency');
-    if (savedCurrency) setCurrency(savedCurrency);
-  }, []);
+    if (savedCurrency && savedCurrency !== currency) {
+      setCurrency(savedCurrency);
+    }
+  }, [currency, setCurrency]);
   const { user, logout } = useAuth();
   const { cart, currency, setCurrency } = useCart();
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const timeoutRef = useRef();
+
   const [onlineUsers, setOnlineUsers] = useState([]);
   const socketRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const [currencies, setCurrencies] = useState(['USD']);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      return;
+    }
     if (socketRef.current) return;
     let mounted = true;
     import('socket.io-client').then(({ io }) => {
@@ -62,10 +72,11 @@ const Navbar = () => {
   }, [user]);
 
   useEffect(() => {
+    if (currencies.length > 1) return;
     axios.get('/payment/currency/list')
       .then(res => setCurrencies(res.data.currencies))
       .catch(() => setCurrencies(['USD']));
-  }, []);
+  }, [currencies]);
 
   const handleCurrencyChange = (e) => {
     setCurrency(e.target.value);
@@ -81,6 +92,25 @@ const Navbar = () => {
 
   const posRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
 
+  const categoryProps = useMemo(() => ({
+    categories,
+    onClose: () => setShowCategoryMenu(false),
+    show: showCategoryMenu,
+    loading: false,
+    error: null,
+  }), [categories, showCategoryMenu]);
+
+  const handleMouseEnter = () => {
+    clearTimeout(timeoutRef.current);
+    setShowCategoryMenu(true);
+    setDropdownHover(true);
+  };
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      if (!dropdownHover) setShowCategoryMenu(false);
+    }, 120);
+  };
+
   return (
     <nav className="bg-blue-900 shadow-2xl sticky top-0 z-50 border-b border-yellow-400 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -88,17 +118,154 @@ const Navbar = () => {
           {/* Logo and Brand */}
           <div className="flex items-center gap-2 md:gap-4 min-w-0">
             <Link to="/" className="flex-shrink-0 flex items-center gap-2 md:gap-3 min-w-0">
-              <img src="/images/logo-footer.svg" alt="MyShop Logo" className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white shadow-lg p-1" aria-label="MyShopping Center Logo" />
+              <img src="/images/logo-footer.svg" alt="MyShopping Center official logo" className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white shadow-lg p-1" aria-label="MyShopping Center Logo" />
               <span className="hidden sm:inline font-heading text-xl sm:text-2xl font-bold text-yellow-400 drop-shadow">MyShopping Center</span>
             </Link>
-          </div>
+            {/* Category Button */}
+            <div
+              className="relative"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button
+                className="text-yellow-400 hover:text-yellow-300 bg-blue-800 hover:bg-blue-700 p-2 rounded-xl transition-colors flex items-center justify-center focus:outline-none border border-blue-700 shadow"
+                title="Categories"
+                aria-haspopup="true"
+                aria-expanded={showCategoryMenu}
+                tabIndex={0}
+                onClick={() => setShowCategoryMenu(v => !v)}
+                onFocus={() => setShowCategoryMenu(true)}
+              >
+                <Squares2X2Icon className="h-7 w-7" /> // Only keep this in the main trigger, remove any duplicate in desktop nav
+              </button>
+            </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
+            {/* Full-width Category Dropdown (desktop only) */}
+            <Suspense fallback={<div>Loading...</div>}>
+              {showCategoryMenu && (
+                <CategoryDropdown {...categoryProps} desktop id="category-menu-id" role="menu" />
+              )}
+            </Suspense>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-6">
+              {/* Home Icon */}
+              <Link
+                to="/"
+                className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center"
+                title="Home"
+              >
+                <HomeIcon className="h-7 w-7" />
+              </Link>
+              {/* Products Icon */}
+              <Link
+                to="/products"
+                className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center"
+                title="Products"
+              >
+                <ShoppingBagIcon className="h-7 w-7" />
+              </Link>
+
+              {/* Messages Icon */}
+              {user && (
+                <Link to="/messages" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="Messages">
+                  <ChatBubbleLeftRightIcon className="h-7 w-7" />
+                </Link>
+              )}
+              {/* POS Icon */}
+              {user && posRoles.includes(user.role) && (
+                <Link to="/pos" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="POS">
+                  <CreditCardIcon className="h-7 w-7" />
+                </Link>
+              )}
+              {/* Admin Dashboard Icon */}
+              {user?.role === 'admin' && (
+                <Link to="/admin" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="Admin Dashboard">
+                  <Cog6ToothIcon className="h-7 w-7" />
+                </Link>
+              )}
+              {/* Currency Selector */}
+              <select
+                value={currency}
+                onChange={handleCurrencyChange}
+                className="border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-blue-900 text-yellow-400"
+                style={{ minWidth: 100 }}
+                title="Select currency"
+              >
+                {currencies.map(cur => (
+                  <option key={cur} value={cur}>{cur}</option>
+                ))}
+              </select>
+
+              {/* Cart Icon */}
+              <Link to="/cart" className="relative group" title="Cart">
+                <ShoppingCartIcon className="h-7 w-7 text-white group-hover:text-primary transition-colors" />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-soft">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Link>
+              {/* User Controls */}
+              {!user ? (
+                <>
+                  <Link to="/login" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="Login">
+                    <ArrowRightOnRectangleIcon className="h-7 w-7" />
+                  </Link>
+                  <Link to="/register" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="Register">
+                    <UserPlusIcon className="h-7 w-7" />
+                  </Link>
+                </>
+              ) : (
+                <div className="relative group ml-2">
+                  <button className="flex items-center gap-2 p-2 rounded-xl text-white hover:text-primary focus:outline-none" title="Account">
+                    <div className="relative">
+                      <UserIcon className="h-7 w-7" />
+                      {onlineUsers.length > 0 && (
+                        <span className="absolute -top-1 -right-2 bg-green-500 text-white text-xs rounded-full px-1 font-bold shadow-soft" title={`Online users: ${onlineUsers.length}`}>
+                          {onlineUsers.length}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                  <div className="absolute right-0 mt-2 w-40 bg-surface border border-gray-100 rounded-xl shadow-strong z-20 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
+                    <Link to="/profile" className="block px-4 py-2 text-white hover:bg-gray-50 rounded-t-xl">Profile</Link>
+                    <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50 rounded-b-xl">Logout</button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="flex md:hidden items-center">
+              {/* Mobile menu toggle button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-xl text-white hover:text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+              >
+                <span className="sr-only">Open main menu</span>
+                {isMobileMenuOpen ? (
+                  <XMarkIcon className="block h-7 w-7" aria-hidden="true" />
+                ) : (
+                  <Bars3Icon className="block h-7 w-7" aria-hidden="true" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div
+          ref={mobileMenuRef}
+          className={`md:hidden transition-all duration-300 ${isMobileMenuOpen ? 'max-h-screen' : 'max-h-0 overflow-hidden'} bg-surface shadow-lg`}
+          aria-label="Mobile menu"
+        >
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {/* Home Icon */}
             <Link
               to="/"
-              className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center"
+              className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
+              onClick={() => setIsMobileMenuOpen(false)}
               title="Home"
             >
               <HomeIcon className="h-7 w-7" />
@@ -111,80 +278,7 @@ const Navbar = () => {
             >
               <ShoppingBagIcon className="h-7 w-7" />
             </Link>
-            {/* Categories Dropdown */}
-            <div
-  className="relative"
-  onMouseEnter={() => { setShowCategoryMenu(true); setDropdownHover(true); }}
-  onMouseLeave={() => {
-    setDropdownHover(false);
-    setTimeout(() => {
-      if (!dropdownHover) setShowCategoryMenu(false);
-    }, 120);
-  }}
->
-  <button
-    className="text-yellow-400 hover:text-yellow-300 bg-blue-800 hover:bg-blue-700 p-2 rounded-xl transition-colors flex items-center justify-center focus:outline-none border border-blue-700 shadow"
-    title="Categories"
-    aria-haspopup="true"
-    aria-expanded={showCategoryMenu}
-    tabIndex={0}
-    onClick={() => setShowCategoryMenu(v => !v)}
-    onFocus={() => setShowCategoryMenu(true)}
-  >
-    <Squares2X2Icon className="h-7 w-7" />
-  </button>
-  {showCategoryMenu && (
-    <div
-      className="absolute left-0 mt-2 w-80 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 transition-opacity max-h-80 overflow-y-auto"
-      onMouseEnter={() => setDropdownHover(true)}
-      onMouseLeave={() => {
-        setDropdownHover(false);
-        setTimeout(() => {
-          if (!dropdownHover) setShowCategoryMenu(false);
-        }, 120);
-      }}
-    >
-      {categories.length === 0 && (
-        <div className="px-4 py-2 text-gray-400">No categories</div>
-      )}
-      {categories.map(cat =>
-        cat.subcategories && cat.subcategories.length > 0 ? (
-          <div key={cat.id} className="group relative">
-            <button
-              className="flex justify-between items-center w-full px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
-              type="button"
-              tabIndex={0}
-            >
-              <span>{cat.name}</span>
-              <svg className="ml-2 h-4 w-4 text-gray-400 group-hover:text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-            </button>
-            <div className="absolute left-full top-0 mt-0 ml-1 w-52 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 transition-opacity max-h-80 overflow-y-auto hidden group-hover:block group-focus-within:block">
-              {cat.subcategories.map(sub => (
-                <Link
-                  key={sub.id}
-                  to={`/products?category=${encodeURIComponent(cat.id)}&subcategory=${encodeURIComponent(sub.id)}`}
-                  className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
-                  onClick={() => setShowCategoryMenu(false)}
-                >
-                  {sub.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <Link
-            key={cat.id}
-            to={cat.id === 'all' ? '/products' : `/products?category=${encodeURIComponent(cat.id)}`}
-            className="block px-4 py-2 text-gray-900 hover:bg-blue-100 hover:text-blue-800 focus:bg-yellow-100 focus:text-yellow-700 rounded-xl text-sm transition-colors"
-            onClick={() => setShowCategoryMenu(false)}
-          >
-            {cat.name}
-          </Link>
-        )
-      )}
-    </div>
-  )}
-</div>
+            
             {/* Messages Icon */}
             {user && (
               <Link to="/messages" className="text-white hover:text-primary p-2 rounded-xl transition-colors flex items-center justify-center" title="Messages">
@@ -276,7 +370,8 @@ const Navbar = () => {
       {/* Mobile Menu */}
       <div
         ref={mobileMenuRef}
-        className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} bg-surface shadow-lg`}
+        className={`md:hidden transition-all duration-300 ${isMobileMenuOpen ? 'max-h-screen' : 'max-h-0 overflow-hidden'} bg-surface shadow-lg`}
+        aria-label="Mobile menu"
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           {/* Home Icon */}
@@ -303,6 +398,8 @@ const Navbar = () => {
             onClose={() => setShowCategoryMenu(false)}
             show={showCategoryMenu}
             desktop={false}
+            loading={false}
+            error={null}
           />
           {user && (
             <Link
