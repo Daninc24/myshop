@@ -103,7 +103,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-blue-900 border-t border-blue-800 dark:bg-gray-900 dark:text-gray-100 mt-12 py-8 sm:py-10 px-2 sm:px-4 text-white transition-colors duration-300">
+    <footer className="bg-gradient-to-r from-blue-700 via-purple-700 to-yellow-400 border-t border-yellow-300 dark:from-gray-900 dark:via-blue-900 dark:to-yellow-600 dark:text-gray-100 mt-12 py-8 sm:py-10 px-2 sm:px-4 text-white transition-colors duration-300">
   {/* Responsive grid: 1col xs, 2col sm, 3col md, 5col lg */}
   <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 md:gap-10">
         {/* Brand & Newsletter */}
@@ -216,7 +216,7 @@ const Footer = () => {
           <div className="text-sm text-gray-500 mt-2">Average rating: <span className="font-bold text-primary">{averageRating.toFixed(1)}</span> ({ratingCount} ratings)</div>
         </div>
       </div>
-      <div className="border-t border-blue-800 mt-8 pt-4 text-center text-xs text-blue-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="border-t border-yellow-300 mt-8 pt-4 text-center text-xs text-yellow-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <span>&copy; {new Date().getFullYear()} MyShopping Center. All rights reserved.</span>
         <a href="#top" className="text-primary hover:underline">Back to Top ↑</a>
       </div>
