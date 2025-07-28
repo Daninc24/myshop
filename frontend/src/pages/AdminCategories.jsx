@@ -114,14 +114,14 @@ export default function AdminCategories() {
         </div>
         <div className="mb-2">
           <label className="block font-semibold">Subcategories</label>
-          {form.subcategories.map((sub, idx) => (
-            <div key={idx} className="flex gap-2 mb-1">
-              <input name="name" placeholder="Subcategory Name" value={sub.name} onChange={e => handleSubInput(idx, e)} className="border rounded px-2 py-1 flex-1" required />
-              <input name="id" placeholder="Subcategory ID" value={sub.id} onChange={e => handleSubInput(idx, e)} className="border rounded px-2 py-1 w-36" required />
-              <button type="button" onClick={() => removeSubcategory(idx)} className="text-red-500 font-bold">&times;</button>
+          {(form.subcategories.length === 0 ? [{}] : form.subcategories).map((sub, idx) => (
+            <div key={idx} className="flex gap-2 mb-1 items-center">
+              <input name="name" placeholder="Subcategory Name" value={sub.name || ''} onChange={e => handleSubInput(idx, e)} className="border rounded px-2 py-1 flex-1" required />
+              <input name="id" placeholder="Subcategory ID" value={sub.id || ''} onChange={e => handleSubInput(idx, e)} className="border rounded px-2 py-1 w-36" required />
+              <button type="button" onClick={() => removeSubcategory(idx)} className="ml-1 px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200" title="Remove Subcategory">&times;</button>
             </div>
           ))}
-          <button type="button" onClick={addSubcategory} className="text-blue-600 underline mt-1">+ Add Subcategory</button>
+          <button type="button" onClick={addSubcategory} className="mt-2 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 font-semibold" title="Add Subcategory">+ Add Subcategory</button>
         </div>
         {error && <div className="text-red-600 mb-2">{error}</div>}
         <div className="flex gap-2 mt-4">
