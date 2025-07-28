@@ -1,17 +1,24 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCartIcon, ShoppingBagIcon, UserIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, CreditCardIcon, Squares2X2Icon, HomeIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, UserPlusIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import categories from '../utils/categories';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
-import { io } from 'socket.io-client';
+// Lazy-load socket.io-client
 import axios from 'axios';
 
 import CategoryDropdown from './CategoryDropdown';
 
 const Navbar = () => {
+  const location = useLocation();
   // ...existing hooks
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+
+  // Collapse category menu on route change
+  useEffect(() => {
+    setShowCategoryMenu(false);
+    setIsMobileMenuOpen(false);
+  }, [location]);
 
 
   // Initialize currency from localStorage
@@ -20,8 +27,7 @@ const Navbar = () => {
     if (savedCurrency) setCurrency(savedCurrency);
   }, []);
   const { user, logout } = useAuth();
-  const { cart } = useCart();
-  const { currency, setCurrency } = useCart();
+  const { cart, currency, setCurrency } = useCart();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -32,18 +38,25 @@ const Navbar = () => {
   useEffect(() => {
     if (!user) return;
     if (socketRef.current) return;
-    const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com', {
-      withCredentials: true,
-      transports: ['websocket'],
+    let mounted = true;
+    import('socket.io-client').then(({ io }) => {
+      if (!mounted) return;
+      const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com', {
+        withCredentials: true,
+        transports: ['websocket'],
+      });
+      socketRef.current = socket;
+      socket.on('online_users', (users) => {
+        setOnlineUsers(users);
+      });
+      socket.emit('get_online_users');
     });
-    socketRef.current = socket;
-    socket.on('online_users', (users) => {
-      setOnlineUsers(users);
-    });
-    socket.emit('get_online_users');
     return () => {
-      socket.disconnect();
-      socketRef.current = null;
+      mounted = false;
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
     };
   }, [user]);
 
@@ -175,7 +188,7 @@ const Navbar = () => {
             <select
               value={currency}
               onChange={handleCurrencyChange}
-              className="border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary"
+              className="border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-blue-900 text-yellow-400"
               style={{ minWidth: 100 }}
               title="Select currency"
             >
@@ -206,7 +219,14 @@ const Navbar = () => {
             ) : (
               <div className="relative group ml-2">
                 <button className="flex items-center gap-2 p-2 rounded-xl text-white hover:text-primary focus:outline-none" title="Account">
-                  <UserIcon className="h-7 w-7" />
+                  <div className="relative">
+                    <UserIcon className="h-7 w-7" />
+                    {onlineUsers.length > 0 && (
+                      <span className="absolute -top-1 -right-2 bg-green-500 text-white text-xs rounded-full px-1 font-bold shadow-soft" title={`Online users: ${onlineUsers.length}`}>
+                        {onlineUsers.length}
+                      </span>
+                    )}
+                  </div>
                 </button>
                 <div className="absolute right-0 mt-2 w-40 bg-surface border border-gray-100 rounded-xl shadow-strong z-20 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
                   <Link to="/profile" className="block px-4 py-2 text-white hover:bg-gray-50 rounded-t-xl">Profile</Link>
@@ -264,8 +284,6 @@ const Navbar = () => {
             onClose={() => setShowCategoryMenu(false)}
             show={showCategoryMenu}
             desktop={false}
-            loading={loading}
-            error={error}
           />
           {user && (
             <Link
@@ -301,7 +319,7 @@ const Navbar = () => {
             <select
               value={currency}
               onChange={handleCurrencyChange}
-              className="block w-full border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary"
+              className="block w-full border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-blue-900 text-yellow-400"
               style={{ minWidth: 100 }}
               title="Select currency"
             >
