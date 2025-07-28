@@ -8,6 +8,8 @@ import { io } from 'socket.io-client';
 import axios from 'axios';
 
 const Navbar = () => {
+  // ...existing hooks
+  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const { user, logout } = useAuth();
   const { cart } = useCart();
   const { currency, setCurrency } = useCart();
