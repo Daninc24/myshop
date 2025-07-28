@@ -24,7 +24,8 @@ import {
   ClipboardDocumentListIcon,
   PresentationChartBarIcon,
   MegaphoneIcon,
-  CubeIcon
+  CubeIcon,
+  Squares2X2Icon
 } from '@heroicons/react/24/outline';
 import { Tab } from '@headlessui/react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, PieChart, Pie, Cell } from 'recharts';
@@ -178,6 +179,10 @@ const AdminDashboard = () => {
           <Link to="/admin/products" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
             <CubeIcon className="h-8 w-8 text-primary mb-1" />
             <span className="font-medium text-secondary text-sm">Products</span>
+          </Link>
+          <Link to="/admin/categories" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
+            <Squares2X2Icon className="h-8 w-8 text-primary mb-1" />
+            <span className="font-medium text-secondary text-sm">Categories</span>
           </Link>
           <Link to="/admin/orders" className="card flex flex-col items-center gap-2 p-4 hover:shadow-strong transition">
             <ClipboardDocumentListIcon className="h-8 w-8 text-primary mb-1" />
