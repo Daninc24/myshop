@@ -56,14 +56,15 @@ const Navbar = () => {
   const posRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
 
   return (
-    <nav className="bg-surface shadow-strong sticky top-0 z-50 border-b border-gray-100">
+    <nav className="bg-blue-900 shadow-strong sticky top-0 z-50 border-b border-blue-800 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-18 items-center">
           {/* Logo and Brand */}
-          <div className="flex items-center gap-3">
-            <Link to="/" className="flex-shrink-0 flex items-center gap-2">
-              <img src="/images/logo-footer.svg" alt="MyShop Logo" className="h-12 w-12" />
-            </Link>
+          <div className="flex items-center gap-2 md:gap-4 min-w-0">
+            <Link to="/" className="flex-shrink-0 flex items-center gap-2 md:gap-3 min-w-0">
+  <img src="/images/logo-footer.svg" alt="MyShop Logo" className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white shadow-lg p-1" aria-label="MyShopping Center Logo" />
+  <span className="hidden sm:inline font-heading text-xl sm:text-2xl font-bold text-yellow-400 drop-shadow">MyShopping Center</span>
+</Link>
           </div>
 
           {/* Desktop Navigation */}

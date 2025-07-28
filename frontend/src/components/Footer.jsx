@@ -103,8 +103,9 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-blue-900 border-t border-blue-800 dark:bg-gray-900 dark:text-gray-100 mt-12 py-12 px-4 text-white transition-colors duration-300">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-10">
+    <footer className="bg-blue-900 border-t border-blue-800 dark:bg-gray-900 dark:text-gray-100 mt-12 py-8 sm:py-10 px-2 sm:px-4 text-white transition-colors duration-300">
+  {/* Responsive grid: 1col xs, 2col sm, 3col md, 5col lg */}
+  <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 md:gap-10">
         {/* Brand & Newsletter */}
         {/* Latest Events & Promotions */}
         <div className="flex flex-col gap-3 md:col-span-1">
@@ -129,20 +130,20 @@ const Footer = () => {
           </div>
           <span className="text-xs text-gray-500 dark:text-gray-400">Nairobi, Kenya</span>
         </div>
-        <div className="flex flex-col gap-4 md:col-span-1">
-          <div className="flex items-center gap-3 mb-2">
-  <img src="/images/logo-footer.svg" alt="Logo" className="w-12 h-12 rounded-xl shadow-lg bg-white p-1" />
-  <span className="font-heading text-2xl font-bold text-yellow-400 drop-shadow">MyShopping Center</span>
+        <div className="flex flex-col gap-4 col-span-1 items-center sm:items-start">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-2 w-full">
+  <img src="/images/logo-footer.svg" alt="Logo" className="w-14 h-14 rounded-xl shadow-lg bg-white p-1 mx-auto sm:mx-0" aria-label="MyShopping Center Logo" />
+  <span className="font-heading text-xl sm:text-2xl font-bold text-yellow-400 drop-shadow text-center sm:text-left">MyShopping Center</span>
 </div>
           <p className="text-gray-500 dark:text-gray-400 mb-2">Your one-stop shop for everything awesome. Enjoy seamless shopping, fast delivery, and great deals!</p>
-          <form className="flex flex-col gap-2" onSubmit={e => { e.preventDefault(); alert('Subscribed!'); }}>
-            <label htmlFor="newsletter" className="font-medium">Subscribe to our newsletter</label>
-            <div className="flex gap-2">
-              <input id="newsletter" type="email" required placeholder="Your email" className="input-field flex-1" />
-              <button type="submit" className="btn-primary">Subscribe</button>
-            </div>
-          </form>
-          <div className="flex gap-3 mt-4">
+          <form className="flex flex-col gap-2 w-full" onSubmit={e => { e.preventDefault(); alert('Subscribed!'); }}>
+  <label htmlFor="newsletter" className="font-medium">Subscribe to our newsletter</label>
+  <div className="flex flex-col xs:flex-row gap-2 w-full">
+    <input id="newsletter" type="email" required placeholder="Your email" className="input-field flex-1 min-w-0" />
+    <button type="submit" className="btn-primary w-full xs:w-auto">Subscribe</button>
+  </div>
+</form>
+          <div className="flex gap-3 mt-4 justify-center sm:justify-start">
             <a href={facebookLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/facebook.svg" alt="Facebook" className="w-6 h-6" /></a>
             <a href={twitterLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/twitter.svg" alt="Twitter" className="w-6 h-6" /></a>
             <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/whatsapp.svg" alt="WhatsApp" className="w-6 h-6" /></a>
@@ -171,18 +172,18 @@ const Footer = () => {
             <span className="font-medium">Email:</span>
             <a href={`mailto:${email}`} className="text-primary hover:underline">{email}</a>
           </div>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex flex-wrap items-center gap-2 mt-2">
             <span className="font-medium">Location:</span>
             <span>Nairobi, Kenya</span>
           </div>
-          <div className="flex gap-2 mt-2">
+          <div className="flex flex-wrap gap-2 mt-2">
   <span className="bg-white rounded shadow p-1"><img src="/icons/visa.svg" alt="Visa" className="w-8 h-6" /></span>
   <span className="bg-white rounded shadow p-1"><img src="/icons/mastercard.svg" alt="MasterCard" className="w-8 h-6" /></span>
   <span className="bg-white rounded shadow p-1"><img src="/icons/paypal.svg" alt="PayPal" className="w-8 h-6" /></span>
 </div>
         </div>
         {/* Service Rating */}
-        <div className="flex flex-col gap-4 items-center md:items-end">
+        <div className="flex flex-col gap-4 items-center sm:items-end mt-4 sm:mt-0">
           <h3 className="text-lg font-heading font-bold mb-2">Rate Our Service</h3>
           <div className="flex items-center gap-2 mb-2">
             {[1,2,3,4,5].map(star => (
@@ -197,25 +198,25 @@ const Footer = () => {
             ))}
           </div>
           <input
-            type="text"
-            placeholder="Your name (optional)"
-            value={userName}
-            onChange={e => setUserName(e.target.value)}
-            className="input-field max-w-xs mb-2"
-          />
+  type="text"
+  placeholder="Your name (optional)"
+  value={userName}
+  onChange={e => setUserName(e.target.value)}
+  className="input-field max-w-xs w-full mb-2"
+/>
           <textarea
-            placeholder="Leave a message..."
-            value={userMessage}
-            onChange={e => setUserMessage(e.target.value)}
-            className="input-field max-w-xs mb-2"
-            rows={2}
-          />
+  placeholder="Leave a message..."
+  value={userMessage}
+  onChange={e => setUserMessage(e.target.value)}
+  className="input-field max-w-xs w-full mb-2"
+  rows={2}
+/>
           <button onClick={handleSubmit} className="btn-primary w-full max-w-xs">Submit Rating</button>
           {submitted && <div className="text-success font-medium mt-2">Thank you for your feedback!</div>}
           <div className="text-sm text-gray-500 mt-2">Average rating: <span className="font-bold text-primary">{averageRating.toFixed(1)}</span> ({ratingCount} ratings)</div>
         </div>
       </div>
-      <div className="border-t border-blue-800 mt-10 pt-6 text-center text-xs text-blue-200 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div className="border-t border-blue-800 mt-8 pt-4 text-center text-xs text-blue-200 flex flex-col sm:flex-row justify-between items-center gap-4">
         <span>&copy; {new Date().getFullYear()} MyShopping Center. All rights reserved.</span>
         <a href="#top" className="text-primary hover:underline">Back to Top ↑</a>
       </div>
