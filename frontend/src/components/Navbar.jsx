@@ -135,7 +135,7 @@ const Navbar = () => {
   </button>
   {showCategoryMenu && (
     <div
-      className="absolute left-0 mt-2 w-56 bg-white border border-blue-400 rounded-xl shadow-2xl z-50 transition-opacity max-h-80 overflow-y-auto"
+      className="absolute left-0 mt-2 w-full bg-white border border-blue-400 rounded-xl shadow-2xl z-50 transition-opacity max-h-80 overflow-y-auto"
       onMouseEnter={() => setDropdownHover(true)}
       onMouseLeave={() => {
         setDropdownHover(false);
