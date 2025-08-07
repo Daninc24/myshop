@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -30,6 +30,7 @@ function useDebounce(value, delay) {
 }
 
 import { getOptimizedImageUrl } from '../utils/imageUtils';
+import categories from '../utils/categories';
 
 const advertTemplates = [
   {
@@ -113,6 +114,7 @@ const advertTemplates = [
 const HERO_IMAGE = gambiaMarket;
 
 const Home = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
   const [bestSelling, setBestSelling] = useState([]);
@@ -122,52 +124,28 @@ const Home = () => {
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const { error, info, success, warning } = useToast();
   const socketRef = React.useRef(null);
-  const categories = [
-    { id: 'all', name: 'All Products' },
-    { id: 'Electronics', name: 'Electronics' },
-    { id: 'Computers & Laptops', name: 'Computers & Laptops' },
-    { id: 'Mobile Phones', name: 'Mobile Phones' },
-    { id: 'Accessories', name: 'Accessories' },
-    { id: 'Home & Kitchen', name: 'Home & Kitchen' },
-    { id: 'Sports', name: 'Sports' },
-    { id: 'Fashion', name: 'Fashion' },
-    { id: 'Beauty', name: 'Beauty & Personal Care' },
-    { id: 'Toys', name: 'Toys & Games' },
-    { id: 'Books', name: 'Books' },
-    { id: 'Automotive', name: 'Automotive' },
-    { id: 'Groceries', name: 'Groceries' },
-    { id: 'Health', name: 'Health & Wellness' },
-    { id: 'Office', name: 'Office Supplies' },
-    { id: 'Garden', name: 'Garden & Outdoors' },
-    { id: 'Pets', name: 'Pet Supplies' },
-    { id: 'Baby', name: 'Baby & Kids' },
-    { id: 'Music', name: 'Music & Instruments' },
-    { id: 'Art', name: 'Art & Craft' },
-    { id: 'Jewelry', name: 'Jewelry' },
-    { id: 'Shoes', name: 'Shoes' },
-    { id: 'Bags', name: 'Bags & Luggage' },
-    { id: 'Watches', name: 'Watches' },
-    { id: 'Phones', name: 'Phones & Tablets' },
-    { id: 'Cameras', name: 'Cameras & Photography' },
-    { id: 'Gaming', name: 'Gaming' },
-    { id: 'Stationery', name: 'Stationery' },
-    { id: 'Food', name: 'Food & Beverages' },
-    { id: 'Tools', name: 'Tools & Hardware' },
-    { id: 'Travel', name: 'Travel' },
-    { id: 'Fitness', name: 'Fitness & Exercise' }
-  ];
   const [adverts, setAdverts] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const searchInputRef = useRef();
+
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 350);
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [dealCountdown, setDealCountdown] = useState(3600); // 1 hour in seconds
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const [bannerIndex, setBannerIndex] = useState(0);
   const bannerIntervalRef = useRef();
+  // Dynamic data states
+  const [categoriesList, setCategoriesList] = useState(Array.isArray(categories) ? categories : []);
+  const [assurances, setAssurances] = useState([
+    { key: 'assurance', title: 'Trade Assurance', subtitle: 'Order protection & refunds', icon: 'shield' },
+    { key: 'delivery', title: 'On-time Delivery', subtitle: 'Trackable shipping', icon: 'truck' },
+    { key: 'payments', title: 'Secure payments', subtitle: 'Multiple options', icon: 'card' },
+    { key: 'returns', title: 'Easy returns', subtitle: 'Hassle-free policy', icon: 'refresh' },
+  ]);
   // Use topAdverts as banners for now
   const splitAdverts = (adverts) => {
     if (adverts.length <= 3) return { top: adverts, middle: [], bottom: [] };
@@ -176,6 +154,34 @@ const Home = () => {
       middle: adverts.slice(2, 4),
       bottom: adverts.slice(4)
     };
+  };
+
+  // Fetch categories from backend for dynamic Source by Category
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get('/categories');
+      const list = Array.isArray(res.data)
+        ? res.data
+        : (Array.isArray(res.data?.categories) ? res.data.categories : []);
+      // Map to { id, name } if needed
+      const mapped = list.map((c) => ({ id: c.id || c._id || c.name, name: c.name }));
+      if (mapped.length) setCategoriesList((prev) => mapped);
+    } catch (e) {
+      // Fallback to util categories already set
+    }
+  };
+
+  // Fetch assurances from backend for dynamic Assurance Strip (optional endpoint)
+  const fetchAssurances = async () => {
+    try {
+      const res = await axios.get('/site/assurances');
+      const items = Array.isArray(res.data)
+        ? res.data
+        : (Array.isArray(res.data?.assurances) ? res.data.assurances : []);
+      if (items.length) setAssurances(items);
+    } catch (e) {
+      // keep defaults
+    }
   };
 
   const { top: topAdverts, middle: middleAdverts, bottom: bottomAdverts } = splitAdverts(adverts);
@@ -243,6 +249,8 @@ const Home = () => {
     fetchBestSelling();
     fetchEvents();
     fetchAdverts();
+    fetchCategories();
+    fetchAssurances();
     axios.get('/testimonials')
       .then(res => setTestimonials(res.data.testimonials || []))
       .catch(() => setTestimonials([]));
@@ -503,6 +511,23 @@ const Home = () => {
           <Link to="/products" className="btn-primary text-lg px-8 py-3 animate-bounce-in">Shop Now</Link>
         </div>
       </section>
+      {/* Assurance Strip (inspired by Alibaba) */}
+      <section className="max-w-6xl mx-auto -mt-6 mb-10 px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {assurances.slice(0,4).map((a, idx) => (
+            <div key={a.key || idx} className={`${idx === 3 ? 'hidden md:flex' : 'flex'} items-center gap-3 bg-white rounded-xl p-4 shadow-sm border border-orange-100`}>
+              {a.icon === 'shield' && <ShieldCheckIcon className="h-8 w-8 text-orange-600" />}
+              {a.icon === 'truck' && <TruckIcon className="h-8 w-8 text-orange-600" />}
+              {a.icon === 'card' && <CreditCardIcon className="h-8 w-8 text-orange-600" />}
+              {a.icon === 'refresh' && <ArrowPathIcon className="h-8 w-8 text-orange-600" />}
+              <div>
+                <div className="text-sm font-semibold text-gray-900">{a.title}</div>
+                <div className="text-xs text-gray-500">{a.subtitle}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
       {/* Main Banner Carousel (below hero) */}
       {banners.length > 0 && (
         <section className="max-w-5xl mx-auto mb-8 relative">
@@ -577,6 +602,32 @@ const Home = () => {
               </div>
             </section>
           )}
+          {/* Source by Category (inspired by Alibaba) */}
+          <section className="bg-white rounded-2xl p-6 shadow-sm border border-orange-100">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">Source by Category</h2>
+              <Link to="/products" className="text-orange-600 hover:underline font-medium">View all</Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {categoriesList.filter(c => c.id !== 'all').slice(0, 12).map(cat => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedCategory(cat.id);
+                    navigate(`/products?category=${encodeURIComponent(cat.id)}`);
+                  }}
+                  className={`group flex flex-col items-center justify-center gap-2 rounded-xl p-4 border transition hover:shadow ${selectedCategory === cat.id ? 'border-orange-500 bg-orange-50' : 'border-orange-100 bg-white'}`}
+                  title={cat.name}
+                >
+                  <div className="h-12 w-12 rounded-full bg-orange-100 group-hover:bg-orange-200 flex items-center justify-center text-orange-700 font-bold">
+                    {cat.name.charAt(0)}
+                  </div>
+                  <span className="text-sm text-gray-700 text-center line-clamp-2">{cat.name}</span>
+                </button>
+              ))}
+            </div>
+          </section>
           {/* Top Adverts Section */}
           {topAdverts.length > 0 && (
             <section className="grid grid-cols-1 md:grid-cols-2 gap-4">

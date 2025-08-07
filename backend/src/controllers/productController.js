@@ -5,7 +5,7 @@ const InventoryLog = require('../models/InventoryLog');
 // Get all products
 const getAllProducts = async (req, res) => {
   try {
-    const { search, category, page = 1, limit = 12, sort = 'createdAt', order = 'desc' } = req.query;
+    const { search, category, subcategory, page = 1, limit = 12, sort = 'createdAt', order = 'desc' } = req.query;
     let query = {};
 
     if (search) {
@@ -16,6 +16,9 @@ const getAllProducts = async (req, res) => {
     }
     if (category && category !== 'all') {
       query.category = category;
+    }
+    if (subcategory && subcategory !== 'all') {
+      query.subcategory = subcategory;
     }
 
     // Calculate pagination values
@@ -100,6 +103,7 @@ const createProduct = async (req, res) => {
     const description = req.body.description;
     const price = req.body.price;
     const category = req.body.category;
+    const subcategory = req.body.subcategory;
     const stock = req.body.stock;
 
     // Validate required fields
@@ -134,6 +138,7 @@ const createProduct = async (req, res) => {
       price: parseFloat(price),
       images: imageUrls,
       category: category.trim(),
+      ...(subcategory ? { subcategory: subcategory.trim() } : {}),
       stock: parseInt(stock)
     };
 
@@ -148,7 +153,7 @@ const createProduct = async (req, res) => {
 // Update product (admin only)
 const updateProduct = async (req, res) => {
   try {
-    const { title, description, price, category, stock } = req.body;
+    const { title, description, price, category, subcategory, stock } = req.body;
 
     // Handle image uploads (Cloudinary URLs)
     let imageUrls = [];
@@ -161,6 +166,7 @@ const updateProduct = async (req, res) => {
       description, 
       price: parseFloat(price), 
       category, 
+      ...(typeof subcategory !== 'undefined' && subcategory !== null ? { subcategory } : {}),
       stock: parseInt(stock) 
     };
     

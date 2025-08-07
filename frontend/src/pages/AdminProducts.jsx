@@ -4,6 +4,7 @@ import { PencilIcon, TrashIcon, PlusIcon, PhotoIcon, XMarkIcon } from '@heroicon
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { getOptimizedImageUrl } from '../utils/imageUtils';
+import categories from '../utils/categories';
 
 const AdminProducts = () => {
   const { isManagerOrAdmin } = useAuth();
@@ -18,42 +19,9 @@ const AdminProducts = () => {
     description: '',
     price: '',
     category: '',
+    subcategory: '',
     stock: ''
   });
-
-  const categories = [
-    { id: 'Electronics', name: 'Electronics' },
-    { id: 'Computers & Laptops', name: 'Computers & Laptops' },
-    { id: 'Mobile Phones', name: 'Mobile Phones' },
-    { id: 'Accessories', name: 'Accessories' },
-    { id: 'Home & Kitchen', name: 'Home & Kitchen' },
-    { id: 'Sports', name: 'Sports' },
-    { id: 'Fashion', name: 'Fashion' },
-    { id: 'Beauty', name: 'Beauty & Personal Care' },
-    { id: 'Toys', name: 'Toys & Games' },
-    { id: 'Books', name: 'Books' },
-    { id: 'Automotive', name: 'Automotive' },
-    { id: 'Groceries', name: 'Groceries' },
-    { id: 'Health', name: 'Health & Wellness' },
-    { id: 'Office', name: 'Office Supplies' },
-    { id: 'Garden', name: 'Garden & Outdoors' },
-    { id: 'Pets', name: 'Pet Supplies' },
-    { id: 'Baby', name: 'Baby & Kids' },
-    { id: 'Music', name: 'Music & Instruments' },
-    { id: 'Art', name: 'Art & Craft' },
-    { id: 'Jewelry', name: 'Jewelry' },
-    { id: 'Shoes', name: 'Shoes' },
-    { id: 'Bags', name: 'Bags & Luggage' },
-    { id: 'Watches', name: 'Watches' },
-    { id: 'Phones', name: 'Phones & Tablets' },
-    { id: 'Cameras', name: 'Cameras & Photography' },
-    { id: 'Gaming', name: 'Gaming' },
-    { id: 'Stationery', name: 'Stationery' },
-    { id: 'Food', name: 'Food & Beverages' },
-    { id: 'Tools', name: 'Tools & Hardware' },
-    { id: 'Travel', name: 'Travel' },
-    { id: 'Fitness', name: 'Fitness & Exercise' }
-  ];
 
   useEffect(() => {
     fetchProducts();
@@ -108,6 +76,9 @@ const AdminProducts = () => {
       submitData.append('price', formData.price);
       submitData.append('category', formData.category);
       submitData.append('stock', formData.stock);
+      if (formData.subcategory) {
+        submitData.append('subcategory', formData.subcategory);
+      }
       
       // Append all image files
       imageFiles.forEach((file, index) => {
@@ -142,6 +113,7 @@ const AdminProducts = () => {
       description: product.description,
       price: product.price.toString(),
       category: product.category,
+      subcategory: product.subcategory || '',
       stock: product.stock.toString()
     });
     setImagePreviews(product.images || []);
@@ -167,6 +139,7 @@ const AdminProducts = () => {
       description: '',
       price: '',
       category: '',
+      subcategory: '',
       stock: ''
     });
     setImageFiles([]);
@@ -221,18 +194,42 @@ const AdminProducts = () => {
               className="input-field"
               required
             />
-            <select
-              name="category"
-              value={formData.category}
-              onChange={e => setFormData(f => ({ ...f, category: e.target.value }))}
-              className="input-field"
-              required
-            >
-              <option value="">Select Category</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="font-medium">Category</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => {
+                    setFormData({...formData, category: e.target.value, subcategory: ''});
+                  }}
+                  className="input-field"
+                >
+                  <option value="">Select Category</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              {formData.category && categories.find(c => c.id === formData.category)?.subcategories?.length > 0 && (
+              <div className="flex flex-col gap-1 w-full">
+                <label className="font-medium">Subcategory</label>
+                <select
+                  value={formData.subcategory}
+                  onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
+                  className="input-field"
+                >
+                  <option value="">Select Subcategory</option>
+                  {categories
+                    .find(c => c.id === formData.category)
+                    ?.subcategories
+                    ?.map(sub => (
+                      <option key={sub.id} value={sub.id}>{sub.name}</option>
+                    ))}
+                </select>
+              </div>
+              )}
+            </div>
             <input
               type="number"
               name="stock"

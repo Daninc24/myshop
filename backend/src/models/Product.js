@@ -27,6 +27,11 @@ const productSchema = new mongoose.Schema({
     trim: true,
     index: true
   },
+  subcategory: {
+    type: String,
+    trim: true,
+    index: true
+  },
   stock: {
     type: Number,
     required: [true, 'Product stock is required'],

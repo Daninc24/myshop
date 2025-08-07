@@ -275,6 +275,17 @@ const Products = () => {
       </Helmet>
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Advert Banner */}
+          <div className="mb-12 rounded-xl overflow-hidden bg-gradient-to-r from-primary to-secondary">
+            <div className="p-8 text-center text-white">
+              <h3 className="text-2xl font-bold mb-2">Summer Sale!</h3>
+              <p className="mb-4">Up to 50% off selected items</p>
+              <button className="px-6 py-2 bg-white text-primary rounded-full hover:bg-opacity-90 transition">
+                Shop Now
+              </button>
+            </div>
+          </div>
+
           {/* Header */}
           <div className="flex items-center mb-8 gap-4">
             <MagnifyingGlassIcon className="h-7 w-7 text-primary mr-2" />
