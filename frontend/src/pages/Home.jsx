@@ -39,7 +39,7 @@ const advertTemplates = [
       productId ? (
         <Link to={`/products/${productId}`} className="block group">
           <div className="card flex gap-6 items-center mb-6 animate-fade-in group-hover:shadow-lg transition-shadow">
-            <img src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-2xl shadow-soft" />
+            <img loading="lazy" decoding="async" src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-2xl shadow-soft" />
             <div>
               <h2 className="text-2xl font-heading font-bold text-secondary mb-1 group-hover:text-primary transition-colors">{title}</h2>
               <p className="text-gray-700 mb-2">{message}</p>
@@ -49,7 +49,7 @@ const advertTemplates = [
         </Link>
       ) : (
         <div className="card flex gap-6 items-center mb-6 animate-fade-in">
-          <img src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-2xl shadow-soft" />
+          <img loading="lazy" decoding="async" src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-2xl shadow-soft" />
           <div>
             <h2 className="text-2xl font-heading font-bold text-secondary mb-1">{title}</h2>
             <p className="text-gray-700 mb-2">{message}</p>
@@ -62,7 +62,7 @@ const advertTemplates = [
     id: 'banner',
     render: ({ title, message, image }) => (
       <div className="relative h-36 flex items-center justify-center bg-primary-light rounded-2xl overflow-hidden mb-6 animate-slide-in">
-        <img src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="absolute inset-0 w-full h-full object-cover opacity-30" />
+        <img loading="lazy" decoding="async" src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="absolute inset-0 w-full h-full object-cover opacity-30" />
         <div className="relative z-10 text-center">
           <h2 className="text-3xl font-heading font-bold text-primary drop-shadow mb-1">{title}</h2>
           <p className="text-primary-dark text-lg">{message}</p>
@@ -74,7 +74,7 @@ const advertTemplates = [
     id: 'card',
     render: ({ title, message, image }) => (
       <div className="bg-gradient-to-br from-primary-light to-accent-light rounded-2xl p-6 flex flex-col items-center mb-6 animate-bounce-in">
-        <img src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-24 h-24 object-cover rounded-full mb-3 shadow-soft" />
+        <img loading="lazy" decoding="async" src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-24 h-24 object-cover rounded-full mb-3 shadow-soft" />
         <h2 className="text-xl font-heading font-bold text-primary mb-1">{title}</h2>
         <p className="text-base text-secondary mb-1">{message}</p>
       </div>
@@ -84,7 +84,7 @@ const advertTemplates = [
     id: 'left-image',
     render: ({ title, message, image, product }) => (
       <div className="flex items-center bg-gradient-to-r from-accent to-primary text-white rounded-2xl p-6 gap-6 mb-6 animate-slide-in">
-        <img src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-32 h-32 object-cover rounded-2xl shadow-strong" />
+        <img loading="lazy" decoding="async" src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-32 h-32 object-cover rounded-2xl shadow-strong" />
         <div>
           <h2 className="text-2xl font-heading font-bold mb-1">{title}</h2>
           <p className="text-white mb-2">{message}</p>
@@ -97,7 +97,7 @@ const advertTemplates = [
     id: 'cta-card',
     render: ({ title, message, image, product, productId }) => (
       <div className="bg-surface border-2 border-primary rounded-2xl p-8 flex flex-col items-center shadow-strong mb-6 animate-fade-in">
-        {image && <img src={getOptimizedImageUrl(image)} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-full border-4 border-primary-light mb-3" />}
+        {image && <img loading="lazy" decoding="async" src={getOptimizedImageUrl(image)} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-full border-4 border-primary-light mb-3" />}
         <h2 className="text-2xl font-heading font-bold text-primary mb-1">{title}</h2>
         <p className="text-secondary mb-2">{message}</p>
         {product && <span className="text-xs text-primary mb-2">{product}</span>}
@@ -141,7 +141,7 @@ const Home = () => {
   // Dynamic data states
   const [categoriesList, setCategoriesList] = useState(Array.isArray(categories) ? categories : []);
   const [assurances, setAssurances] = useState([
-    { key: 'assurance', title: 'Trade Assurance', subtitle: 'Order protection & refunds', icon: 'shield' },
+    { key: 'assurance', title: 'Purchase Protection', subtitle: 'Coverage on eligible orders', icon: 'shield' },
     { key: 'delivery', title: 'On-time Delivery', subtitle: 'Trackable shipping', icon: 'truck' },
     { key: 'payments', title: 'Secure payments', subtitle: 'Multiple options', icon: 'card' },
     { key: 'returns', title: 'Easy returns', subtitle: 'Hassle-free policy', icon: 'refresh' },
@@ -455,10 +455,28 @@ const Home = () => {
             ]
           }
         `}</script>
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "MyShopping Center",
+            "url": "https://myshoppingcenter.com/",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://myshoppingcenter.com/products?search={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        `}</script>
       </Helmet>
       {/* Hero Section with Search (search bar over image, above Shop Now) */}
       <section className="relative w-full h-[350px] md:h-[420px] flex items-center justify-center mb-8 bg-gradient-to-br from-orange-100 to-orange-200">
         <img
+          decoding="async"
+          fetchpriority="high"
           src={HERO_IMAGE}
           alt="Gambia Market Hero - MyShopping Center"
           srcSet={`${HERO_IMAGE}?size=small 600w, ${HERO_IMAGE}?size=medium 1200w, ${HERO_IMAGE}?size=large 1920w`}
@@ -484,24 +502,24 @@ const Home = () => {
               {/* Autocomplete Suggestions Dropdown */}
               {showSuggestions && searchSuggestions.length > 0 && (
                 <ul className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-72 overflow-y-auto">
-                  {searchSuggestions.map(suggestion => (
-                    <li
-                      key={suggestion._id}
-                      className="px-4 py-2 hover:bg-orange-100 cursor-pointer flex items-center gap-2"
-                      onClick={() => {
-                        setSearch(suggestion.title || suggestion.name);
-                        setShowSuggestions(false);
-                      }}
-                    >
-                      {suggestion.images && suggestion.images[0] && (
-                        <img src={suggestion.images[0]} alt="" className="w-8 h-8 object-cover rounded mr-2" />
-                      )}
-                      <span>{suggestion.title || suggestion.name}</span>
-                      {suggestion.category && (
-                        <span className="ml-auto text-xs text-gray-400">{suggestion.category}</span>
-                      )}
-                    </li>
-                  ))}
+                {searchSuggestions.map(suggestion => (
+                  <li
+                    key={suggestion._id}
+                    className="px-4 py-2 hover:bg-orange-100 cursor-pointer flex items-center gap-2"
+                    onClick={() => {
+                      setSearch(suggestion.title || suggestion.name);
+                      setShowSuggestions(false);
+                    }}
+                  >
+                    {suggestion.images && suggestion.images[0] && (
+                      <img loading="lazy" decoding="async" src={suggestion.images[0]} alt="" className="w-8 h-8 object-cover rounded mr-2" />
+                    )}
+                    <span>{suggestion.title || suggestion.name}</span>
+                    {suggestion.category && (
+                      <span className="ml-auto text-xs text-gray-400">{suggestion.category}</span>
+                    )}
+                  </li>
+                ))}
                 </ul>
               )}
             </div>
@@ -511,7 +529,7 @@ const Home = () => {
           <Link to="/products" className="btn-primary text-lg px-8 py-3 animate-bounce-in">Shop Now</Link>
         </div>
       </section>
-      {/* Assurance Strip (inspired by Alibaba) */}
+      {/* Assurance Strip */}
       <section className="max-w-6xl mx-auto -mt-6 mb-10 px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {assurances.slice(0,4).map((a, idx) => (
@@ -542,7 +560,7 @@ const Home = () => {
                   {Template ? Template({
                     title: ad.title,
                     message: ad.message,
-                    image: ad.images[0],
+                    image: (ad.images && ad.images[0]) || ad.image,
                     product: ad.product?.title || ad.product?.name,
                     productId: ad.product?._id || ad.product
                   }) : null}
@@ -602,10 +620,10 @@ const Home = () => {
               </div>
             </section>
           )}
-          {/* Source by Category (inspired by Alibaba) */}
+          {/* Shop by Category */}
           <section className="bg-white rounded-2xl p-6 shadow-sm border border-orange-100">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">Source by Category</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Shop by Category</h2>
               <Link to="/products" className="text-orange-600 hover:underline font-medium">View all</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -637,7 +655,7 @@ const Home = () => {
                   <div key={ad._id}>{Template({
                     title: ad.title,
                     message: ad.message,
-                    image: ad.image,
+                    image: (ad.images && ad.images[0]) || ad.image,
                     product: ad.product?.title || ad.product?.name,
                     productId: ad.product?._id || ad.product
                   })}</div>
@@ -712,7 +730,7 @@ const Home = () => {
                   <div key={ad._id}>{Template({
                     title: ad.title,
                     message: ad.message,
-                    image: ad.image,
+                    image: (ad.images && ad.images[0]) || ad.image,
                     product: ad.product?.title || ad.product?.name,
                     productId: ad.product?._id || ad.product
                   })}</div>
@@ -758,7 +776,7 @@ const Home = () => {
                   <div key={ad._id}>{Template({
                     title: ad.title,
                     message: ad.message,
-                    image: ad.image,
+                    image: (ad.images && ad.images[0]) || ad.image,
                     product: ad.product?.title || ad.product?.name,
                     productId: ad.product?._id || ad.product
                   })}</div>
