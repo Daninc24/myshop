@@ -96,6 +96,14 @@ const Products = () => {
     { value: 'newest', label: 'Newest First' }
   ];
 
+  // Initialize search from URL query param (e.g., /products?search=phone)
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const initialSearch = query.get('search') || '';
+    setSearchTerm(initialSearch);
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, [location.search]);
+
   useEffect(() => {
     fetchProducts();
   }, [searchTerm, selectedCategory, selectedSubcategory, priceRange, sortBy, sortOrder, pagination.page, pagination.limit]);

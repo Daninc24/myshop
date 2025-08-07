@@ -13,27 +13,27 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white font-semibold py-2 px-5 rounded-2xl shadow-soft hover:bg-primary-dark transition-colors duration-200;
+    @apply bg-primary text-white font-semibold py-2 px-5 rounded-lg shadow-soft hover:bg-primary-dark transition-colors duration-200;
   }
   
   .btn-secondary {
-    @apply bg-secondary text-white font-medium py-2 px-5 rounded-2xl shadow-soft hover:bg-secondary-dark transition-colors duration-200;
+    @apply bg-secondary text-white font-medium py-2 px-5 rounded-lg shadow-soft hover:bg-secondary-dark transition-colors duration-200;
   }
   
   .btn-danger {
-    @apply bg-error text-white font-medium py-2 px-5 rounded-2xl shadow-soft hover:bg-red-700 transition-colors duration-200;
+    @apply bg-error text-white font-medium py-2 px-5 rounded-lg shadow-soft hover:bg-red-700 transition-colors duration-200;
   }
   
   .card {
-    @apply bg-surface rounded-2xl shadow-soft p-8;
+    @apply bg-surface rounded-xl shadow-soft p-5;
   }
   
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-secondary bg-background;
+    @apply w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-secondary bg-white;
   }
   
   .file-upload-area {
-    @apply flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer bg-background hover:bg-primary-light transition-colors duration-200;
+    @apply flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-background hover:bg-primary-light transition-colors duration-200;
   }
   
   .file-upload-area:hover {
@@ -41,7 +41,7 @@
   }
   
   .image-preview {
-    @apply w-32 h-32 object-cover rounded-2xl border-2 border-gray-200 shadow-sm;
+    @apply w-32 h-32 object-cover rounded-xl border-2 border-gray-200 shadow-sm;
   }
 }
 

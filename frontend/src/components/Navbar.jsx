@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCartIcon, ShoppingBagIcon, UserIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, CreditCardIcon, Squares2X2Icon, HomeIcon, ArrowRightOnRectangleIcon, UserPlusIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { Input, Select, Badge, Button } from 'antd';
 import categories from '../utils/categories';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -17,6 +18,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState('');
 
   useEffect(() => {
     setShowCategoryMenu(false);
@@ -82,6 +84,15 @@ const Navbar = () => {
     navigate('/login');
   };
 
+  const onSearch = (value) => {
+    const query = value?.trim();
+    if (!query) {
+      navigate('/products');
+      return;
+    }
+    navigate(`/products?search=${encodeURIComponent(query)}`);
+  };
+
   const cartItemCount = useMemo(() => cart.reduce((total, item) => total + item.quantity, 0), [cart]);
 
   const posRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
@@ -96,90 +107,98 @@ const Navbar = () => {
 
   return (
     <>
-            <nav className="bg-gradient-to-r from-blue-700 via-purple-700 to-yellow-400 shadow-2xl sticky top-0 z-50 border-b border-yellow-300 transition-colors duration-300">
+            <nav className="bg-white sticky top-0 z-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 w-full">
+          <div className="flex items-center gap-4 h-16 w-full">
             {/* Left: Logo and Category */}
-            <div className="flex items-center gap-2 md:gap-4 min-w-0">
+            <div className="flex items-center gap-3 min-w-0">
               <Link to="/" className="flex-shrink-0 flex items-center gap-2 md:gap-3 min-w-0">
-                <img src="/images/logo-footer.svg" alt="MyShopping Center official logo" className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white shadow-lg p-1" aria-label="MyShopping Center Logo" />
-                <span className="hidden sm:inline font-heading text-xl sm:text-2xl font-bold text-yellow-400 drop-shadow">MyShopping Center</span>
+                <img src="/images/logo-footer.svg" alt="MyShopping Center official logo" className="h-10 w-10 rounded-xl bg-white" aria-label="MyShopping Center Logo" />
+                <span className="hidden sm:inline font-heading text-xl sm:text-2xl font-bold text-secondary">MyShopping Center</span>
               </Link>
               {/* Category Button */}
-              <div className="relative">
+              <div className="relative hidden md:block">
                 <button
-                  className="text-yellow-400 hover:text-yellow-300 bg-blue-800 hover:bg-blue-700 p-2 rounded-xl transition-colors flex items-center justify-center focus:outline-none border border-blue-700 shadow"
+                  className="text-secondary hover:text-primary bg-gray-50 hover:bg-gray-100 p-2 rounded-lg transition-colors flex items-center justify-center focus:outline-none border border-gray-200"
                   title="Categories"
                   aria-haspopup="true"
                   aria-expanded={showCategoryMenu}
                   tabIndex={0}
                   onClick={() => setShowCategoryMenu(v => !v)}
                 >
-                  <Squares2X2Icon className="h-7 w-7" />
+                  <Squares2X2Icon className="h-6 w-6" />
                 </button>
+                <Suspense fallback={<div>Loading...</div>}>
+                  {showCategoryMenu && (
+                    <CategoryDropdown {...categoryProps} desktop id="category-menu-id" role="menu" />
+                  )}
+                </Suspense>
               </div>
-              <Suspense fallback={<div>Loading...</div>}>
-                {showCategoryMenu && (
-                  <CategoryDropdown {...categoryProps} desktop id="category-menu-id" role="menu" />
-                )}
-              </Suspense>
+            </div>
+
+            {/* Center: Search */}
+            <div className="flex-1 hidden md:block">
+              <Input.Search
+                placeholder="Search products, suppliers and more"
+                allowClear
+                size="large"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onSearch={onSearch}
+                enterButton
+              />
             </div>
 
             {/* Right: Icons and User Controls (Desktop) */}
-            <div className="hidden md:flex items-center space-x-4">
-               <Link to="/" className="text-white hover:text-primary p-2 rounded-xl transition-colors" title="Home">
-                <HomeIcon className="h-7 w-7" />
+            <div className="hidden md:flex items-center gap-3">
+              <Link to="/" className="text-secondary hover:text-primary p-2 rounded-lg transition-colors" title="Home">
+                <HomeIcon className="h-6 w-6" />
               </Link>
-              <Link to="/products" className="text-white hover:text-primary p-2 rounded-xl transition-colors" title="Products">
-                <ShoppingBagIcon className="h-7 w-7" />
+              <Link to="/products" className="text-secondary hover:text-primary p-2 rounded-lg transition-colors" title="Products">
+                <ShoppingBagIcon className="h-6 w-6" />
               </Link>
               {user && (
-                <Link to="/messages" className="text-white hover:text-primary p-2 rounded-xl transition-colors" title="Messages">
-                  <ChatBubbleLeftRightIcon className="h-7 w-7" />
+                <Link to="/messages" className="text-secondary hover:text-primary p-2 rounded-lg transition-colors" title="Messages">
+                  <ChatBubbleLeftRightIcon className="h-6 w-6" />
                 </Link>
               )}
               {user && posRoles.includes(user.role) && (
-                <Link to="/pos" className="text-white hover:text-primary p-2 rounded-xl transition-colors" title="POS">
-                  <CreditCardIcon className="h-7 w-7" />
+                <Link to="/pos" className="text-secondary hover:text-primary p-2 rounded-lg transition-colors" title="POS">
+                  <CreditCardIcon className="h-6 w-6" />
                 </Link>
               )}
               {user?.role === 'admin' && (
-                <Link to="/admin" className="text-white hover:text-primary p-2 rounded-xl transition-colors" title="Admin Dashboard">
-                  <Cog6ToothIcon className="h-7 w-7" />
+                <Link to="/admin" className="text-secondary hover:text-primary p-2 rounded-lg transition-colors" title="Admin Dashboard">
+                  <Cog6ToothIcon className="h-6 w-6" />
                 </Link>
               )}
-              <select
+              <Select
                 value={currency}
-                onChange={handleCurrencyChange}
-                className="border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-blue-900 text-yellow-400"
+                onChange={(value) => handleCurrencyChange({ target: { value } })}
+                size="middle"
                 style={{ minWidth: 100 }}
-                title="Select currency"
-              >
-                {currencies.map(cur => (
-                  <option key={cur} value={cur}>{cur}</option>
-                ))}
-              </select>
-              <Link to="/cart" className="relative group" title="Cart">
-                <ShoppingCartIcon className="h-7 w-7 text-white group-hover:text-primary transition-colors" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-soft">
-                    {cartItemCount}
-                  </span>
-                )}
+                options={currencies.map(cur => ({ value: cur, label: cur }))}
+              />
+              <Link to="/cart" title="Cart">
+                <Badge count={cartItemCount} size="small" color="#ff6600">
+                  <ShoppingCartIcon className="h-6 w-6 text-secondary hover:text-primary transition-colors" />
+                </Badge>
               </Link>
               {!user ? (
-                <>
-                  <Link to="/login" className="text-white hover:text-primary p-2 rounded-xl transition-colors" title="Login">
-                    <ArrowRightOnRectangleIcon className="h-7 w-7" />
+                <div className="flex items-center gap-2">
+                  <Link to="/login" title="Login">
+                    <Button type="text" className="text-secondary hover:text-primary p-2">
+                      <ArrowRightOnRectangleIcon className="h-6 w-6" />
+                    </Button>
                   </Link>
-                  <Link to="/register" className="text-white hover:text-primary p-2 rounded-xl transition-colors" title="Register">
-                    <UserPlusIcon className="h-7 w-7" />
+                  <Link to="/register" title="Register">
+                    <Button type="primary" className="rounded-lg">Sign up</Button>
                   </Link>
-                </>
+                </div>
               ) : (
                 <div className="relative group ml-2">
-                  <button className="flex items-center gap-2 p-2 rounded-xl text-white hover:text-primary focus:outline-none" title="Account">
-                    <UserIcon className="h-7 w-7" />
+                  <button className="flex items-center gap-2 p-2 rounded-lg text-secondary hover:text-primary focus:outline-none" title="Account">
+                    <UserIcon className="h-6 w-6" />
                   </button>
                   <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-20 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
                     <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-t-xl">Profile</Link>
@@ -189,29 +208,37 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* Mobile menu button */}
-            <div className="flex md:hidden items-center">
-               {/* Cart Icon for mobile */}
+            {/* Mobile: cart + hamburger */}
+            <div className="flex md:hidden items-center ml-auto">
               <Link to="/cart" className="relative group mr-2" title="Cart">
-                <ShoppingCartIcon className="h-7 w-7 text-white group-hover:text-primary transition-colors" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-soft">
-                    {cartItemCount}
-                  </span>
-                )}
+                <Badge count={cartItemCount} size="small" color="#ff6600">
+                  <ShoppingCartIcon className="h-6 w-6 text-secondary" />
+                </Badge>
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-xl text-white hover:text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+                className="inline-flex items-center justify-center p-2 rounded-lg text-secondary hover:text-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
               >
                 <span className="sr-only">Open main menu</span>
                 {isMobileMenuOpen ? (
-                  <XMarkIcon className="block h-7 w-7" aria-hidden="true" />
+                  <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
                 ) : (
-                  <Bars3Icon className="block h-7 w-7" aria-hidden="true" />
+                  <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
                 )}
               </button>
             </div>
+          </div>
+          {/* Mobile search */}
+          <div className="md:hidden pb-3">
+            <Input.Search
+              placeholder="Search products"
+              allowClear
+              size="middle"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onSearch={onSearch}
+              enterButton
+            />
           </div>
         </div>
       </nav>

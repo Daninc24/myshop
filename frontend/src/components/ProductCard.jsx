@@ -21,7 +21,7 @@ const ProductCard = ({ product, small, viewMode = 'grid' }) => {
   };
 
   return (
-    <Link to={`/products/${product._id}`} className={`card relative animate-fade-in focus:outline-none focus:ring-2 focus:ring-primary group ${viewMode === 'grid' ? 'flex flex-col items-center p-8 transition-transform duration-200 hover:scale-105 hover:shadow-strong' : 'flex flex-row items-center p-4 transition-shadow duration-200 hover:shadow-strong'}`} tabIndex={0}>
+    <Link to={`/products/${product._id}`} className={`card relative animate-fade-in focus:outline-none focus:ring-2 focus:ring-primary group ${viewMode === 'grid' ? 'flex flex-col items-center p-6 transition-transform duration-200 hover:shadow-strong' : 'flex flex-row items-center p-4 transition-shadow duration-200 hover:shadow-strong'}`} tabIndex={0}>
       {/* Deal Badge */}
       {product.isDeal && (
         <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">Deal</span>
@@ -39,11 +39,11 @@ const ProductCard = ({ product, small, viewMode = 'grid' }) => {
         className={`${viewMode === 'grid' ? (small ? 'w-16 h-16' : 'w-24 h-24 mb-4') : 'w-20 h-20 mr-4'} rounded-2xl object-cover object-center group-hover:shadow-lg group-hover:ring-2 group-hover:ring-orange-400 transition-all`}
       />
       <div className={`${viewMode === 'grid' ? 'text-center' : 'flex-grow'}`}>
-        <h3 className={`font-heading font-bold text-secondary ${viewMode === 'grid' ? 'text-lg mb-1 line-clamp-2' : 'text-base mb-0.5 line-clamp-1'} group-hover:text-orange-600 transition-colors`}>{product.title}</h3>
-        <p className={`text-primary font-semibold ${viewMode === 'grid' ? 'text-xl mb-2' : 'text-lg'}`}>{getCurrencySymbol(currency)}{convertPrice(product.price).toFixed(2)}</p>
+        <h3 className={`font-heading font-bold text-secondary ${viewMode === 'grid' ? 'text-base mb-1 line-clamp-2' : 'text-base mb-0.5 line-clamp-1'} group-hover:text-orange-600 transition-colors`}>{product.title}</h3>
+        <p className={`text-primary font-semibold ${viewMode === 'grid' ? 'text-lg mb-2' : 'text-lg'}`}>{getCurrencySymbol(currency)}{convertPrice(product.price).toFixed(2)}</p>
       </div>
       <div className={`${viewMode === 'grid' ? 'w-full' : 'flex flex-col items-end gap-2'}`}>
-        <span className="btn-primary w-full mt-2 text-center">View Details</span>
+        <span className="btn-primary w-full mt-2 text-center">View details</span>
 
       </div>
     </Link>
