@@ -7,6 +7,7 @@ import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import axios from 'axios';
 import { Helmet } from 'react-helmet';
+import { Form, Input, Button, Card, Typography } from 'antd';
 
 const Checkout = () => {
   const { cart, clearCart, currency, convertPrice } = useCart();
@@ -97,26 +98,39 @@ const Checkout = () => {
         <meta name="twitter:image" content="https://myshoppingcenter.com/logo.png" />
         <link rel="canonical" href="https://myshoppingcenter.com/checkout" />
       </Helmet>
-      {/* Modernize checkout container and form */}
+      {/* Ant Design checkout container and form */}
       <div className="max-w-4xl mx-auto py-10 animate-fade-in">
-        <h1 className="text-3xl font-heading font-bold text-secondary mb-8">Checkout</h1>
+        <Typography.Title level={2} style={{ marginBottom: 24 }}>Checkout</Typography.Title>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Checkout Form */}
-          <form className="card flex flex-col gap-6">
-            <h2 className="text-xl font-heading font-bold text-secondary mb-2">Shipping Details</h2>
-            <input type="text" placeholder="Full Name" className="input-field" required />
-            <input type="email" placeholder="Email Address" className="input-field" required />
-            <input type="text" placeholder="Address" className="input-field" required />
-            <input type="text" placeholder="City" className="input-field" required />
-            <input type="text" placeholder="State" className="input-field" required />
-            <input type="text" placeholder="Zip Code" className="input-field" required />
-            <input type="text" placeholder="Country" className="input-field" required />
-            <button type="submit" className="btn-primary mt-4">Continue to Payment</button>
-          </form>
-          {/* Order Summary & Payment */}
-          <div className="card flex flex-col gap-6">
-            <h2 className="text-xl font-heading font-bold text-secondary mb-2">Order Summary</h2>
-            {/* List of products and total */}
+          <Card>
+            <Typography.Title level={4}>Shipping Details</Typography.Title>
+            <Form layout="vertical">
+              <Form.Item label="Full Name" required>
+                <Input placeholder="Full Name" />
+              </Form.Item>
+              <Form.Item label="Email Address" required>
+                <Input type="email" placeholder="Email Address" />
+              </Form.Item>
+              <Form.Item label="Address" required>
+                <Input placeholder="Address" />
+              </Form.Item>
+              <Form.Item label="City" required>
+                <Input placeholder="City" />
+              </Form.Item>
+              <Form.Item label="State" required>
+                <Input placeholder="State" />
+              </Form.Item>
+              <Form.Item label="Zip Code" required>
+                <Input placeholder="Zip Code" />
+              </Form.Item>
+              <Form.Item label="Country" required>
+                <Input placeholder="Country" />
+              </Form.Item>
+              <Button type="primary" block>Continue to Payment</Button>
+            </Form>
+          </Card>
+          <Card>
+            <Typography.Title level={4}>Order Summary</Typography.Title>
             <div className="space-y-2">
               {cart.map(item => (
                 <div key={item.product} className="flex justify-between items-center">
@@ -129,13 +143,12 @@ const Checkout = () => {
               <span>Total:</span>
               <span>{getCurrencySymbol(currency)}{convertPrice(cart.reduce((sum, item) => sum + item.price * item.quantity, 0)).toFixed(2)}</span>
             </div>
-            {/* PaymentForm component can be placed here */}
             <div className="mt-4">
               <Elements stripe={stripePromise}>
                 <PaymentForm onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />
               </Elements>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </>

@@ -15,6 +15,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import { Helmet } from 'react-helmet';
+import { Drawer, Select, Segmented, Pagination, Input, Button, Space } from 'antd';
 
 
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
@@ -279,142 +280,112 @@ const Products = () => {
             <MagnifyingGlassIcon className="h-7 w-7 text-primary mr-2" />
             <h2 className="text-3xl font-heading font-bold text-secondary">Browse Products</h2>
           </div>
-          {/* Filter and Sort Controls */} 
+          {/* Filter and Sort Controls */}
           <div className="flex flex-col md:flex-row gap-4 mb-6 items-center justify-between">
-            {/* Search and Desktop Filters */} 
-            <div className="flex flex-wrap gap-4 w-full md:w-auto">
-              <div className="relative flex-grow">
-                <input
-                  type="text"
+            {/* Search and Desktop Filters */}
+            <div className="flex flex-wrap gap-3 w-full md:w-auto items-center">
+              <div className="w-full md:w-80">
+                <Input
                   placeholder="Search products..."
                   value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="input-field pr-10 w-full"
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  allowClear
+                  size="middle"
                 />
-                <MagnifyingGlassIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               </div>
-              {/* Desktop-only filters */} 
-              <select
+              <Select
                 value={selectedCategory}
-                onChange={e => setSelectedCategory(e.target.value)}
-                className="input-field hidden md:block"
-              >
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-              <select
+                onChange={(value) => setSelectedCategory(value)}
+                className="hidden md:block"
+                style={{ minWidth: 200 }}
+                options={categories.map((c) => ({ value: c.id, label: c.name }))}
+              />
+              <Select
                 value={sortBy}
-                onChange={e => setSortBy(e.target.value)}
-                className="input-field hidden md:block"
-              >
-                {sortOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+                onChange={(value) => setSortBy(value)}
+                className="hidden md:block"
+                style={{ minWidth: 200 }}
+                options={sortOptions.map((o) => ({ value: o.value, label: o.label }))}
+              />
+              <div className="hidden md:block">
+                <Segmented
+                  options={[
+                    { label: 'Grid', value: 'grid' },
+                    { label: 'List', value: 'list' },
+                  ]}
+                  value={viewMode}
+                  onChange={(val) => setViewMode(val)}
+                />
+              </div>
             </div>
 
-            {/* Mobile Filter/Sort Button and View Mode */} 
-            <div className="flex items-center gap-4 w-full md:w-auto justify-end">
-              <button
-                onClick={() => setShowFilters(true)}
-                className="btn-secondary md:hidden flex items-center gap-2 flex-grow justify-center"
-              >
-                <FunnelIcon className="h-5 w-5" />
+            {/* Mobile Filter/Sort Button and View Mode */}
+            <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+              <Button className="md:hidden" onClick={() => setShowFilters(true)} icon={null}>
                 Filters & Sort
-              </button>
-
-              {/* View Mode Toggle */} 
-              <div className="flex bg-gray-200 rounded-xl p-1">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-500'}`}
-                  aria-label="Grid view"
-                >
-                  <Squares2X2Icon className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-500'}`}
-                  aria-label="List view"
-                >
-                  <ListBulletIcon className="h-5 w-5" />
-                </button>
+              </Button>
+              <div className="md:hidden">
+                <Segmented
+                  options={[
+                    { label: 'Grid', value: 'grid' },
+                    { label: 'List', value: 'list' },
+                  ]}
+                  value={viewMode}
+                  onChange={(val) => setViewMode(val)}
+                />
               </div>
             </div>
           </div>
 
-          {/* Mobile Filters Modal/Sidebar */} 
-          {showFilters && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end md:hidden">
-              <div className="bg-surface w-full max-w-sm h-full shadow-lg p-6 animate-slide-in-right overflow-y-auto">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-heading font-bold text-secondary">Filters & Sort</h3>
-                  <button onClick={() => setShowFilters(false)} className="text-gray-500 hover:text-gray-700">
-                    <XMarkIcon className="h-6 w-6" />
-                  </button>
-                </div>
-
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <label htmlFor="mobile-category" className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                    <select
-                      id="mobile-category"
-                      value={selectedCategory}
-                      onChange={e => setSelectedCategory(e.target.value)}
-                      className="input-field w-full"
-                    >
-                      {categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label htmlFor="mobile-min-price" className="block text-sm font-medium text-gray-700 mb-2">Min Price</label>
-                    <input
-                      id="mobile-min-price"
-                      type="number"
-                      placeholder="Min price"
-                      value={priceRange.min}
-                      onChange={e => setPriceRange({ ...priceRange, min: e.target.value })}
-                      className="input-field w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="mobile-max-price" className="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
-                    <input
-                      id="mobile-max-price"
-                      type="number"
-                      placeholder="Max price"
-                      value={priceRange.max}
-                      onChange={e => setPriceRange({ ...priceRange, max: e.target.value })}
-                      className="input-field w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="mobile-sort-by" className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
-                    <select
-                      id="mobile-sort-by"
-                      value={sortBy}
-                      onChange={e => setSortBy(e.target.value)}
-                      className="input-field w-full"
-                    >
-                      {sortOptions.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <button onClick={() => { clearFilters(); setShowFilters(false); }} className="btn-secondary w-full mt-4">
-                    Clear Filters
-                  </button>
-                </div>
+          {/* Mobile Filters Drawer */}
+          <Drawer
+            title="Filters & Sort"
+            placement="right"
+            onClose={() => setShowFilters(false)}
+            open={showFilters}
+          >
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <div>
+                <div className="mb-2 font-medium">Category</div>
+                <Select
+                  value={selectedCategory}
+                  onChange={(value) => setSelectedCategory(value)}
+                  style={{ width: '100%' }}
+                  options={categories.map((c) => ({ value: c.id, label: c.name }))}
+                />
               </div>
-            </div>
-          )}
+              <div>
+                <div className="mb-2 font-medium">Min Price</div>
+                <Input
+                  type="number"
+                  placeholder="Min price"
+                  value={priceRange.min}
+                  onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                />
+              </div>
+              <div>
+                <div className="mb-2 font-medium">Max Price</div>
+                <Input
+                  type="number"
+                  placeholder="Max price"
+                  value={priceRange.max}
+                  onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                />
+              </div>
+              <div>
+                <div className="mb-2 font-medium">Sort By</div>
+                <Select
+                  value={sortBy}
+                  onChange={(value) => setSortBy(value)}
+                  style={{ width: '100%' }}
+                  options={sortOptions.map((o) => ({ value: o.value, label: o.label }))}
+                />
+              </div>
+              <Button onClick={() => { clearFilters(); setShowFilters(false); }} block>
+                Clear Filters
+              </Button>
+            </Space>
+          </Drawer>
 
           {/* Products Grid/List */}
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 animate-fade-in' : 'flex flex-col gap-4 animate-fade-in'}>
@@ -429,53 +400,15 @@ const Products = () => {
             )}
           </div>
           
-          {/* Pagination Controls */}
+          {/* Pagination */}
           {pagination.pages > 1 && (
-            <div className="flex justify-center mt-12 gap-2">
-              <button 
-                onClick={() => handlePageChange(Math.max(1, pagination.page - 1))}
-                disabled={pagination.page === 1}
-                className={`px-4 py-2 rounded-md ${pagination.page === 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-primary text-white hover:bg-primary-dark'}`}
-              >
-                Previous
-              </button>
-              
-              {/* Page Numbers */}
-              <div className="flex gap-2">
-                {[...Array(pagination.pages).keys()].map(i => {
-                  const pageNum = i + 1;
-                  // Only show a window of pages around current page
-                  if (
-                    pageNum === 1 || 
-                    pageNum === pagination.pages || 
-                    (pageNum >= pagination.page - 2 && pageNum <= pagination.page + 2)
-                  ) {
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => handlePageChange(pageNum)}
-                        className={`w-10 h-10 rounded-md ${pageNum === pagination.page ? 'bg-primary text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  } else if (
-                    pageNum === pagination.page - 3 || 
-                    pageNum === pagination.page + 3
-                  ) {
-                    return <span key={pageNum} className="self-center">...</span>;
-                  }
-                  return null;
-                })}
-              </div>
-              
-              <button 
-                onClick={() => handlePageChange(Math.min(pagination.pages, pagination.page + 1))}
-                disabled={pagination.page === pagination.pages}
-                className={`px-4 py-2 rounded-md ${pagination.page === pagination.pages ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-primary text-white hover:bg-primary-dark'}`}
-              >
-                Next
-              </button>
+            <div className="flex justify-center mt-12">
+              <Pagination
+                current={pagination.page}
+                pageSize={pagination.limit}
+                total={pagination.pages * pagination.limit}
+                onChange={(page) => handlePageChange(page)}
+              />
             </div>
           )}
         </div>

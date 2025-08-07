@@ -45,38 +45,66 @@ const CategoryDropdown = ({
     return () => window.removeEventListener('keydown', handleKey);
   }, [show, onClose]);
 
-  const renderDesktopMenu = () => (
-    <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5'>
-      <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-8 gap-y-6'>
-        {categories.map(cat => (
-          <div key={cat.id} className='space-y-3'>
-            <Link
-              to={`/category/${cat.id}`}
-              onClick={onClose}
-              className='font-semibold text-gray-900 hover:text-blue-600 transition-colors duration-150 text-base border-b-2 border-transparent hover:border-blue-500 pb-1 inline-block'
-            >
-              {cat.name}
-            </Link>
-            {cat.subcategories && cat.subcategories.length > 0 && (
-              <ul className='space-y-1.5'>
-                {cat.subcategories.map(sub => (
-                  <li key={sub.id}>
-                    <Link
-                      to={`/category/${cat.id}/${sub.id}`}
-                      className='block text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-md py-1.5 px-2 text-sm transition-colors duration-150'
-                      onClick={onClose}
-                    >
-                      {sub.name}
-                    </Link>
-                  </li>
+  const renderDesktopMenu = () => {
+    const effectiveCategories = categories.filter(c => c.id !== 'all');
+    const activeCategory = effectiveCategories.find(c => c.id === openCategoryId) || effectiveCategories[0];
+    return (
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5'>
+        <div className='flex gap-6'>
+          <div className='w-60 flex-shrink-0 border-r border-gray-200 pr-3'>
+            <ul className='space-y-1'>
+              {effectiveCategories.map(cat => (
+                <li key={cat.id}>
+                  <button
+                    onMouseEnter={() => setOpenCategoryId(cat.id)}
+                    onFocus={() => setOpenCategoryId(cat.id)}
+                    onClick={() => { onClose && onClose(); }}
+                    className={`w-full text-left px-3 py-2 rounded-md transition-colors ${((openCategoryId || effectiveCategories[0]?.id) === cat.id) ? 'bg-primary/10 text-primary font-semibold' : 'hover:bg-gray-100'}`}
+                  >
+                    {cat.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className='flex-1'>
+            <div className='mb-2 flex items-center justify-between'>
+              <Link
+                to={`/category/${activeCategory.id}`}
+                className='font-heading text-lg font-bold text-secondary hover:text-primary'
+                onClick={onClose}
+              >
+                {activeCategory.name}
+              </Link>
+              <Link
+                to={`/category/${activeCategory.id}`}
+                className='text-sm text-primary hover:underline'
+                onClick={onClose}
+              >
+                View all
+              </Link>
+            </div>
+            {activeCategory.subcategories && activeCategory.subcategories.length > 0 ? (
+              <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2'>
+                {activeCategory.subcategories.map(sub => (
+                  <Link
+                    key={sub.id}
+                    to={`/category/${activeCategory.id}/${sub.id}`}
+                    onClick={onClose}
+                    className='block px-3 py-2 rounded-lg border border-gray-200 hover:border-primary hover:bg-primary/5 text-sm text-secondary hover:text-primary transition-colors'
+                  >
+                    {sub.name}
+                  </Link>
                 ))}
-              </ul>
+              </div>
+            ) : (
+              <div className='text-gray-500 text-sm'>No subcategories</div>
             )}
           </div>
-        ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderMobileMenu = () => (
     <div className='p-2'>
@@ -133,6 +161,7 @@ const CategoryDropdown = ({
       role='menu'
       aria-label='Categories'
       tabIndex={-1}
+      style={desktop ? { maxHeight: '50vh', overflowY: 'auto' } : {}}
     >
       {categories.length === 0 && (
         <div className='px-4 py-3 text-gray-500'>No categories</div>

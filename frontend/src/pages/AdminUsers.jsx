@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import AdminLayout from '../components/admin/AdminLayout';
 
 const roleOptions = [
   { value: 'user', label: 'User' },
@@ -80,7 +81,8 @@ const AdminUsers = () => {
   };
 
   return (
-    <div className="card max-w-6xl mx-auto mt-8">
+    <AdminLayout breadcrumb={["Users"]}>
+    <div className="card max-w-6xl mx-auto mt-2">
       <h1 className="text-3xl font-heading font-bold mb-6 text-secondary">User Management</h1>
 
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-2 mb-3 animate-slide-in">{error}</div>}
@@ -158,6 +160,7 @@ const AdminUsers = () => {
         </div>
       )}
     </div>
+    </AdminLayout>
   );
 };
 

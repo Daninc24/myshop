@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import AdminLayout from '../components/admin/AdminLayout';
 import { PencilIcon, TrashIcon, PlusIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
@@ -183,7 +184,8 @@ const AdminProducts = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto mt-8">
+    <AdminLayout breadcrumb={["Products"]}>
+    <div className="space-y-6 max-w-7xl mx-auto mt-2">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-heading font-bold text-secondary">Manage Products</h1>
         {isManagerOrAdmin && (
@@ -298,6 +300,7 @@ const AdminProducts = () => {
         {products.length === 0 && <div className="text-gray-400 text-center">No products found.</div>}
       </div>
     </div>
+    </AdminLayout>
   );
 };
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Chart, registerables } from 'chart.js';
 import { Line, Bar, Pie } from 'react-chartjs-2';
+import AdminLayout from '../components/admin/AdminLayout';
 Chart.register(...registerables);
 
 const periods = [
@@ -61,7 +62,8 @@ const AdminSalesReport = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto mt-8">
+    <AdminLayout breadcrumb={["Sales Report"]}>
+    <div className="max-w-5xl mx-auto mt-2">
       <div className="card mb-8">
         <h1 className="text-3xl font-heading font-bold text-secondary mb-6">Sales Reporting Dashboard</h1>
         <div className="mb-6 flex gap-4 items-center">
@@ -186,6 +188,7 @@ const AdminSalesReport = () => {
         )}
       </div>
     </div>
+    </AdminLayout>
   );
 };
 

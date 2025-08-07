@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminLayout from '../components/admin/AdminLayout';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
@@ -167,8 +168,8 @@ const AdminDashboard = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto py-10 animate-fade-in">
+    <AdminLayout breadcrumb={["Dashboard"]}>
+      <div className="max-w-7xl mx-auto py-6 animate-fade-in">
         <h1 className="text-3xl font-heading font-bold text-secondary mb-8">Admin Dashboard Overview</h1>
         {/* Admin Shortcuts */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-10">
@@ -260,7 +261,7 @@ const AdminDashboard = () => {
           )}
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

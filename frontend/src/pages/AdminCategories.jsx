@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import AdminLayout from '../components/admin/AdminLayout';
 
 const emptyCategory = { name: '', id: '', subcategories: [] };
 const emptySubcategory = { name: '', id: '' };
@@ -104,7 +105,8 @@ export default function AdminCategories() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-8">
+    <AdminLayout breadcrumb={["Categories"]}>
+    <div className="max-w-3xl mx-auto py-6">
       <h1 className="text-2xl font-bold mb-4">Manage Categories & Subcategories</h1>
       <form onSubmit={handleSubmit} className="bg-white p-4 rounded-xl shadow mb-6">
         <div className="mb-2">
@@ -157,5 +159,6 @@ export default function AdminCategories() {
         </ul>
       </div>
     </div>
+    </AdminLayout>
   );
 }

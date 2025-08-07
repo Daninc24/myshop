@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminLayout from '../components/admin/AdminLayout';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -62,7 +63,8 @@ const AdminOrders = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="card max-w-7xl mx-auto mt-8">
+    <AdminLayout breadcrumb={["Orders"]}>
+    <div className="card max-w-7xl mx-auto mt-2">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-heading font-bold text-secondary">Order Management</h1>
         <div className="text-sm text-gray-600">
@@ -147,6 +149,7 @@ const AdminOrders = () => {
         ))}
       </div>
     </div>
+    </AdminLayout>
   );
 };
 
