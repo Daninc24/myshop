@@ -250,6 +250,41 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
+// Enable gzip compression when available to reduce payload size
+try {
+  const compression = require('compression');
+  app.use(compression());
+  console.log('✅ Compression enabled');
+} catch (e) {
+  console.log('ℹ️ compression package not installed; skipping gzip');
+}
+
+// Security headers via Helmet (optional)
+try {
+  const helmet = require('helmet');
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }));
+  console.log('✅ Helmet enabled');
+} catch (e) {
+  console.log('ℹ️ helmet package not installed; skipping security headers');
+}
+
+// Basic rate limiting for public APIs
+try {
+  const rateLimit = require('express-rate-limit');
+  const limiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 300, // per IP per window
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.use('/api/', limiter);
+  console.log('✅ Rate limiting enabled');
+} catch (e) {
+  console.log('ℹ️ express-rate-limit not installed; skipping rate limit');
+}
+
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
   'http://localhost:5173/',
@@ -321,7 +356,13 @@ app.use('/uploads', cors({
   methods: 'GET',
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Content-Length', 'Content-Type']
-}), express.static(path.join(__dirname, '../uploads')));
+}), express.static(path.join(__dirname, '../uploads'), {
+  maxAge: '30d',
+  setHeaders: (res, filePath) => {
+    // Strong caching for immutable uploads; adjust if files can change in place
+    res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+  }
+}));
 
 // Fallback removed to prevent conflicts
 
@@ -338,9 +379,38 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Basic robots.txt allowing all
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send(`User-agent: *\nAllow: /\nSitemap: ${process.env.FRONTEND_URL || 'https://myshoppingcenter.com'}/sitemap.xml`);
+});
 
-
-
+// Simple sitemap.xml listing home, products, and product detail pages
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const baseUrl = process.env.FRONTEND_URL || 'https://myshoppingcenter.com';
+    // Only fetch a reasonable number to avoid huge payloads
+    const products = await Product.find({}, {_id: 1, updatedAt: 1}).sort({ updatedAt: -1 }).limit(500).lean();
+    const urls = [
+      { loc: `${baseUrl}/`, changefreq: 'daily', priority: '1.0' },
+      { loc: `${baseUrl}/products`, changefreq: 'daily', priority: '0.9' },
+    ].concat(products.map(p => ({
+      loc: `${baseUrl}/products/${p._id}`,
+      lastmod: (p.updatedAt || new Date()).toISOString(),
+      changefreq: 'weekly',
+      priority: '0.8'
+    })));
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+      `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+      urls.map(u => `  <url>\n    <loc>${u.loc}</loc>\n${u.lastmod ? `    <lastmod>${u.lastmod}</lastmod>\n` : ''}    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`).join('\n') +
+      `\n</urlset>`;
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (e) {
+    console.error('Error generating sitemap:', e);
+    res.status(500).send('');
+  }
+});
 
 // Alternative image serving route without CORS restrictions
 app.get('/api/images/:filename', (req, res) => {

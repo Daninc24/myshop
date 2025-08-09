@@ -49,7 +49,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('7d');
   const { user } = useAuth();
-  const { success, error } = useToast();
+  const { success, error: showError } = useToast();
   const [users, setUsers] = useState([]);
   const [tab, setTab] = useState('dashboard');
   const [currencyFilter, setCurrencyFilter] = useState('ALL');
@@ -79,9 +79,13 @@ const AdminDashboard = () => {
         monthlyRevenue,
         usersByMonth: res.data.usersByMonth
       });
-    } catch (error) {
-      // Use toast error handler
-      if (typeof error === 'function') error('Error fetching analytics');
+    } catch (err) {
+      // Avoid noisy toasts for unauthorized in dev; log instead
+      if (axios.isAxiosError?.(err) && (err.response?.status === 401 || err.response?.status === 403)) {
+        console.debug('Analytics endpoint unauthorized; skipping');
+      } else {
+        showError('Error fetching analytics');
+      }
     } finally {
       setLoading(false);
     }
@@ -92,8 +96,8 @@ const AdminDashboard = () => {
     try {
       const res = await axios.get('/users');
       setUsers(res.data.users);
-    } catch (error) {
-      error('Error fetching users');
+    } catch (err) {
+      showError('Error fetching users');
     } finally {
       setLoading(false);
     }

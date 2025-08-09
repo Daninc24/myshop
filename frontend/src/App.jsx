@@ -1,36 +1,36 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
 import { recordPageView } from './utils/pageViewTracker';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { ToastProvider } from './contexts/ToastContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Products from './pages/Products';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Profile from './pages/Profile';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminProducts from './pages/AdminProducts';
-import AdminOrders from './pages/AdminOrders';
+const Home = lazy(() => import('./pages/Home'));
+const Products = lazy(() => import('./pages/Products'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const Profile = lazy(() => import('./pages/Profile'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminProducts = lazy(() => import('./pages/AdminProducts'));
+const AdminOrders = lazy(() => import('./pages/AdminOrders'));
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
-import Messages from './pages/Messages';
-import AdminPaymentSettings from './pages/AdminPaymentSettings';
+const Messages = lazy(() => import('./pages/Messages'));
+const AdminPaymentSettings = lazy(() => import('./pages/AdminPaymentSettings'));
 import Footer from './components/Footer';
-import Events from './pages/Events';
-import AdminEvents from './pages/AdminEvents';
-import POS from './pages/POS';
-import AdminUsers from './pages/AdminUsers';
-import AdminSalesReport from './pages/AdminSalesReport';
-import AdminCategories from './pages/AdminCategories';
-import AdminInventoryLogs from './pages/AdminInventoryLogs';
-import AdminPerformanceDashboard from './pages/AdminPerformanceDashboard';
-import AdminAdverts from './pages/AdminAdverts';
+const Events = lazy(() => import('./pages/Events'));
+const AdminEvents = lazy(() => import('./pages/AdminEvents'));
+const POS = lazy(() => import('./pages/POS'));
+const AdminUsers = lazy(() => import('./pages/AdminUsers'));
+const AdminSalesReport = lazy(() => import('./pages/AdminSalesReport'));
+const AdminCategories = lazy(() => import('./pages/AdminCategories'));
+const AdminInventoryLogs = lazy(() => import('./pages/AdminInventoryLogs'));
+const AdminPerformanceDashboard = lazy(() => import('./pages/AdminPerformanceDashboard'));
+const AdminAdverts = lazy(() => import('./pages/AdminAdverts'));
 import SEO from './components/SEO';
 import FAQ from './pages/FAQ';
 
@@ -52,6 +52,7 @@ function App() {
   <Navbar />
 </ErrorBoundary>
                 <main className="container mx-auto px-4 py-8">
+                  <Suspense fallback={<div className="py-12 text-center text-gray-500">Loading…</div>}>
                   <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={
@@ -203,6 +204,7 @@ function App() {
                       </>
                     } />
                   </Routes>
+                  </Suspense>
                 </main>
                 <Footer />
               </div>

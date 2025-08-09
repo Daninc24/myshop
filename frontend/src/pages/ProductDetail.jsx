@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+
 import { useParams, Link } from 'react-router-dom';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
@@ -14,6 +15,9 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedOptions, setSelectedOptions] = useState({});
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
   const { addToCart, currency, convertPrice } = useCart();
   const { error: showError } = useToast();
 
@@ -45,9 +49,40 @@ const ProductDetail = () => {
     }
   }, [product]);
 
+  // When product or selected options change, find matching variant
+  useEffect(() => {
+    if (!product) return;
+    if (!Array.isArray(product.variants) || product.variants.length === 0) {
+      setSelectedVariant(null);
+      return;
+    }
+    const match = product.variants.find(v => {
+      if (!Array.isArray(v.options)) return false;
+      return v.options.every(opt => selectedOptions[opt.name] === opt.value);
+    });
+    setSelectedVariant(match || null);
+  }, [product, selectedOptions]);
+
+  // Determine if an option value is available given current partial selections
+  const isValueAvailable = (optionName, value) => {
+    if (!product || !Array.isArray(product.variants)) return true;
+    return product.variants.some(v => {
+      if (!Array.isArray(v.options) || (v.quantity || 0) <= 0) return false;
+      // Check this option value matches
+      const hasThis = v.options.find(o => o.name === optionName && o.value === value);
+      if (!hasThis) return false;
+      // Ensure other selected options (except this one) match the variant
+      return Object.entries(selectedOptions).every(([name, val]) => {
+        if (name === optionName || !val) return true;
+        return v.options.some(o => o.name === name && o.value === val);
+      });
+    });
+  };
+
   const handleAddToCart = async () => {
     setAddingToCart(true);
-    const result = await addToCart(product._id, quantity);
+    const variantSku = selectedVariant ? selectedVariant.sku : null;
+    const result = await addToCart(product._id, quantity, variantSku);
     if (result.success) {
       setQuantity(1);
     } else {
@@ -86,6 +121,13 @@ const ProductDetail = () => {
     );
   }
 
+  const hasVariants = Array.isArray(product.variants) && product.variants.length > 0;
+
+  // Determine displayed price/stock
+  const displayPrice = hasVariants && selectedVariant ? selectedVariant.price : product.price;
+  const availableStock = hasVariants && selectedVariant ? (selectedVariant.quantity || 0) : product.stock;
+  const canAdd = hasVariants ? !!selectedVariant && availableStock > 0 : product.stock > 0;
+
   return (
     <>
       <Helmet>
@@ -116,8 +158,8 @@ const ProductDetail = () => {
                 "@type": "Offer",
                 "url": "https://myshoppingcenter.com/products/${product._id}",
                 "priceCurrency": "KES",
-                "price": "${product.price}",
-                "availability": "${product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}"
+                "price": "${displayPrice}",
+                "availability": "${availableStock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}"
               }
             }
           `}</script>
@@ -189,9 +231,38 @@ const ProductDetail = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <span className="text-3xl font-bold text-blue-600">{getCurrencySymbol(currency)}{convertPrice(product.price).toFixed(2)}</span>
-              <span className="text-sm text-gray-500">Stock: {product.stock}</span>
+              <span className="text-3xl font-bold text-blue-600">{getCurrencySymbol(currency)}{convertPrice(displayPrice).toFixed(2)}</span>
+              <span className="text-sm text-gray-500">Stock: {availableStock}</span>
             </div>
+
+            {/* Variant Option Selectors */}
+            {hasVariants && (
+              <div className="space-y-4">
+                {(product.options || []).map((opt) => (
+                  <div key={opt.name} className="flex flex-col max-w-xs">
+                    <label className="font-medium mb-1">{opt.name}</label>
+                    <select
+                      value={selectedOptions[opt.name] || ''}
+                      onChange={(e) => setSelectedOptions(prev => ({ ...prev, [opt.name]: e.target.value }))}
+                      className="input-field"
+                    >
+                      <option value="" disabled>Select {opt.name}</option>
+                      {(opt.values || []).map((val) => {
+                        const available = isValueAvailable(opt.name, val);
+                        return (
+                          <option key={val} value={val} disabled={!available}>
+                            {val}{!available ? ' (unavailable)' : ''}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                ))}
+                {!selectedVariant && (
+                  <p className="text-sm text-red-500">Select all options to see availability.</p>
+                )}
+              </div>
+            )}
 
             <div className="flex items-center space-x-4">
               <div>
@@ -201,9 +272,9 @@ const ProductDetail = () => {
                   value={quantity}
                   onChange={(e) => setQuantity(parseInt(e.target.value))}
                   className="input-field w-24"
-                  disabled={product.stock === 0}
+                  disabled={availableStock === 0}
                 >
-                  {[...Array(Math.min(10, product.stock))].map((_, i) => (
+                  {[...Array(Math.min(10, availableStock || 0))].map((_, i) => (
                     <option key={i + 1} value={i + 1}>
                       {i + 1}
                     </option>
@@ -213,7 +284,7 @@ const ProductDetail = () => {
 
               <button
                 onClick={handleAddToCart}
-                disabled={product.stock === 0 || addingToCart}
+                disabled={!canAdd || addingToCart}
                 className="w-full btn-primary disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 <ShoppingCartIcon className="h-5 w-5" />
@@ -231,7 +302,7 @@ const ProductDetail = () => {
                 <span>Chat on WhatsApp</span>
               </a>
 
-              {product.stock === 0 && (
+              {(!canAdd && hasVariants && selectedVariant && availableStock === 0) && (
                 <p className="text-red-500 text-center">Out of Stock</p>
               )}
             </div>
@@ -245,7 +316,7 @@ const ProductDetail = () => {
                 </div>
                 <div className="flex justify-between">
                   <span>SKU:</span>
-                  <span>{product._id}</span>
+                  <span>{selectedVariant ? selectedVariant.sku : product._id}</span>
                 </div>
               </div>
             </div>
@@ -257,6 +328,34 @@ const ProductDetail = () => {
           <Link to="/products" className="text-blue-600 hover:text-blue-700 font-semibold">
             ← Back to Products
           </Link>
+        </div>
+      </div>
+
+      {/* Sticky Add-to-Cart Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t z-40 p-3 sm:p-4 flex items-center justify-between gap-3">
+        <div className="flex items-baseline gap-2">
+          <span className="text-lg sm:text-2xl font-bold text-blue-600">{getCurrencySymbol(currency)}{convertPrice(displayPrice).toFixed(2)}</span>
+          <span className="text-xs sm:text-sm text-gray-500">{availableStock > 0 ? `${availableStock} in stock` : 'Out of stock'}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            aria-label="Quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(parseInt(e.target.value))}
+            className="input-field w-20"
+            disabled={availableStock === 0}
+          >
+            {[...Array(Math.min(10, availableStock || 0))].map((_, i) => (
+              <option key={i + 1} value={i + 1}>{i + 1}</option>
+            ))}
+          </select>
+          <button
+            onClick={handleAddToCart}
+            disabled={!canAdd || addingToCart}
+            className="btn-primary whitespace-nowrap"
+          >
+            {addingToCart ? 'Adding…' : 'Add to Cart'}
+          </button>
         </div>
       </div>
     </>

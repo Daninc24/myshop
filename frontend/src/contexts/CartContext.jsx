@@ -46,17 +46,17 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const addToCart = async (productId, quantity = 1) => {
+  const addToCart = async (productId, quantity = 1, variantSku = null) => {
     try {
       if (!isAuthenticated) {
         // For non-authenticated users, store in localStorage
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const existingItem = localCart.find(item => item.productId === productId);
+        const existingItem = localCart.find(item => item.productId === productId && (item.variantSku || null) === (variantSku || null));
         
         if (existingItem) {
           existingItem.quantity += quantity;
         } else {
-          localCart.push({ productId, quantity });
+          localCart.push({ productId, quantity, variantSku: variantSku || null });
         }
         
         localStorage.setItem('cart', JSON.stringify(localCart));
@@ -65,7 +65,7 @@ export const CartProvider = ({ children }) => {
       }
 
       // For authenticated users, save to server
-      const response = await axios.post('/cart', { productId, quantity });
+      const response = await axios.post('/cart', { productId, quantity, variantSku });
       setCart(response.data.cart);
       return { success: true };
     } catch (error) {
@@ -76,19 +76,19 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const removeFromCart = async (productId) => {
+  const removeFromCart = async (productId, variantSku = null) => {
     try {
       if (!isAuthenticated) {
         // For non-authenticated users, remove from localStorage
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const updatedCart = localCart.filter(item => item.productId !== productId);
+        const updatedCart = localCart.filter(item => !(item.productId === productId && (item.variantSku || null) === (variantSku || null)));
         localStorage.setItem('cart', JSON.stringify(updatedCart));
         setCart(updatedCart);
         return { success: true };
       }
 
       // For authenticated users, remove from server
-      const response = await axios.delete(`/cart/${productId}`);
+      const response = await axios.delete(`/cart/${productId}`, { params: { variantSku } });
       setCart(response.data.cart);
       return { success: true };
     } catch (error) {
@@ -99,12 +99,12 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const updateQuantity = async (productId, quantity) => {
+  const updateQuantity = async (productId, quantity, variantSku = null) => {
     try {
       if (!isAuthenticated) {
         // For non-authenticated users, update in localStorage
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const item = localCart.find(item => item.productId === productId);
+        const item = localCart.find(item => item.productId === productId && (item.variantSku || null) === (variantSku || null));
         if (item) {
           item.quantity = quantity;
           localStorage.setItem('cart', JSON.stringify(localCart));
@@ -114,7 +114,7 @@ export const CartProvider = ({ children }) => {
       }
 
       // For authenticated users, update on server
-      const response = await axios.put(`/cart/${productId}`, { quantity });
+      const response = await axios.put(`/cart/${productId}`, { quantity, variantSku });
       setCart(response.data.cart);
       return { success: true };
     } catch (error) {

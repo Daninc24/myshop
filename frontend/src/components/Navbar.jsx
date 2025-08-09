@@ -38,30 +38,50 @@ const Navbar = () => {
   const [categoriesList, setCategoriesList] = useState(categoriesFallback);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [categoriesError, setCategoriesError] = useState(null);
+  const categoriesLoadedRef = useRef(false);
 
+  // Lazy-load categories on demand when the category menu is opened
   useEffect(() => {
+    if (!showCategoryMenu || categoriesLoadedRef.current) return;
     let cancelled = false;
+    const controller = new AbortController();
+    const cached = localStorage.getItem('categories_cache');
+    if (cached && !categoriesLoadedRef.current) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length) {
+          setCategoriesList(parsed);
+          categoriesLoadedRef.current = true;
+          return;
+        }
+      } catch {}
+    }
     const fetchCategories = async () => {
       try {
         setLoadingCategories(true);
-        const res = await axios.get('/categories');
+        const res = await axios.get('/categories', { signal: controller.signal });
         const list = Array.isArray(res.data)
           ? res.data
           : (Array.isArray(res.data?.categories) ? res.data.categories : []);
         const mapped = list.map((c) => ({ id: c.id || c._id || c.name, name: c.name, subcategories: c.subcategories || [] }));
-        if (!cancelled && mapped.length) setCategoriesList(mapped);
+        if (!cancelled && mapped.length) {
+          setCategoriesList(mapped);
+          localStorage.setItem('categories_cache', JSON.stringify(mapped));
+          categoriesLoadedRef.current = true;
+        }
       } catch (e) {
-        if (!cancelled) setCategoriesError('Failed to load categories');
+        if (!cancelled && e.name !== 'CanceledError' && e.name !== 'AbortError') setCategoriesError('Failed to load categories');
       } finally {
         if (!cancelled) setLoadingCategories(false);
       }
     };
     fetchCategories();
-    return () => { cancelled = true; };
-  }, []);
+    return () => { cancelled = true; controller.abort(); };
+  }, [showCategoryMenu]);
 
   useEffect(() => {
-    if (!user) {
+    const onMessagesPage = location.pathname.startsWith('/messages');
+    if (!user || !onMessagesPage) {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -89,7 +109,7 @@ const Navbar = () => {
         socketRef.current = null;
       }
     };
-  }, [user]);
+  }, [user, location.pathname]);
 
   useEffect(() => {
     if (currencies.length > 1) return;

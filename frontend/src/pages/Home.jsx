@@ -125,8 +125,10 @@ const Home = () => {
   const fetchNewArrivals = async () => {
     try {
       const response = await axios.get('/products');
-      
-      setNewArrivals((response.data || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4));
+      const data = response.data;
+      const list = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
+      const sorted = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
+      setNewArrivals(sorted);
     } catch (err) {
       console.error('Error fetching new arrivals:', err);
       setNewArrivals([]);

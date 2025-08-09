@@ -1,10 +1,10 @@
 // Simple in-memory cart storage (in production, you'd use Redis or database)
 const carts = new Map();
 
-// Add item to cart
+// Add item to cart (supports variants via variantSku)
 const addToCart = async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
+    const { productId, quantity, variantSku } = req.body;
     const userId = req.user._id.toString();
 
     if (!carts.has(userId)) {
@@ -12,12 +12,12 @@ const addToCart = async (req, res) => {
     }
 
     const userCart = carts.get(userId);
-    const existingItem = userCart.find(item => item.productId === productId);
+    const existingItem = userCart.find(item => item.productId === productId && item.variantSku === (variantSku || null));
 
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
-      userCart.push({ productId, quantity });
+      userCart.push({ productId, quantity, variantSku: variantSku || null });
     }
 
     res.json({ message: 'Item added to cart', cart: userCart });
@@ -31,17 +31,18 @@ const getCart = async (req, res) => {
   try {
     const userId = req.user._id.toString();
     const userCart = carts.get(userId) || [];
-    
+
     res.json({ cart: userCart });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
-// Remove item from cart
+// Remove item from cart (supports variants via ?variantSku=...)
 const removeFromCart = async (req, res) => {
   try {
     const { productId } = req.params;
+    const { variantSku } = req.query;
     const userId = req.user._id.toString();
 
     if (!carts.has(userId)) {
@@ -49,21 +50,21 @@ const removeFromCart = async (req, res) => {
     }
 
     const userCart = carts.get(userId);
-    const updatedCart = userCart.filter(item => item.productId !== productId);
-    
+    const updatedCart = userCart.filter(item => !(item.productId === productId && item.variantSku === (variantSku || null)));
+
     carts.set(userId, updatedCart);
-    
+
     res.json({ message: 'Item removed from cart', cart: updatedCart });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
-// Update item quantity in cart
+// Update item quantity in cart (supports variants via body.variantSku)
 const updateQuantity = async (req, res) => {
   try {
     const { productId } = req.params;
-    const { quantity } = req.body;
+    const { quantity, variantSku } = req.body;
     const userId = req.user._id.toString();
 
     if (!carts.has(userId)) {
@@ -71,7 +72,7 @@ const updateQuantity = async (req, res) => {
     }
 
     const userCart = carts.get(userId);
-    const item = userCart.find(item => item.productId === productId);
+    const item = userCart.find(item => item.productId === productId && item.variantSku === (variantSku || null));
 
     if (!item) {
       return res.status(404).json({ message: 'Item not found in cart' });
@@ -79,7 +80,8 @@ const updateQuantity = async (req, res) => {
 
     if (quantity <= 0) {
       // Remove item if quantity is 0 or negative
-      const updatedCart = userCart.filter(item => item.productId !== productId);
+      const updatedCart = userCart.filter(item => !(item.productId === productId && item.variantSku === (variantSku || null)));
+
       carts.set(userId, updatedCart);
       res.json({ message: 'Item removed from cart', cart: updatedCart });
     } else {

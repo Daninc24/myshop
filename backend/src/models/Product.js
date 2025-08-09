@@ -1,5 +1,62 @@
 const mongoose = require('mongoose');
 
+const variantSchema = new mongoose.Schema({
+  sku: {
+    type: String,
+    required: [true, 'SKU is required'],
+    unique: true,
+    trim: true,
+    index: true
+  },
+  price: {
+    type: Number,
+    required: [true, 'Variant price is required'],
+    min: 0
+  },
+  compareAtPrice: {
+    type: Number,
+    min: 0
+  },
+  quantity: {
+    type: Number,
+    required: [true, 'Variant quantity is required'],
+    min: 0,
+    default: 0
+  },
+  barcode: String,
+  weight: {
+    value: Number,
+    unit: {
+      type: String,
+      enum: ['g', 'kg', 'oz', 'lb'],
+      default: 'g'
+    }
+  },
+  dimensions: {
+    length: Number,
+    width: Number,
+    height: Number,
+    unit: {
+      type: String,
+      enum: ['mm', 'cm', 'm', 'in', 'ft'],
+      default: 'cm'
+    }
+  },
+  options: [{
+    name: {
+      type: String,
+      required: [true, 'Option name is required'],
+      trim: true
+    },
+    value: {
+      type: String,
+      required: [true, 'Option value is required'],
+      trim: true
+    }
+  }],
+  image: String
+}, { _id: false });
+
 const productSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -11,11 +68,16 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Product description is required']
   },
+  // Base price (can be overridden by variants)
   price: {
     type: Number,
-    required: [true, 'Product price is required'],
     min: 0,
-    index: true
+    index: true,
+    default: 0
+  },
+  compareAtPrice: {
+    type: Number,
+    min: 0
   },
   images: {
     type: [String],
@@ -32,20 +94,95 @@ const productSchema = new mongoose.Schema({
     trim: true,
     index: true
   },
+  // Total stock across all variants
   stock: {
     type: Number,
-    required: [true, 'Product stock is required'],
     min: 0,
-    default: 0
+    default: 0,
+    index: true
   },
+  // Product options (e.g., Size, Color, Material)
+  options: [{
+    name: {
+      type: String,
+      required: [true, 'Option name is required'],
+      trim: true
+    },
+    values: [{
+      type: String,
+      required: [true, 'Option value is required'],
+      trim: true
+    }]
+  }],
+  // Product variants
+  variants: [variantSchema],
+  // Track total sales
   salesCount: {
     type: Number,
     default: 0,
     min: 0,
     index: true
+  },
+  // SEO fields
+  seo: {
+    title: String,
+    description: String,
+    keywords: [String]
+  },
+  // Product status
+  status: {
+    type: String,
+    enum: ['draft', 'active', 'archived', 'out_of_stock'],
+    default: 'draft'
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
+
+// Calculate total stock from variants
+productSchema.virtual('totalStock').get(function() {
+  if (this.variants && this.variants.length > 0) {
+    return this.variants.reduce((sum, variant) => sum + (variant.quantity || 0), 0);
+  }
+  return this.stock || 0;
+});
+
+// Update total stock before saving
+productSchema.pre('save', function(next) {
+  if (this.variants && this.variants.length > 0) {
+    this.stock = this.totalStock;
+  }
+  next();
+});
+
+// Update status based on stock
+productSchema.pre('save', function(next) {
+  if (this.variants && this.variants.length > 0) {
+    const hasStock = this.variants.some(v => v.quantity > 0);
+    if (this.status === 'active' && !hasStock) {
+      this.status = 'out_of_stock';
+    } else if (this.status === 'out_of_stock' && hasStock) {
+      this.status = 'active';
+    }
+  } else {
+    if (this.status === 'active' && this.stock <= 0) {
+      this.status = 'out_of_stock';
+    } else if (this.status === 'out_of_stock' && this.stock > 0) {
+      this.status = 'active';
+    }
+  }
+  next();
+});
+
+// Performance indexes (must be defined BEFORE compiling the model)
+// Text index for search across title and description
+productSchema.index({ title: 'text', description: 'text' });
+// Compound index to speed up listing queries
+productSchema.index({ category: 1, subcategory: 1, price: 1, createdAt: -1 });
+// Indexes to accelerate variant option filtering and stock checks
+productSchema.index({ 'variants.options.name': 1, 'variants.options.value': 1 });
+productSchema.index({ 'variants.quantity': 1 });
 
 module.exports = mongoose.model('Product', productSchema);

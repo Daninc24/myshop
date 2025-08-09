@@ -2,25 +2,33 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../components/admin/AdminLayout';
 import { PencilIcon, TrashIcon, PlusIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
+import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getOptimizedImageUrl } from '../utils/imageUtils';
 import categories from '../utils/categories';
 
 const AdminProducts = () => {
   const { isManagerOrAdmin } = useAuth();
+  const { error, success } = useToast();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [hasVariants, setHasVariants] = useState(false);
+  // Structured state for options and variants (replaces raw JSON)
+  const [options, setOptions] = useState([{ name: '', values: [] }]);
+  const [variants, setVariants] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     price: '',
+    compareAtPrice: '',
     category: '',
     subcategory: '',
-    stock: ''
+    stock: '',
+    status: 'draft'
   });
 
   useEffect(() => {
@@ -30,7 +38,9 @@ const AdminProducts = () => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get('/products');
-      setProducts(response.data || []);
+      const data = response.data;
+      const list = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
+      setProducts(list);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -73,12 +83,38 @@ const AdminProducts = () => {
       const submitData = new FormData();
       submitData.append('title', formData.title);
       submitData.append('description', formData.description);
-      submitData.append('price', formData.price);
+      // If not using variants, send simple price/stock
+      if (!hasVariants) {
+        submitData.append('price', formData.price);
+        submitData.append('stock', formData.stock);
+        if (formData.compareAtPrice) submitData.append('compareAtPrice', formData.compareAtPrice);
+      } else {
+        // Using variants: validate and send options and variants as JSON
+        const cleanOptions = options
+          .filter(opt => opt.name && Array.isArray(opt.values) && opt.values.length)
+          .map(opt => ({ name: opt.name.trim(), values: opt.values.map(v => v.trim()).filter(Boolean) }));
+        if (cleanOptions.length === 0) {
+          error('Please add at least one option with values (e.g., Size: S, M, L)');
+          return;
+        }
+        if (!variants || variants.length === 0) {
+          error('Please generate variants from options before saving');
+          return;
+        }
+        const cleanVariants = variants.map(v => ({
+          sku: (v.sku || '').trim(),
+          price: Number(v.price) || 0,
+          quantity: Number(v.quantity) || 0,
+          options: Array.isArray(v.options) ? v.options.map(o => ({ name: o.name, value: o.value })) : []
+        }));
+        submitData.append('options', JSON.stringify(cleanOptions));
+        submitData.append('variants', JSON.stringify(cleanVariants));
+      }
       submitData.append('category', formData.category);
-      submitData.append('stock', formData.stock);
       if (formData.subcategory) {
         submitData.append('subcategory', formData.subcategory);
       }
+      submitData.append('status', formData.status);
       
       // Append all image files
       imageFiles.forEach((file, index) => {
@@ -91,12 +127,14 @@ const AdminProducts = () => {
             'Content-Type': 'multipart/form-data'
           }
         });
+        success('Product updated');
       } else {
         await axios.post('/products', submitData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
+        success('Product created');
       }
       fetchProducts();
       resetForm();
@@ -111,11 +149,29 @@ const AdminProducts = () => {
     setFormData({
       title: product.title,
       description: product.description,
-      price: product.price.toString(),
+      price: (product.price ?? '').toString(),
+      compareAtPrice: (product.compareAtPrice ?? '').toString(),
       category: product.category,
       subcategory: product.subcategory || '',
-      stock: product.stock.toString()
+      stock: (product.stock ?? '').toString(),
+      status: product.status || 'draft'
     });
+    // Determine if product has variants
+    const hasVar = Array.isArray(product.variants) && product.variants.length > 0;
+    setHasVariants(hasVar);
+    if (hasVar) {
+      // Initialize structured options and variants
+      setOptions((product.options || []).map(o => ({ name: o.name, values: Array.isArray(o.values) ? o.values : [] })));
+      setVariants((product.variants || []).map(v => ({
+        sku: v.sku || '',
+        price: v.price ?? 0,
+        quantity: v.quantity ?? 0,
+        options: Array.isArray(v.options) ? v.options : []
+      })));
+    } else {
+      setOptions([{ name: '', values: [] }]);
+      setVariants([]);
+    }
     setImagePreviews(product.images || []);
     setImageFiles([]);
     setShowForm(true);
@@ -138,14 +194,57 @@ const AdminProducts = () => {
       title: '',
       description: '',
       price: '',
+      compareAtPrice: '',
       category: '',
       subcategory: '',
-      stock: ''
+      stock: '',
+      status: 'draft'
     });
     setImageFiles([]);
     setImagePreviews([]);
     setEditingProduct(null);
     setShowForm(false);
+    setHasVariants(false);
+    setOptions([{ name: '', values: [] }]);
+    setVariants([]);
+  };
+
+  // Helpers for options/variants UI
+  const updateOptionName = (idx, value) => {
+    setOptions(prev => prev.map((o, i) => i === idx ? { ...o, name: value } : o));
+  };
+  const updateOptionValues = (idx, csv) => {
+    const values = csv.split(',').map(v => v.trim()).filter(Boolean);
+    setOptions(prev => prev.map((o, i) => i === idx ? { ...o, values } : o));
+  };
+  const addOption = () => setOptions(prev => [...prev, { name: '', values: [] }]);
+  const removeOption = (idx) => setOptions(prev => prev.filter((_, i) => i !== idx));
+  const cartesian = (arrays) => arrays.reduce((a, b) => a.flatMap(x => b.map(y => [...x, y])), [[]]);
+  const generateSku = (base, optionPairs, idx) => {
+    const slugBase = (base || 'SKU').toString().toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const optPart = optionPairs.map(p => p.value.toString().toUpperCase().replace(/[^A-Z0-9]+/g, '')).join('-');
+    return `${slugBase}-${optPart || 'VAR'}-${String(idx + 1).padStart(3, '0')}`;
+  };
+  const generateVariants = () => {
+    const cleanOptions = options.filter(o => o.name && o.values.length);
+    if (cleanOptions.length === 0) {
+      error('Add at least one option with values before generating variants');
+      return;
+    }
+    const combos = cartesian(cleanOptions.map(o => o.values));
+    const newVariants = combos.map((combo, idx) => {
+      const optionPairs = combo.map((val, i) => ({ name: cleanOptions[i].name, value: val }));
+      return {
+        sku: generateSku(formData.title || formData.category, optionPairs, idx),
+        price: Number(formData.price) || 0,
+        quantity: 0,
+        options: optionPairs
+      };
+    });
+    setVariants(newVariants);
+  };
+  const updateVariantField = (vIdx, field, value) => {
+    setVariants(prev => prev.map((v, i) => i === vIdx ? { ...v, [field]: field === 'price' || field === 'quantity' ? Number(value) : value } : v));
   };
 
   if (loading) {
@@ -185,15 +284,27 @@ const AdminProducts = () => {
               className="input-field"
               required
             />
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={e => setFormData(f => ({ ...f, price: e.target.value }))}
-              placeholder="Price"
-              className="input-field"
-              required
-            />
+            {!hasVariants && (
+              <>
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={e => setFormData(f => ({ ...f, price: e.target.value }))}
+                  placeholder="Price"
+                  className="input-field"
+                  required
+                />
+                <input
+                  type="number"
+                  name="compareAtPrice"
+                  value={formData.compareAtPrice}
+                  onChange={e => setFormData(f => ({ ...f, compareAtPrice: e.target.value }))}
+                  placeholder="Compare-at Price (optional)"
+                  className="input-field"
+                />
+              </>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="font-medium">Category</label>
@@ -230,15 +341,138 @@ const AdminProducts = () => {
               </div>
               )}
             </div>
-            <input
-              type="number"
-              name="stock"
-              value={formData.stock}
-              onChange={e => setFormData(f => ({ ...f, stock: e.target.value }))}
-              placeholder="Stock"
-              className="input-field"
-              required
-            />
+            {!hasVariants && (
+              <input
+                type="number"
+                name="stock"
+                value={formData.stock}
+                onChange={e => setFormData(f => ({ ...f, stock: e.target.value }))}
+                placeholder="Stock"
+                className="input-field"
+                required
+              />
+            )}
+            <div className="flex items-center gap-2 md:col-span-2">
+              <input id="hasVariants" type="checkbox" checked={hasVariants} onChange={e => setHasVariants(e.target.checked)} />
+              <label htmlFor="hasVariants" className="font-medium">This product has variants (e.g., Size, Color)</label>
+            </div>
+            {hasVariants && (
+              <>
+                {/* Options Builder */}
+                <div className="md:col-span-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="font-medium">Options</label>
+                    <button type="button" className="btn-secondary" onClick={addOption}>Add Option</button>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    {options.map((opt, idx) => (
+                      <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+                        <div className="flex flex-col">
+                          <label className="text-sm text-gray-600">Option name</label>
+                          <input
+                            type="text"
+                            value={opt.name}
+                            onChange={(e) => updateOptionName(idx, e.target.value)}
+                            placeholder="e.g., Size"
+                            className="input-field"
+                          />
+                        </div>
+                        <div className="md:col-span-2 flex flex-col">
+                          <label className="text-sm text-gray-600">Values (comma-separated)</label>
+                          <input
+                            type="text"
+                            value={opt.values.join(', ')}
+                            onChange={(e) => updateOptionValues(idx, e.target.value)}
+                            placeholder="e.g., S, M, L"
+                            className="input-field"
+                          />
+                        </div>
+                        {options.length > 1 && (
+                          <button type="button" className="btn-danger md:col-span-3 w-max" onClick={() => removeOption(idx)}>Remove</button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3">
+                    <button type="button" className="btn-primary" onClick={generateVariants}>Generate Variants</button>
+                  </div>
+                </div>
+
+                {/* Variants Table */}
+                <div className="md:col-span-2">
+                  <label className="font-medium mb-2 block">Variants</label>
+                  {variants.length === 0 ? (
+                    <div className="text-gray-500 text-sm">No variants generated yet. Click "Generate Variants".</div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead>
+                          <tr className="text-left text-gray-600">
+                            <th className="p-2">SKU</th>
+                            <th className="p-2">Price</th>
+                            <th className="p-2">Quantity</th>
+                            <th className="p-2">Options</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {variants.map((v, i) => (
+                            <tr key={i} className="border-t">
+                              <td className="p-2">
+                                <input
+                                  type="text"
+                                  value={v.sku}
+                                  onChange={(e) => updateVariantField(i, 'sku', e.target.value)}
+                                  className="input-field"
+                                />
+                              </td>
+                              <td className="p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  value={v.price}
+                                  onChange={(e) => updateVariantField(i, 'price', e.target.value)}
+                                  className="input-field"
+                                />
+                              </td>
+                              <td className="p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="1"
+                                  value={v.quantity}
+                                  onChange={(e) => updateVariantField(i, 'quantity', e.target.value)}
+                                  className="input-field"
+                                />
+                              </td>
+                              <td className="p-2 text-gray-700">
+                                {Array.isArray(v.options) && v.options.map((o, j) => (
+                                  <span key={j} className="inline-block bg-gray-100 rounded px-2 py-1 mr-1 mb-1">{o.name}: {o.value}</span>
+                                ))}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+            <div className="flex flex-col gap-1">
+              <label className="font-medium">Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={e => setFormData(f => ({ ...f, status: e.target.value }))}
+                className="input-field"
+              >
+                <option value="draft">Draft</option>
+                <option value="active">Active</option>
+                <option value="archived">Archived</option>
+                <option value="out_of_stock">Out of stock</option>
+              </select>
+            </div>
             <div className="flex flex-col gap-1 md:col-span-2">
               <label className="font-medium">Description</label>
               <textarea

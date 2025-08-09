@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -24,6 +24,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
   const [categories, setCategories] = useState([{ id: 'all', name: 'All Categories' }]);
@@ -55,6 +56,11 @@ const Products = () => {
     total: 0,
     pages: 0
   });
+  // Facets and selected filters
+  const [facets, setFacets] = useState({ categories: [], subcategories: [], priceRanges: [], options: {} });
+  const [selectedBucket, setSelectedBucket] = useState('');
+  // selectedOptions: { [optionName]: value }
+  const [selectedOptions, setSelectedOptions] = useState({});
   const { showToast } = useToast();
 
   // Load categories dynamically from backend
@@ -98,9 +104,15 @@ const Products = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
   }, [location.search]);
 
+  // Debounce search term to avoid excessive requests
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearchTerm(searchTerm.trim()), 300);
+    return () => clearTimeout(id);
+  }, [searchTerm]);
+
   useEffect(() => {
     fetchProducts();
-  }, [searchTerm, selectedCategory, selectedSubcategory, priceRange, sortBy, sortOrder, pagination.page, pagination.limit]);
+  }, [debouncedSearchTerm, selectedCategory, selectedSubcategory, priceRange, sortBy, sortOrder, pagination.page, pagination.limit, onlyInStock, selectedBucket, selectedOptions]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -142,8 +154,8 @@ const Products = () => {
       params.append('sort', sort);
       params.append('order', order);
       
-      if (searchTerm) {
-        params.append('search', searchTerm);
+      if (debouncedSearchTerm) {
+        params.append('search', debouncedSearchTerm);
       }
       
       if (selectedCategory !== 'all') {
@@ -162,11 +174,37 @@ const Products = () => {
       if (onlyInStock) {
         params.append('inStock', 'true');
       }
+
+      // Apply price bucket mapping (overrides manual min/max if set)
+      if (selectedBucket) {
+        // Mirror backend buckets
+        const bucketToRange = {
+          under_25: { min: 0, max: 25 },
+          '25_50': { min: 25, max: 50 },
+          '50_100': { min: 50, max: 100 },
+          '100_200': { min: 100, max: 200 },
+          '200_plus': { min: 200, max: '' }
+        };
+        const br = bucketToRange[selectedBucket];
+        if (br) {
+          params.set('minPrice', br.min);
+          if (br.max !== '') params.set('maxPrice', br.max);
+          else params.delete('maxPrice');
+        }
+      }
+
+      // Append selected variant options as opt_<OptionName>
+      Object.entries(selectedOptions).forEach(([name, value]) => {
+        if (value) params.append(`opt_${name}`, value);
+      });
       
       const response = await axios.get(`/products?${params.toString()}`);
       const data = response.data;
       const list = Array.isArray(data) ? data : (data.products || []);
       setProducts(list);
+      if (!Array.isArray(data)) {
+        setFacets(data.facets || { categories: [], subcategories: [], priceRanges: [], options: {} });
+      }
       setPagination(Array.isArray(data) ? {
         page: 1,
         limit: list.length,
@@ -225,11 +263,20 @@ const Products = () => {
     return filtered;
   };
 
+  const filteredProducts = useMemo(() => getFilteredProducts(), [
+    products,
+    selectedCategory,
+    selectedSubcategory,
+    onlyInStock
+  ]);
+
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedCategory('all');
     setSelectedSubcategory('');
     setPriceRange({ min: '', max: '' });
+    setSelectedBucket('');
+    setSelectedOptions({});
     setSortBy('createdAt');
     setSortOrder('desc');
     setPagination(prev => ({ ...prev, page: 1 }));
@@ -461,17 +508,73 @@ const Products = () => {
             </Space>
           </Drawer>
 
-          {/* Products Grid/List */}
-          <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 animate-fade-in' : 'flex flex-col gap-4 animate-fade-in'}>
-            {getFilteredProducts().length > 0 ? (
-              getFilteredProducts().map(product => (
-                <ProductCard key={product._id} product={product} altText={product.title} viewMode={viewMode} />
-              ))
-            ) : (
-              <div className="col-span-full text-center py-16">
-                <p className="text-gray-500 text-lg">No products available at the moment.</p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Facets Sidebar (desktop) */}
+            <aside className="hidden lg:block lg:col-span-3">
+              <div className="bg-white rounded-lg shadow p-4 sticky top-28">
+                {/* In-stock toggle */}
+                <div className="mb-4">
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" checked={onlyInStock} onChange={(e) => setOnlyInStock(e.target.checked)} />
+                    <span>Only show in-stock</span>
+                  </label>
+                </div>
+                {/* Price Ranges */}
+                <div className="mb-6">
+                  <div className="font-semibold mb-2">Price</div>
+                  <ul className="space-y-2">
+                    {(facets.priceRanges || []).map((b) => (
+                      <li key={b.id}>
+                        <button
+                          className={`w-full text-left px-3 py-2 rounded border ${selectedBucket === b.id ? 'bg-primary text-white border-primary' : 'border-gray-200 hover:bg-gray-50'}`}
+                          onClick={() => setSelectedBucket(prev => prev === b.id ? '' : b.id)}
+                        >
+                          <span className="mr-2">{b.label}</span>
+                          <span className="text-xs text-gray-500">{b.count}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                {/* Variant Options */}
+                {Object.keys(facets.options || {}).length > 0 && (
+                  <div className="space-y-4">
+                    {Object.entries(facets.options).map(([name, values]) => (
+                      <div key={name}>
+                        <div className="font-semibold mb-2">{name}</div>
+                        <Select
+                          allowClear
+                          value={selectedOptions[name] || undefined}
+                          onChange={(val) => setSelectedOptions(prev => {
+                            const next = { ...prev };
+                            if (!val) delete next[name]; else next[name] = val;
+                            return next;
+                          })}
+                          style={{ width: '100%' }}
+                          placeholder={`Choose ${name}`}
+                          options={values.map(v => ({ value: v.value, label: `${v.value} (${v.count})` }))}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </aside>
+
+            {/* Products Grid/List */}
+            <div className="lg:col-span-9">
+              <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 animate-fade-in' : 'flex flex-col gap-4 animate-fade-in'}>
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map(product => (
+                    <ProductCard key={product._id} product={product} altText={product.title} viewMode={viewMode} />
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-16">
+                    <p className="text-gray-500 text-lg">No products available at the moment.</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           
           {/* Pagination */}

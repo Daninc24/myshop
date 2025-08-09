@@ -78,9 +78,15 @@ const ProductCard = ({ product, small, viewMode = 'grid' }) => {
           <button onClick={handleQuickAdd} className="bg-white rounded-full p-2 shadow hover:text-primary" title="Add to cart">
             <ShoppingCartIcon className="w-5 h-5" />
           </button>
-          <Link to={`/products/${product._id}`} className="bg-white rounded-full p-2 shadow hover:text-primary" title="Quick view">
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); }}
+            className="bg-white rounded-full p-2 shadow hover:text-primary"
+            title="Quick view"
+            aria-label="Quick view"
+          >
             <EyeIcon className="w-5 h-5" />
-          </Link>
+          </button>
         </div>
       )}
     </Link>
