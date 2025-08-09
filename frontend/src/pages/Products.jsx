@@ -111,10 +111,12 @@ const Products = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    fetchProducts();
+    const controller = new AbortController();
+    fetchProducts(controller.signal);
+    return () => controller.abort();
   }, [debouncedSearchTerm, selectedCategory, selectedSubcategory, priceRange, sortBy, sortOrder, pagination.page, pagination.limit, onlyInStock, selectedBucket, selectedOptions]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (signal) => {
     setLoading(true);
     try {
       // Convert UI sort options to API parameters
@@ -198,7 +200,7 @@ const Products = () => {
         if (value) params.append(`opt_${name}`, value);
       });
       
-      const response = await axios.get(`/products?${params.toString()}`);
+      const response = await axios.get(`/products?${params.toString()}`, { signal });
       const data = response.data;
       const list = Array.isArray(data) ? data : (data.products || []);
       setProducts(list);
@@ -217,6 +219,10 @@ const Products = () => {
         pages: 0
       }));
     } catch (error) {
+      if (error.name === 'CanceledError' || error.name === 'AbortError') {
+        // Swallow cancellation
+        return;
+      }
       showToast('Error fetching products', 'error');
       setProducts([]);
     } finally {

@@ -16,6 +16,10 @@ const generateSKU = (title, variantOptions = []) => {
 const facetsCache = new Map();
 const FACETS_TTL_MS = 90 * 1000; // 90 seconds
 
+// Simple in-memory cache for product list responses
+const listCache = new Map();
+const LIST_TTL_MS = 60 * 1000; // 60 seconds
+
 // Get all products
 const getAllProducts = async (req, res) => {
   try {
@@ -82,9 +86,19 @@ const getAllProducts = async (req, res) => {
     // Get total count for pagination info
     const total = await Product.countDocuments(query);
     
+    // Check list cache first (cache key includes filters/pagination/sort)
+    const listCacheKey = JSON.stringify({ query, pageNum, limitNum, sortOptions });
+    const listNow = Date.now();
+    const cachedList = listCache.get(listCacheKey);
+    if (cachedList && (listNow - cachedList.timestamp) < LIST_TTL_MS) {
+      // Serve cached payload
+      res.set('Cache-Control', 'public, max-age=30');
+      return res.json(cachedList.value);
+    }
+
     // Execute query with pagination and sorting (project only fields needed for PLP)
     const products = await Product.find(query)
-      .select('title price compareAtPrice images category subcategory stock variants updatedAt createdAt')
+      .select('title price compareAtPrice images category subcategory stock updatedAt createdAt')
       .sort(sortOptions)
       .skip(skip)
       .limit(limitNum)
@@ -221,7 +235,7 @@ const getAllProducts = async (req, res) => {
     }
 
     // Standardized response with pagination and facets
-    res.json({
+    const payload = {
       products: migratedProducts,
       pagination: {
         page: pageNum,
@@ -235,7 +249,10 @@ const getAllProducts = async (req, res) => {
         priceRanges: priceRangesFacet,
         options: optionsFacet
       }
-    });
+    };
+    listCache.set(listCacheKey, { timestamp: listNow, value: payload });
+    res.set('Cache-Control', 'public, max-age=30');
+    res.json(payload);
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
