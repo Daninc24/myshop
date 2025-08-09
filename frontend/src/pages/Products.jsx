@@ -26,6 +26,7 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
+  const [categories, setCategories] = useState([{ id: 'all', name: 'All Categories' }]);
   const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const Products = () => {
     }
   }, [params, location.pathname]);
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [onlyInStock, setOnlyInStock] = useState(false);
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [viewMode, setViewMode] = useState('grid');
@@ -54,40 +56,27 @@ const Products = () => {
     pages: 0
   });
   const { showToast } = useToast();
-  const categories = [
-    { id: 'all', name: 'All Categories' },
-    { id: 'Electronics', name: 'Electronics' },
-    { id: 'Computers & Laptops', name: 'Computers & Laptops' },
-    { id: 'Mobile Phones', name: 'Mobile Phones' },
-    { id: 'Accessories', name: 'Accessories' },
-    { id: 'Home & Kitchen', name: 'Home & Kitchen' },
-    { id: 'Sports', name: 'Sports' },
-    { id: 'Fashion', name: 'Fashion' },
-    { id: 'Beauty', name: 'Beauty & Personal Care' },
-    { id: 'Toys', name: 'Toys & Games' },
-    { id: 'Books', name: 'Books' },
-    { id: 'Automotive', name: 'Automotive' },
-    { id: 'Groceries', name: 'Groceries' },
-    { id: 'Health', name: 'Health & Wellness' },
-    { id: 'Office', name: 'Office Supplies' },
-    { id: 'Garden', name: 'Garden & Outdoors' },
-    { id: 'Pets', name: 'Pet Supplies' },
-    { id: 'Baby', name: 'Baby & Kids' },
-    { id: 'Music', name: 'Music & Instruments' },
-    { id: 'Art', name: 'Art & Craft' },
-    { id: 'Jewelry', name: 'Jewelry' },
-    { id: 'Shoes', name: 'Shoes' },
-    { id: 'Bags', name: 'Bags & Luggage' },
-    { id: 'Watches', name: 'Watches' },
-    { id: 'Phones', name: 'Phones & Tablets' },
-    { id: 'Cameras', name: 'Cameras & Photography' },
-    { id: 'Gaming', name: 'Gaming' },
-    { id: 'Stationery', name: 'Stationery' },
-    { id: 'Food', name: 'Food & Beverages' },
-    { id: 'Tools', name: 'Tools & Hardware' },
-    { id: 'Travel', name: 'Travel' },
-    { id: 'Fitness', name: 'Fitness & Exercise' }
-  ];
+
+  // Load categories dynamically from backend
+  useEffect(() => {
+    let cancelled = false;
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get('/categories');
+        const list = Array.isArray(res.data)
+          ? res.data
+          : (Array.isArray(res.data?.categories) ? res.data.categories : []);
+        const mapped = [{ id: 'all', name: 'All Categories' }].concat(
+          list.map(c => ({ id: c.id || c._id || c.name, name: c.name, subcategories: c.subcategories || [] }))
+        );
+        if (!cancelled) setCategories(mapped);
+      } catch (e) {
+        // keep default
+      }
+    };
+    fetchCategories();
+    return () => { cancelled = true; };
+  }, []);
 
   const sortOptions = [
     { value: 'name', label: 'Name A-Z' },
@@ -97,11 +86,15 @@ const Products = () => {
     { value: 'newest', label: 'Newest First' }
   ];
 
-  // Initialize search from URL query param (e.g., /products?search=phone)
+  // Initialize search and category from URL query params
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const initialSearch = query.get('search') || '';
+    const initialCategory = query.get('category');
+    const initialSubcategory = query.get('subcategory');
     setSearchTerm(initialSearch);
+    if (initialCategory) setSelectedCategory(initialCategory);
+    if (initialSubcategory) setSelectedSubcategory(initialSubcategory);
     setPagination(prev => ({ ...prev, page: 1 }));
   }, [location.search]);
 
@@ -156,18 +149,35 @@ const Products = () => {
       if (selectedCategory !== 'all') {
         params.append('category', selectedCategory);
       }
+      if (selectedSubcategory) {
+        params.append('subcategory', selectedSubcategory);
+      }
       
-      // Price range filters would need to be implemented on the backend
-      // For now, we'll filter them client-side after fetching
+      if (priceRange.min !== '') {
+        params.append('minPrice', priceRange.min);
+      }
+      if (priceRange.max !== '') {
+        params.append('maxPrice', priceRange.max);
+      }
+      if (onlyInStock) {
+        params.append('inStock', 'true');
+      }
       
       const response = await axios.get(`/products?${params.toString()}`);
-      setProducts(response.data.products || []);
-      setPagination(response.data.pagination || {
+      const data = response.data;
+      const list = Array.isArray(data) ? data : (data.products || []);
+      setProducts(list);
+      setPagination(Array.isArray(data) ? {
+        page: 1,
+        limit: list.length,
+        total: list.length,
+        pages: 1
+      } : (data.pagination || {
         page: 1,
         limit: 12,
         total: 0,
         pages: 0
-      });
+      }));
     } catch (error) {
       showToast('Error fetching products', 'error');
       setProducts([]);
@@ -176,7 +186,7 @@ const Products = () => {
     }
   };
   
-  // Client-side price filtering (until backend supports it)
+  // Client-side safeguard filters (kept minimal)
   const getFilteredProducts = () => {
     let filtered = [...products];
 
@@ -194,7 +204,7 @@ const Products = () => {
         return false;
       });
     }
-    // Subcategory filter
+    // Subcategory filter (client-side safeguard)
     if (selectedSubcategory) {
       filtered = filtered.filter(product => {
         if (!product.subcategory) return false;
@@ -209,12 +219,8 @@ const Products = () => {
       });
     }
 
-    // Price range filter (client-side for now)
-    if (priceRange.min !== '') {
-      filtered = filtered.filter(product => product.price >= parseFloat(priceRange.min));
-    }
-    if (priceRange.max !== '') {
-      filtered = filtered.filter(product => product.price <= parseFloat(priceRange.max));
+    if (onlyInStock) {
+      filtered = filtered.filter(p => (typeof p.stock === 'number' ? p.stock > 0 : true));
     }
     return filtered;
   };
@@ -306,11 +312,36 @@ const Products = () => {
               </div>
               <Select
                 value={selectedCategory}
-                onChange={(value) => setSelectedCategory(value)}
+                onChange={(value) => {
+                  setSelectedCategory(value);
+                  setSelectedSubcategory('');
+                  if (value === 'all') {
+                    navigate('/products');
+                  } else {
+                    navigate(`/category/${encodeURIComponent(value)}`);
+                  }
+                }}
                 className="hidden md:block"
                 style={{ minWidth: 200 }}
                 options={categories.map((c) => ({ value: c.id, label: c.name }))}
               />
+              {selectedCategory !== 'all' && (categories.find(c => c.id === selectedCategory)?.subcategories?.length > 0) && (
+                <Select
+                  value={selectedSubcategory}
+                  onChange={(value) => {
+                    setSelectedSubcategory(value);
+                    if (!value) {
+                      navigate(`/category/${encodeURIComponent(selectedCategory)}`);
+                    } else {
+                      navigate(`/category/${encodeURIComponent(selectedCategory)}/${encodeURIComponent(value)}`);
+                    }
+                  }}
+                  placeholder="Subcategory"
+                  className="hidden md:block"
+                  style={{ minWidth: 200 }}
+                  options={categories.find(c => c.id === selectedCategory).subcategories.map((s) => ({ value: s.id || s.name, label: s.name }))}
+                />
+              )}
               <Select
                 value={sortBy}
                 onChange={(value) => setSortBy(value)}
@@ -360,11 +391,37 @@ const Products = () => {
                 <div className="mb-2 font-medium">Category</div>
                 <Select
                   value={selectedCategory}
-                  onChange={(value) => setSelectedCategory(value)}
+                  onChange={(value) => {
+                    setSelectedCategory(value);
+                    setSelectedSubcategory('');
+                    if (value === 'all') {
+                      navigate('/products');
+                    } else {
+                      navigate(`/category/${encodeURIComponent(value)}`);
+                    }
+                  }}
                   style={{ width: '100%' }}
                   options={categories.map((c) => ({ value: c.id, label: c.name }))}
                 />
               </div>
+              {selectedCategory !== 'all' && (categories.find(c => c.id === selectedCategory)?.subcategories?.length > 0) && (
+                <div>
+                  <div className="mb-2 font-medium">Subcategory</div>
+                  <Select
+                    value={selectedSubcategory}
+                    onChange={(value) => {
+                      setSelectedSubcategory(value);
+                      if (!value) {
+                        navigate(`/category/${encodeURIComponent(selectedCategory)}`);
+                      } else {
+                        navigate(`/category/${encodeURIComponent(selectedCategory)}/${encodeURIComponent(value)}`);
+                      }
+                    }}
+                    style={{ width: '100%' }}
+                    options={categories.find(c => c.id === selectedCategory).subcategories.map((s) => ({ value: s.id || s.name, label: s.name }))}
+                  />
+                </div>
+              )}
               <div>
                 <div className="mb-2 font-medium">Min Price</div>
                 <Input
@@ -382,6 +439,12 @@ const Products = () => {
                   value={priceRange.max}
                   onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
                 />
+              </div>
+              <div>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={onlyInStock} onChange={(e) => setOnlyInStock(e.target.checked)} />
+                  <span>Only show in-stock</span>
+                </label>
               </div>
               <div>
                 <div className="mb-2 font-medium">Sort By</div>

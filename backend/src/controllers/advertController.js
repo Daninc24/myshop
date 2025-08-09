@@ -8,8 +8,12 @@ exports.createAdvert = async (req, res) => {
 
     const { title, message, product, startDate, endDate, active, template } = req.body;
     let images = [];
-    if (req.files && req.files.length > 0) {
+    if (req.file) {
+      images = [req.file.path];
+    } else if (req.files && req.files.length > 0) {
       images = req.files.map(file => file.path); // Cloudinary URLs
+    } else if (req.body.image && typeof req.body.image === 'string') {
+      images = [req.body.image];
     }
     // Parse dates to ensure correct type
     const startDateParsed = startDate ? new Date(startDate) : undefined;
@@ -21,7 +25,7 @@ exports.createAdvert = async (req, res) => {
       images,
       startDate: startDateParsed,
       endDate: endDateParsed,
-      active,
+      active: typeof active === 'string' ? active === 'true' : !!active,
       template
     });
     res.status(201).json({ advert });
@@ -35,9 +39,16 @@ exports.updateAdvert = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, message, product, startDate, endDate, active, template } = req.body;
-    let images = [];
-    if (req.files && req.files.length > 0) {
+    const existing = await Advert.findById(id);
+    if (!existing) return res.status(404).json({ message: 'Advert not found' });
+
+    let images = existing.images || [];
+    if (req.file) {
+      images = [req.file.path];
+    } else if (req.files && req.files.length > 0) {
       images = req.files.map(file => file.path); // Cloudinary URLs
+    } else if (req.body.image && typeof req.body.image === 'string') {
+      images = [req.body.image];
     }
     // Parse dates to ensure correct type
     const startDateParsed = startDate ? new Date(startDate) : undefined;
@@ -51,12 +62,11 @@ exports.updateAdvert = async (req, res) => {
         images,
         startDate: startDateParsed,
         endDate: endDateParsed,
-        active,
+        active: typeof active === 'string' ? active === 'true' : !!active,
         template
       },
       { new: true }
     );
-    if (!advert) return res.status(404).json({ message: 'Advert not found' });
     res.json({ advert });
   } catch (error) {
     res.status(500).json({ message: 'Error updating advert', error: error.message });
@@ -89,10 +99,18 @@ exports.listAdverts = async (req, res) => {
   }
 };
 
+// Simple in-memory cache for active adverts
+let advertsCache = { data: null, ts: 0 };
+const ADVERTS_TTL_MS = 60 * 1000; // 1 minute
+
 // Public: Get active adverts
 exports.getActiveAdverts = async (req, res) => {
   try {
     const now = new Date();
+    const nowMs = Date.now();
+    if (advertsCache.data && (nowMs - advertsCache.ts) < ADVERTS_TTL_MS) {
+      return res.json({ adverts: advertsCache.data });
+    }
 
     // Log all adverts for debugging
     const allAdverts = await Advert.find().populate('product');
@@ -113,6 +131,7 @@ exports.getActiveAdverts = async (req, res) => {
       ...ad.toObject(),
       image: ad.images && ad.images.length > 0 ? ad.images[0] : ''
     }));
+    advertsCache = { data: advertsWithImage, ts: nowMs };
     res.json({ adverts: advertsWithImage });
   } catch (error) {
     console.error('Error in getActiveAdverts:', error);

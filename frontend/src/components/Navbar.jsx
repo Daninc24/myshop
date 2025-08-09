@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCartIcon, ShoppingBagIcon, UserIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, CreditCardIcon, Squares2X2Icon, HomeIcon, ArrowRightOnRectangleIcon, UserPlusIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { Input, Select, Badge, Button } from 'antd';
-import categories from '../utils/categories';
+import categoriesFallback from '../utils/categories';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import axios from 'axios';
@@ -35,6 +35,30 @@ const Navbar = () => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const socketRef = useRef(null);
   const [currencies, setCurrencies] = useState(['USD']);
+  const [categoriesList, setCategoriesList] = useState(categoriesFallback);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [categoriesError, setCategoriesError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const res = await axios.get('/categories');
+        const list = Array.isArray(res.data)
+          ? res.data
+          : (Array.isArray(res.data?.categories) ? res.data.categories : []);
+        const mapped = list.map((c) => ({ id: c.id || c._id || c.name, name: c.name, subcategories: c.subcategories || [] }));
+        if (!cancelled && mapped.length) setCategoriesList(mapped);
+      } catch (e) {
+        if (!cancelled) setCategoriesError('Failed to load categories');
+      } finally {
+        if (!cancelled) setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -98,12 +122,12 @@ const Navbar = () => {
   const posRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
 
   const categoryProps = useMemo(() => ({
-    categories,
+    categories: categoriesList,
     onClose: () => setShowCategoryMenu(false),
     show: showCategoryMenu,
-    loading: false,
-    error: null,
-  }), [categories, showCategoryMenu]);
+    loading: loadingCategories,
+    error: categoriesError,
+  }), [categoriesList, showCategoryMenu, loadingCategories, categoriesError]);
 
   return (
     <>

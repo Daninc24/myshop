@@ -2,7 +2,7 @@ import React from 'react';
 import { Squares2X2Icon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
-import categories from '../utils/categories';
+// Categories are provided by parent via props; util fallback removed to avoid stale data
 
 const CategoryDropdown = ({
   show,

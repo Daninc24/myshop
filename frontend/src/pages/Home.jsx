@@ -30,86 +30,10 @@ function useDebounce(value, delay) {
 }
 
 import { getOptimizedImageUrl } from '../utils/imageUtils';
-import categories from '../utils/categories';
+import { advertTemplates } from '../components/AdvertTemplates';
+import categoriesFallback from '../utils/categories';
 
-const advertTemplates = [
-  {
-    id: 'classic',
-    render: ({ title, message, image, product, productId }) => (
-      productId ? (
-        <Link to={`/products/${productId}`} className="block group">
-          <div className="card flex gap-6 items-center mb-6 animate-fade-in group-hover:shadow-lg transition-shadow">
-            <img loading="lazy" decoding="async" src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-2xl shadow-soft" />
-            <div>
-              <h2 className="text-2xl font-heading font-bold text-secondary mb-1 group-hover:text-primary transition-colors">{title}</h2>
-              <p className="text-gray-700 mb-2">{message}</p>
-              {product && <span className="text-primary underline text-sm mt-2 block font-medium">View Product</span>}
-            </div>
-          </div>
-        </Link>
-      ) : (
-        <div className="card flex gap-6 items-center mb-6 animate-fade-in">
-          <img loading="lazy" decoding="async" src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-2xl shadow-soft" />
-          <div>
-            <h2 className="text-2xl font-heading font-bold text-secondary mb-1">{title}</h2>
-            <p className="text-gray-700 mb-2">{message}</p>
-          </div>
-        </div>
-      )
-    )
-  },
-  {
-    id: 'banner',
-    render: ({ title, message, image }) => (
-      <div className="relative h-36 flex items-center justify-center bg-primary-light rounded-2xl overflow-hidden mb-6 animate-slide-in">
-        <img loading="lazy" decoding="async" src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="absolute inset-0 w-full h-full object-cover opacity-30" />
-        <div className="relative z-10 text-center">
-          <h2 className="text-3xl font-heading font-bold text-primary drop-shadow mb-1">{title}</h2>
-          <p className="text-primary-dark text-lg">{message}</p>
-        </div>
-      </div>
-    )
-  },
-  {
-    id: 'card',
-    render: ({ title, message, image }) => (
-      <div className="bg-gradient-to-br from-primary-light to-accent-light rounded-2xl p-6 flex flex-col items-center mb-6 animate-bounce-in">
-        <img loading="lazy" decoding="async" src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-24 h-24 object-cover rounded-full mb-3 shadow-soft" />
-        <h2 className="text-xl font-heading font-bold text-primary mb-1">{title}</h2>
-        <p className="text-base text-secondary mb-1">{message}</p>
-      </div>
-    )
-  },
-  {
-    id: 'left-image',
-    render: ({ title, message, image, product }) => (
-      <div className="flex items-center bg-gradient-to-r from-accent to-primary text-white rounded-2xl p-6 gap-6 mb-6 animate-slide-in">
-        <img loading="lazy" decoding="async" src={image ? getOptimizedImageUrl(image) : '/images/placeholder-advert.png'} alt={title ? `Advert: ${title}` : 'Advert'} className="w-32 h-32 object-cover rounded-2xl shadow-strong" />
-        <div>
-          <h2 className="text-2xl font-heading font-bold mb-1">{title}</h2>
-          <p className="text-white mb-2">{message}</p>
-          {product && <span className="text-xs bg-white/20 px-3 py-1 rounded-xl">{product}</span>}
-        </div>
-      </div>
-    )
-  },
-  {
-    id: 'cta-card',
-    render: ({ title, message, image, product, productId }) => (
-      <div className="bg-surface border-2 border-primary rounded-2xl p-8 flex flex-col items-center shadow-strong mb-6 animate-fade-in">
-        {image && <img loading="lazy" decoding="async" src={getOptimizedImageUrl(image)} alt={title ? `Advert: ${title}` : 'Advert'} className="w-28 h-28 object-cover rounded-full border-4 border-primary-light mb-3" />}
-        <h2 className="text-2xl font-heading font-bold text-primary mb-1">{title}</h2>
-        <p className="text-secondary mb-2">{message}</p>
-        {product && <span className="text-xs text-primary mb-2">{product}</span>}
-        {productId ? (
-          <Link to={`/products/${productId}`} className="btn-primary mt-2">Shop Now</Link>
-        ) : (
-          <button className="btn-primary mt-2" disabled>Shop Now</button>
-        )}
-      </div>
-    )
-  },
-];
+// Use shared advert templates
 
 const HERO_IMAGE = gambiaMarket;
 
@@ -139,7 +63,7 @@ const Home = () => {
   const [bannerIndex, setBannerIndex] = useState(0);
   const bannerIntervalRef = useRef();
   // Dynamic data states
-  const [categoriesList, setCategoriesList] = useState(Array.isArray(categories) ? categories : []);
+  const [categoriesList, setCategoriesList] = useState(Array.isArray(categoriesFallback) ? categoriesFallback : []);
   const [assurances, setAssurances] = useState([
     { key: 'assurance', title: 'Purchase Protection', subtitle: 'Coverage on eligible orders', icon: 'shield' },
     { key: 'delivery', title: 'On-time Delivery', subtitle: 'Trackable shipping', icon: 'truck' },
@@ -216,8 +140,9 @@ const Home = () => {
       const response = await axios.get('/products/best-selling', {
         params: { limit: 8 }
       });
-      
-      setBestSelling(response.data.products || []);
+      const data = response.data;
+      const list = Array.isArray(data) ? data : (data.products || []);
+      setBestSelling(list);
     } catch (err) {
       console.error('Error fetching best selling:', err);
       setBestSelling([]);
@@ -335,7 +260,9 @@ const Home = () => {
       if (searchTerm) params.search = searchTerm;
       if (category && category !== 'all') params.category = category;
       const response = await axios.get('/products', { params });
-      setProducts(response.data || []);
+      const data = response.data;
+      const list = Array.isArray(data) ? data : (data.products || []);
+      setProducts(list);
     } catch (err) {
       setProducts([]);
     } finally {
@@ -359,7 +286,9 @@ const Home = () => {
       try {
         const res = await axios.get('/products', { params: { search } });
         if (!cancelled) {
-          setSearchSuggestions((res.data || []).slice(0, 8));
+          const data = res.data;
+          const list = Array.isArray(data) ? data : (data.products || []);
+          setSearchSuggestions(list.slice(0, 8));
           setShowSuggestions(true);
         }
       } catch {
@@ -593,7 +522,7 @@ const Home = () => {
         <main className="flex flex-col gap-8">
           {/* Mobile: Horizontal Category Bar (improved) */}
           <div className="md:hidden w-full overflow-x-auto flex gap-2 py-2 mb-4 sticky top-0 z-20 bg-white shadow-sm border-b border-orange-100">
-            {categories.map(category => (
+            {categoriesList.map(category => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
@@ -684,7 +613,7 @@ const Home = () => {
           {/* Product Grid Section - Responsive/Scrollable */}
           <section>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">{selectedCategory === 'all' ? 'Featured Products' : categories.find(cat => cat.id === selectedCategory)?.name}</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{selectedCategory === 'all' ? 'Featured Products' : categoriesList.find(cat => cat.id === selectedCategory)?.name}</h2>
               <Link to="/products" className="text-orange-600 hover:underline font-medium">View All</Link>
             </div>
             {/* Loading spinner only for product grid */}

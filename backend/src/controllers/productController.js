@@ -5,7 +5,7 @@ const InventoryLog = require('../models/InventoryLog');
 // Get all products
 const getAllProducts = async (req, res) => {
   try {
-    const { search, category, subcategory, page = 1, limit = 12, sort = 'createdAt', order = 'desc' } = req.query;
+    const { search, category, subcategory, page = 1, limit = 12, sort = 'createdAt', order = 'desc', minPrice, maxPrice, inStock } = req.query;
     let query = {};
 
     if (search) {
@@ -19,6 +19,24 @@ const getAllProducts = async (req, res) => {
     }
     if (subcategory && subcategory !== 'all') {
       query.subcategory = subcategory;
+    }
+    // Price range filters
+    if (typeof minPrice !== 'undefined' || typeof maxPrice !== 'undefined') {
+      query.price = {};
+      if (typeof minPrice !== 'undefined' && !isNaN(parseFloat(minPrice))) {
+        query.price.$gte = parseFloat(minPrice);
+      }
+      if (typeof maxPrice !== 'undefined' && !isNaN(parseFloat(maxPrice))) {
+        query.price.$lte = parseFloat(maxPrice);
+      }
+      if (Object.keys(query.price).length === 0) delete query.price;
+    }
+    // In-stock filter
+    if (typeof inStock !== 'undefined') {
+      const inStockBool = (typeof inStock === 'string') ? (inStock === 'true') : !!inStock;
+      if (inStockBool) {
+        query.stock = { $gt: 0 };
+      }
     }
 
     // Calculate pagination values
@@ -51,11 +69,43 @@ const getAllProducts = async (req, res) => {
       return product;
     });
     
-    // If query is for new arrivals (no search/category/pagination), return array for compatibility
-    if (!search && (!category || category === 'all') && pageNum === 1 && limitNum === 12 && !req.query.sort && !req.query.order) {
-      return res.json(migratedProducts);
+    // Facets (category and subcategory counts) based on current filters except the facet dimension
+    // Base match includes search, price, and stock filters but not category/subcategory
+    const baseMatch = {};
+    if (search) {
+      baseMatch.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { name: { $regex: search, $options: 'i' } }
+      ];
     }
-    // Return pagination metadata along with products (default)
+    if (typeof minPrice !== 'undefined' || typeof maxPrice !== 'undefined') {
+      baseMatch.price = {};
+      if (typeof minPrice !== 'undefined' && !isNaN(parseFloat(minPrice))) baseMatch.price.$gte = parseFloat(minPrice);
+      if (typeof maxPrice !== 'undefined' && !isNaN(parseFloat(maxPrice))) baseMatch.price.$lte = parseFloat(maxPrice);
+      if (Object.keys(baseMatch.price).length === 0) delete baseMatch.price;
+    }
+    if (typeof inStock !== 'undefined') {
+      const inStockBool = (typeof inStock === 'string') ? (inStock === 'true') : !!inStock;
+      if (inStockBool) baseMatch.stock = { $gt: 0 };
+    }
+
+    const categoryCountsPromise = Product.aggregate([
+      { $match: baseMatch },
+      { $group: { _id: '$category', count: { $sum: 1 } } },
+      { $project: { id: '$_id', count: 1, _id: 0 } },
+      { $sort: { count: -1 } }
+    ]);
+    const subcategoryMatch = { ...baseMatch };
+    if (category && category !== 'all') subcategoryMatch.category = category;
+    const subcategoryCountsPromise = Product.aggregate([
+      { $match: subcategoryMatch },
+      { $group: { _id: '$subcategory', count: { $sum: 1 } } },
+      { $project: { id: '$_id', count: 1, _id: 0 } },
+      { $sort: { count: -1 } }
+    ]);
+    const [categoryCounts, subcategoryCounts] = await Promise.all([categoryCountsPromise, subcategoryCountsPromise]);
+
+    // Standardized response with pagination and facets
     res.json({
       products: migratedProducts,
       pagination: {
@@ -63,6 +113,10 @@ const getAllProducts = async (req, res) => {
         limit: limitNum,
         total,
         pages: Math.ceil(total / limitNum)
+      },
+      facets: {
+        categories: categoryCounts,
+        subcategories: subcategoryCounts
       }
     });
   } catch (error) {

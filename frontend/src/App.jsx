@@ -66,6 +66,18 @@ function App() {
                         <Products />
                       </>
                     } />
+                    <Route path="/category/:categoryId" element={
+                      <>
+                        <SEO title="My Shop - Products" description="Browse our wide range of products at My Shop." name="My Shop" type="website" />
+                        <Products />
+                      </>
+                    } />
+                    <Route path="/category/:categoryId/:subcategoryId" element={
+                      <>
+                        <SEO title="My Shop - Products" description="Browse our wide range of products at My Shop." name="My Shop" type="website" />
+                        <Products />
+                      </>
+                    } />
                     <Route path="/products/:id" element={
                       <>
                         <SEO title="My Shop - Product Detail" description="View details of a product at My Shop." name="My Shop" type="website" />
