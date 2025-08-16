@@ -99,7 +99,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('/api/categories');
+        const response = await axios.get('/categories');
         const categoriesData = response.data;
         
         if (Array.isArray(categoriesData) && categoriesData.length > 0) {
@@ -119,7 +119,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchCurrencies = async () => {
       try {
-        const response = await axios.get('/api/payment/currency/list');
+        const response = await axios.get('/payment/currency/list');
         const currencyData = response.data;
         
         // Ensure we have a valid array of currencies
@@ -144,7 +144,7 @@ const Navbar = () => {
     }
 
     try {
-      const response = await axios.get(`/api/products/search?q=${encodeURIComponent(term)}&limit=5`);
+              const response = await axios.get(`/products/search?q=${encodeURIComponent(term)}&limit=5`);
       setSearchResults(response.data || []);
       setShowSearchResults(true);
     } catch (error) {

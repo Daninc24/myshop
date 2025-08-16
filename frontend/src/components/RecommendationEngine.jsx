@@ -88,7 +88,7 @@ const RecommendationEngine = ({
       if (currentProductId) params.productId = currentProductId;
       if (userBehavior) params.behavior = JSON.stringify(userBehavior);
 
-             const response = await fetchWithRetry('/api/recommendations', {
+             const response = await fetchWithRetry('/recommendations', {
           params,
           signal: abortControllerRef.current.signal,
           timeout: 15000 // Increased to 15 seconds for better reliability
@@ -215,7 +215,7 @@ const RecommendationEngine = ({
      const controller = new AbortController();
      const timeoutId = setTimeout(() => controller.abort(), 3000);
      
-           axios.post('/api/analytics/interaction', {
+           axios.post('/analytics/interaction', {
         type,
         productId,
         recommendationType,

@@ -21,11 +21,10 @@ import { ConfigProvider, theme as antdTheme } from 'antd';
     // Development: let Vite proxy handle API calls
     axios.defaults.baseURL = '';
   } else {
-    // Production: use the full API URL
-    const raw = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+    // Production: use the full API URL as provided by environment variable
+    const raw = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
     const trimmed = raw.replace(/\/+$/, ''); // remove trailing slashes
-    const base = /\/api\/?$/.test(trimmed) ? trimmed : `${trimmed}/api`;
-    axios.defaults.baseURL = base;
+    axios.defaults.baseURL = trimmed;
   }
   axios.defaults.withCredentials = true;
 })();

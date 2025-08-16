@@ -15,7 +15,7 @@ const AdminInventoryLogs = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('/api/products');
+      const res = await axios.get('/products');
       setProducts(res.data || []);
     } catch {}
   };
@@ -24,7 +24,7 @@ const AdminInventoryLogs = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get(`/api/products/logs/${pid}`);
+      const res = await axios.get(`/products/logs/${pid}`);
       setLogs(res.data.logs || []);
     } catch {
       setError('Failed to fetch inventory logs');

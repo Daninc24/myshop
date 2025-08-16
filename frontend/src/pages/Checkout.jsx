@@ -26,7 +26,7 @@ const Checkout = () => {
 
       try {
         const productIds = cart.map(item => item.productId);
-        const response = await axios.get('/api/products');
+        const response = await axios.get('/products');
         const products = response.data.filter(product => 
           productIds.includes(product._id)
         );

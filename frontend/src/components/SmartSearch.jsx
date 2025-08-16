@@ -153,7 +153,7 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
     
     setIsLoading(true);
     try {
-              const response = await axios.get(`/api/products/search/suggestions?q=${encodeURIComponent(query)}`, {
+              const response = await axios.get(`/products/search/suggestions?q=${encodeURIComponent(query)}`, {
         timeout: 2000 // 2 second timeout
       });
       setSuggestions(response.data);

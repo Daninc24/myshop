@@ -94,7 +94,7 @@ const AdminDashboard = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/users');
+      const res = await axios.get('/users');
       setUsers(res.data.users);
     } catch (err) {
       showError('Error fetching users');

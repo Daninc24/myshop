@@ -24,7 +24,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`/api/products/${id}`);
+        const response = await axios.get(`/products/${id}`);
         setProduct(response.data);
       } catch (error) {
         showError('Failed to load product details.');

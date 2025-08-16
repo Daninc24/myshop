@@ -49,7 +49,7 @@ const AdminAdverts = () => {
   const fetchAdverts = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/adverts/all');
+      const res = await axios.get('/adverts/all');
       setAdverts(res.data.adverts || []);
     } catch {
       setAdverts([]);
@@ -60,7 +60,7 @@ const AdminAdverts = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('/api/products');
+      const res = await axios.get('/products');
       setProducts(Array.isArray(res.data) ? res.data : (res.data.products || []));
     } catch {
       setProducts([]);
@@ -94,10 +94,10 @@ const AdminAdverts = () => {
       if (imageFile) data.append('image', imageFile);
       else if (form.image) data.append('image', form.image);
       if (editingId) {
-        await axios.put(`/api/adverts/${editingId}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await axios.put(`/adverts/${editingId}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
         setMsg('Advert updated!');
       } else {
-        await axios.post('/api/adverts', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await axios.post('/adverts', data, { headers: { 'Content-Type': 'multipart/form-data' } });
         setMsg('Advert created!');
       }
       setForm(emptyAdvert);
@@ -128,7 +128,7 @@ const AdminAdverts = () => {
     if (!window.confirm('Delete this advert?')) return;
     setMsg('');
     try {
-      await axios.delete(`/api/adverts/${id}`);
+              await axios.delete(`/adverts/${id}`);
       setMsg('Advert deleted!');
       fetchAdverts();
     } catch (err) {

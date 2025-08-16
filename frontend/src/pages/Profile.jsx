@@ -26,7 +26,7 @@ const Profile = () => {
   useEffect(() => {
     if (!user) return;
     if (socketRef.current) return;
-    const socket = io(import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com', {
+    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5002', {
       withCredentials: true,
       transports: ['websocket'],
     });

@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const loginWithGoogle = () => {
-    window.location.href = (import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com') + '/api/auth/google';
+            window.location.href = (import.meta.env.VITE_API_URL || 'http://localhost:5002') + '/api/auth/google';
   };
 
   const value = {

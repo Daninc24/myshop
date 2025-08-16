@@ -7,6 +7,8 @@ import SmartSearch from '../components/SmartSearch';
 import RecommendationEngine from '../components/RecommendationEngine';
 import LoadingSpinner from '../components/LoadingSpinner';
 import DynamicPerformanceMonitor from '../components/DynamicPerformanceMonitor';
+import PremiumHero from '../components/PremiumHero';
+import PremiumFeatures from '../components/PremiumFeatures';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -79,6 +81,8 @@ const Home = () => {
   const [categoriesList, setCategoriesList] = useState([]);
   const [assurances, setAssurances] = useState([]);
 
+
+
   // Enhanced features with better icons and descriptions
   const features = [
     {
@@ -101,11 +105,56 @@ const Home = () => {
     },
     {
       icon: CreditCardIcon,
-      title: 'Multiple Payment',
-      description: 'Credit card, PayPal, and more',
+      title: 'Flexible Payment',
+      description: 'Pay in installments',
       gradient: 'from-orange-500 to-red-500'
     }
   ];
+
+
+
+  // World-class hero content with dynamic data
+  const heroContent = {
+    title: "MyShopping Center",
+    subtitle: `Discover ${products.length > 0 ? products.length : 'thousands of'} amazing products with confidence. Shop the latest trends and enjoy lightning-fast delivery!`,
+    highlights: [
+      "🎯 Premium Quality Products",
+      "⚡ Same Day Delivery",
+      "🛡️ 100% Secure Shopping",
+      `💎 ${products.length > 0 ? products.length : '15,000'}+ Premium Products`,
+      "🌟 World-Class Service"
+    ],
+    cta: {
+      primary: "Shop Now",
+      secondary: "View Deals"
+    }
+  };
+
+  // Trending products for hero section
+  const [trendingProducts, setTrendingProducts] = useState([]);
+
+  // Handler functions for premium hero
+  const handleShopNow = () => {
+    navigate('/products');
+  };
+
+  const handleViewDeals = () => {
+    navigate('/products?sort=discount');
+  };
+
+  // Fetch trending products for hero
+  const fetchTrendingProducts = async () => {
+    try {
+      const response = await axios.get('/products?sort=trending&limit=3');
+      setTrendingProducts(response.data.products || []);
+    } catch (error) {
+      console.error('Error fetching trending products:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrendingProducts();
+  }, []);
 
   // Enhanced stats for social proof
   const stats = [
@@ -134,7 +183,7 @@ const Home = () => {
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
-      const response = await fetchWithRetry('/api/categories', {
+      const response = await fetchWithRetry('/categories', {
         timeout: 10000 // Increased timeout for better reliability
       });
       if (Array.isArray(response.data)) {
@@ -150,7 +199,7 @@ const Home = () => {
   // Fetch assurances from backend for dynamic Assurance Strip (optional endpoint)
   const fetchAssurances = async () => {
     try {
-      const res = await fetchWithRetry('/api/site/assurances', {
+      const res = await fetchWithRetry('/site/assurances', {
         timeout: 10000
       });
       if (Array.isArray(res.data)) {
@@ -183,7 +232,7 @@ const Home = () => {
       if (searchTerm) params.search = searchTerm;
       if (category && category !== 'all') params.category = category;
       
-      const response = await fetchWithRetry('/api/products', { 
+      const response = await fetchWithRetry('/products', { 
         params,
         timeout: 10000 // Increased timeout for better reliability
       });
@@ -245,7 +294,7 @@ const Home = () => {
   const fetchNewArrivals = async () => {
     try {
       setLoadingNewArrivals(true);
-      const response = await fetchWithRetry('/api/products', { 
+      const response = await fetchWithRetry('/products', { 
         params: { sort: 'newest', limit: 8 },
         timeout: 10000 // Increased timeout for better reliability
       });
@@ -306,7 +355,7 @@ const Home = () => {
   const fetchBestSelling = async () => {
     try {
       setLoadingBestSelling(true);
-      const response = await fetchWithRetry('/api/products/best-selling', { 
+      const response = await fetchWithRetry('/products/best-selling', { 
         params: { limit: 8 },
         timeout: 10000 // Increased timeout for better reliability
       });
@@ -366,7 +415,7 @@ const Home = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetchWithRetry('/api/events', { 
+      const response = await fetchWithRetry('/events', { 
         params: { upcoming: true },
         timeout: 10000
       });
@@ -379,7 +428,7 @@ const Home = () => {
 
   const fetchAdverts = async () => {
     try {
-      const response = await fetchWithRetry('/api/adverts/active', { 
+      const response = await fetchWithRetry('/adverts/active', { 
         timeout: 10000
       });
       // Ensure we always set an array
@@ -392,7 +441,7 @@ const Home = () => {
 
   const fetchTestimonials = async () => {
     try {
-      const response = await fetchWithRetry('/api/testimonials', { 
+      const response = await fetchWithRetry('/testimonials', { 
         timeout: 10000
       });
       const testimonialsData = Array.isArray(response.data) ? response.data : [];
@@ -471,7 +520,7 @@ const Home = () => {
     let cancelled = false;
     const fetchSuggestions = async () => {
       try {
-        const res = await fetchWithRetry('/api/products', { 
+        const res = await fetchWithRetry('/products', { 
           params: { search },
           timeout: 5000
         });
@@ -592,78 +641,17 @@ const Home = () => {
         <meta property="og:image" content="https://myshoppingcenter.com/logo.png" />
       </Helmet>
 
-      {/* Enhanced Hero Section - Always visible */}
-      <section className="relative w-full min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden">
-        {/* Animated background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 animate-gradient-xy"></div>
-        
-        {/* Floating elements for visual interest */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full animate-float"></div>
-          <div className="absolute top-40 right-20 w-16 h-16 bg-white/10 rounded-full animate-float-delayed"></div>
-          <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-white/10 rounded-full animate-float"></div>
-        </div>
+      {/* Premium Hero Section */}
+      <PremiumHero
+        heroContent={heroContent}
+        trendingProducts={trendingProducts}
+        onShopNow={handleShopNow}
+        onViewDeals={handleViewDeals}
+        backgroundImage={HERO_IMAGE}
+      />
 
-        {/* Hero content */}
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-6xl mx-auto">
-          {/* Smart Search Bar */}
-          <div className="w-full max-w-2xl mb-8">
-            <SmartSearch 
-              onSearch={(query) => {
-                setSearch(query);
-                navigate(`/search?q=${encodeURIComponent(query)}`);
-              }}
-              placeholder="Search for products, brands, or categories..."
-            />
-          </div>
-
-          {/* Enhanced hero text */}
-          <div className="space-y-6 mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <SparklesIcon className="w-8 h-8 text-yellow-300 animate-pulse" />
-              <span className="text-yellow-300 font-semibold text-lg">Premium Shopping Experience</span>
-              <SparklesIcon className="w-8 h-8 text-yellow-300 animate-pulse" />
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
-              <span className="block">Welcome to</span>
-              <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                MyShopping Center
-              </span>
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-white/90 max-w-3xl leading-relaxed">
-              Discover the best products, exclusive deals, and a premium marketplace experience. 
-              Shop with confidence and enjoy lightning-fast delivery!
-            </p>
-          </div>
-
-          {/* Enhanced CTA buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <Link 
-              to="/products" 
-              className="group relative px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-full text-lg shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                Start Shopping
-                <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            </Link>
-            
-            <button className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full text-lg border border-white/30 hover:bg-white/30 transition-all duration-300">
-              Watch Demo
-            </button>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse"></div>
-          </div>
-        </div>
-      </section>
+      {/* Premium Features Section */}
+      <PremiumFeatures />
 
       {/* Enhanced Assurance Strip */}
       <section className="max-w-7xl mx-auto -mt-8 mb-16 px-4 relative z-20">

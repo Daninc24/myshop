@@ -35,7 +35,7 @@ const Messages = () => {
   // Fetch users/conversations
   useEffect(() => {
     if (user?.role === 'admin') {
-              axios.get('/api/users').then(res => {
+              axios.get('/users').then(res => {
         setUsers(res.data.users);
         axios.get(`/users/messages/all?ts=${Date.now()}`).then(msgRes => {
           const adminId = user.id?.toString();
@@ -55,7 +55,7 @@ const Messages = () => {
 
   useEffect(() => {
     if (user && user.role !== 'admin') {
-              axios.get('/api/users/admin-user')
+              axios.get('/users/admin-user')
         .then(res => {
           if (res.data.admin && res.data.admin._id) {
             setAdminId(res.data.admin._id);
@@ -170,7 +170,7 @@ const Messages = () => {
     
     // Use singleton pattern for socket connection
     if (!socketInstance) {
-      socketInstance = io(import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com', {
+              socketInstance = io(import.meta.env.VITE_API_URL || 'http://localhost:5002', {
         withCredentials: true,
         transports: ['websocket'],
         reconnection: true,

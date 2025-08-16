@@ -91,7 +91,7 @@ const Products = () => {
 
     setCategoriesLoading(true);
     try {
-      const res = await axios.get('/api/categories');
+      const res = await axios.get('/categories');
       const list = Array.isArray(res.data)
         ? res.data
         : (Array.isArray(res.data?.categories) ? res.data.categories : []);
@@ -230,7 +230,7 @@ const Products = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get(`/api/products?${queryParams}`, { signal });
+      const response = await axios.get(`/products?${queryParams}`, { signal });
       const data = response.data;
       const list = Array.isArray(data) ? data : (data.products || []);
       

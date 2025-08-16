@@ -30,7 +30,7 @@ const AdminUsers = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get('/api/users');
+      const res = await axios.get('/users');
       setUsers(res.data.users || []);
     } catch (err) {
       setError('Failed to fetch users');

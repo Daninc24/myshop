@@ -157,7 +157,7 @@ const AdvancedProductCard = ({
        const controller = new AbortController();
        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
 
-       fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5002'}/api/analytics/interaction`, {
+               fetch(`/analytics/interaction`, {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify({
