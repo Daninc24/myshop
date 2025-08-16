@@ -163,9 +163,19 @@ const Navbar = () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      const result = await logout();
+      if (result.success) {
+        navigate('/');
+      } else {
+        console.error('Logout failed:', result.error);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force logout by clearing state and redirecting
+      navigate('/');
+    }
   };
 
   const cartItemCount = cart.reduce((total, item) => total + (item.quantity || 1), 0);

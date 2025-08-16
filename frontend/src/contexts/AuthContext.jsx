@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      const response = await axios.get('/auth/profile');
+      const response = await axios.get('/api/auth/profile');
 
       setUser(response.data.user);
     } catch (error) {
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       // Sending login data
-      const response = await axios.post('/auth/login', { email, password });
+      const response = await axios.post('/api/auth/login', { email, password });
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     try {
-      const response = await axios.post('/auth/register', { name, email, password });
+      const response = await axios.post('/api/auth/register', { name, email, password });
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
@@ -96,14 +96,20 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('/auth/logout');
+      await axios.post('/api/auth/logout');
       setUser(null);
+      // Clear any stored cart data
+      localStorage.removeItem('cart');
+      // Clear any stored user preferences
+      localStorage.removeItem('currency');
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Logout failed' 
-      };
+      console.error('Logout error:', error);
+      // Even if the API call fails, clear the user state locally
+      setUser(null);
+      localStorage.removeItem('cart');
+      localStorage.removeItem('currency');
+      return { success: true };
     }
   };
 

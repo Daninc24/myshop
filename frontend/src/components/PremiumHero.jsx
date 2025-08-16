@@ -60,11 +60,13 @@ const PremiumHero = ({
         backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundBlendMode: 'overlay'
+        backgroundBlendMode: 'multiply'
       }}
     >
       {/* Animated background elements */}
       <div className="absolute inset-0">
+        {/* Dark overlay for better text visibility */}
+        <div className="absolute inset-0 bg-black/40"></div>
         <div 
           className="absolute inset-0 opacity-20"
           style={{
@@ -141,7 +143,8 @@ const PremiumHero = ({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 text-white/90"
+                className="inline-flex items-center gap-2 bg-white/30 backdrop-blur-sm border border-white/40 rounded-full px-6 py-3 text-white font-semibold shadow-xl"
+                style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}
               >
                 <SparklesIcon className="h-5 w-5 text-yellow-400" />
                 <span className="text-sm font-medium">World-Class Shopping Experience</span>
@@ -154,7 +157,7 @@ const PremiumHero = ({
                 transition={{ delay: 0.3, duration: 0.8 }}
                 className="text-5xl md:text-7xl font-bold text-white leading-tight"
               >
-                <span className="bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-yellow-200 via-orange-300 to-red-400 bg-clip-text text-transparent drop-shadow-2xl filter contrast-125" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -2px -2px 4px rgba(255,255,255,0.3)' }}>
                   {heroContent.title}
                 </span>
               </motion.h1>
@@ -164,7 +167,8 @@ const PremiumHero = ({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
-                className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto"
+                className="text-xl md:text-2xl text-white font-semibold max-w-3xl mx-auto drop-shadow-2xl"
+                style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(255,255,255,0.2)' }}
               >
                 {heroContent.subtitle}
               </motion.p>
@@ -183,7 +187,8 @@ const PremiumHero = ({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5 }}
-                    className="text-lg text-white/90 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3 border border-white/20"
+                    className="text-lg text-white font-bold bg-white/30 backdrop-blur-sm rounded-lg px-6 py-3 border border-white/40 shadow-xl"
+                    style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.9)' }}
                   >
                     {heroContent.highlights[currentHighlight]}
                   </motion.div>
