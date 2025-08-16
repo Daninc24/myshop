@@ -22,11 +22,11 @@ exports.getCategories = async (req, res) => {
   try {
     const now = Date.now();
     if (categoriesCache.data && (now - categoriesCache.ts) < CATEGORIES_TTL_MS) {
-      return res.json({ categories: categoriesCache.data });
+      return res.json(categoriesCache.data);
     }
     const categories = await Category.find();
     categoriesCache = { data: categories, ts: now };
-    res.json({ categories });
+    res.json(categories);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching categories', error: error.message });
   }
@@ -69,5 +69,20 @@ exports.deleteCategory = async (req, res) => {
     res.json({ message: 'Category deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting category', error: error.message });
+  }
+};
+
+// Test endpoint to check categories
+exports.testCategories = async (req, res) => {
+  try {
+    const count = await Category.countDocuments();
+    const categories = await Category.find().limit(5);
+    res.json({ 
+      count, 
+      sample: categories,
+      message: `Found ${count} categories in database`
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error testing categories', error: error.message });
   }
 };

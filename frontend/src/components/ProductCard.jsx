@@ -1,100 +1,386 @@
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
-import { ShoppingCartIcon, EyeIcon, HeartIcon } from '@heroicons/react/24/outline';
-import { getOptimizedImageUrl } from '../utils/imageUtils';
-import { memo, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { 
+  ShoppingCartIcon, 
+  HeartIcon, 
+  EyeIcon,
+  StarIcon,
+  FireIcon,
+  TagIcon
+} from '@heroicons/react/24/outline';
+import { 
+  HeartIcon as HeartSolid,
+  ShoppingCartIcon as ShoppingCartSolid
+} from '@heroicons/react/24/solid';
+import { getLazyImageProps, getOptimizedImageUrl } from '../utils/imageUtils';
 
-const ProductCard = ({ product, small, viewMode = 'grid' }) => {
+const ProductCard = ({ product, showQuickView = true, showWishlist = true }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
   const { addToCart, currency, convertPrice } = useCart();
-  const { success } = useToast();
-  const [hovered, setHovered] = useState(false);
+  const { success, error } = useToast();
+  const { user } = useAuth();
 
-  // Utility for currency symbols
-  const getCurrencySymbol = (cur) => {
-    switch (cur) {
-      case 'USD': return '$';
-      case 'EUR': return '€';
-      case 'GBP': return '£';
-      case 'GMD': return 'D';
-      default: return cur + ' '; 
+  const {
+    _id,
+    title,
+    price,
+    originalPrice,
+    images = [],
+    category,
+    rating = 0,
+    reviewCount = 0,
+    stock = 0,
+    discount = 0,
+    isNew = false,
+    isHot = false,
+    isOnSale = false,
+    brand,
+    sku,
+    weight,
+    dimensions,
+    warranty,
+    shippingInfo
+  } = product;
+
+  const displayPrice = convertPrice(price);
+  const displayOriginalPrice = originalPrice ? convertPrice(originalPrice) : null;
+  const discountPercentage = discount || (originalPrice && originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0);
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!user) {
+      error('Please login to add items to cart');
+      return;
+    }
+
+    if (stock <= 0) {
+      error('Product is out of stock');
+      return;
+    }
+
+    setIsAddingToCart(true);
+    try {
+      const result = await addToCart(_id, 1);
+      if (result.success) {
+        success('Added to cart successfully!');
+      } else {
+        error(result.error || 'Failed to add to cart');
+      }
+    } catch (err) {
+      error('Failed to add to cart');
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
-  const handleQuickAdd = async (e) => {
+  const handleWishlistToggle = (e) => {
     e.preventDefault();
-    const res = await addToCart(product._id, 1);
-    if (res.success) success('Added to cart');
+    e.stopPropagation();
+    
+    if (!user) {
+      error('Please login to manage wishlist');
+      return;
+    }
+
+    setIsInWishlist(!isInWishlist);
+    if (!isInWishlist) {
+      success('Added to wishlist!');
+    } else {
+      success('Removed from wishlist');
+    }
+  };
+
+  const handleImageLoad = () => {
+    setIsImageLoaded(true);
+  };
+
+  const getCurrencySymbol = (cur) => {
+    const currencySymbols = {
+      'USD': '$',
+      'EUR': '€',
+      'GBP': '£',
+      'GMD': 'D',
+      'CAD': 'C$',
+      'AUD': 'A$',
+      'JPY': '¥',
+      'CHF': 'CHF',
+      'CNY': '¥',
+      'INR': '₹',
+      'BRL': 'R$',
+      'MXN': '$',
+      'SGD': 'S$',
+      'HKD': 'HK$',
+      'NZD': 'NZ$',
+      'SEK': 'kr',
+      'NOK': 'kr',
+      'DKK': 'kr',
+      'PLN': 'zł',
+      'CZK': 'Kč',
+      'HUF': 'Ft',
+      'RUB': '₽',
+      'TRY': '₺',
+      'ZAR': 'R',
+      'KRW': '₩',
+      'THB': '฿',
+      'MYR': 'RM',
+      'IDR': 'Rp',
+      'PHP': '₱',
+      'VND': '₫',
+      'EGP': 'E£',
+      'NGN': '₦',
+      'KES': 'KSh',
+      'UGX': 'USh',
+      'TZS': 'TSh',
+      'GHS': 'GH₵',
+      'XOF': 'CFA',
+      'XAF': 'FCFA'
+    };
+    return currencySymbols[cur] || cur + ' ';
+  };
+
+  const renderRatingStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(
+          <StarIcon key={i} className="w-4 h-4 text-warning fill-current" />
+        );
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(
+          <StarIcon key={i} className="w-4 h-4 text-warning fill-current opacity-50" />
+        );
+      } else {
+        stars.push(
+          <StarIcon key={i} className="w-4 h-4 text-gray-300" />
+        );
+      }
+    }
+    return stars;
   };
 
   return (
-    <Link
-      to={`/products/${product._id}`}
-      className={`card relative animate-fade-in focus:outline-none focus:ring-2 focus:ring-primary group ${viewMode === 'grid' ? 'flex flex-col items-center p-6 transition-transform duration-200 hover:shadow-strong' : 'flex flex-row items-center p-4 transition-shadow duration-200 hover:shadow-strong'}`}
-      tabIndex={0}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+    <div
+      className="group relative bg-surface rounded-2xl border border-border overflow-hidden hover:shadow-large transition-all duration-300 transform hover:-translate-y-1"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Deal Badge */}
-      {product.isDeal && (
-        <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">Deal</span>
-      )}
-      <img
-        src={getOptimizedImageUrl(product.images && product.images[0])}
-        alt={product.title}
-        loading="lazy"
-        srcSet={
-                      (product.images && product.images[0] && product.images[0].startsWith('data:image'))
-                        ? getOptimizedImageUrl(product.images[0])
-                        : `${getOptimizedImageUrl(product.images && product.images[0])}?size=small 100w, ${getOptimizedImageUrl(product.images && product.images[0])}?size=medium 200w, ${getOptimizedImageUrl(product.images && product.images[0])}?size=large 400w`
-                    }
-        sizes="(max-width: 600px) 100px, 200px"
-        className={`${viewMode === 'grid' ? (small ? 'w-16 h-16' : 'w-24 h-24 mb-4') : 'w-20 h-20 mr-4'} rounded-2xl object-cover object-center group-hover:shadow-lg group-hover:ring-2 group-hover:ring-orange-400 transition-all`}
-      />
-      <div className={`${viewMode === 'grid' ? 'text-center' : 'flex-grow'}`}>
-        <h3 className={`font-heading font-bold text-secondary ${viewMode === 'grid' ? 'text-base mb-1 line-clamp-2' : 'text-base mb-0.5 line-clamp-1'} group-hover:text-orange-600 transition-colors`}>{product.title}</h3>
-        <p className={`text-primary font-semibold ${viewMode === 'grid' ? 'text-lg mb-2' : 'text-lg'}`}>{getCurrencySymbol(currency)}{convertPrice(product.price).toFixed(2)}</p>
-        {product.rating && (
-          <div className="flex items-center justify-center gap-1 text-xs text-yellow-500">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i}>{i < Math.round(product.rating) ? '★' : '☆'}</span>
-            ))}
-            <span className="text-gray-500 ml-1">({product.reviewsCount || 0})</span>
-          </div>
+      {/* Badges */}
+      <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+        {isNew && (
+          <span className="bg-info text-white text-xs font-semibold px-2 py-1 rounded-lg">
+            NEW
+          </span>
+        )}
+        {isHot && (
+          <span className="bg-error text-white text-xs font-semibold px-2 py-1 rounded-lg flex items-center gap-1">
+            <FireIcon className="w-3 h-3" />
+            HOT
+          </span>
+        )}
+        {isOnSale && (
+          <span className="bg-success text-white text-xs font-semibold px-2 py-1 rounded-lg flex items-center gap-1">
+            <TagIcon className="w-3 h-3" />
+            SALE
+          </span>
+        )}
+        {discountPercentage > 0 && (
+          <span className="bg-primary text-white text-xs font-semibold px-2 py-1 rounded-lg">
+            -{discountPercentage}%
+          </span>
         )}
       </div>
-      <div className={`${viewMode === 'grid' ? 'w-full' : 'flex flex-col items-end gap-2'}`}>
-        <div className={`${viewMode === 'grid' ? 'grid grid-cols-2 gap-2 w-full mt-2' : 'flex gap-2'}`}>
-          <span className="btn-primary text-center">View details</span>
-          <span className="btn-secondary text-center">Chat</span>
+
+      {/* Wishlist Button */}
+      {showWishlist && (
+        <button
+          onClick={handleWishlistToggle}
+          className={`absolute top-3 right-3 z-10 p-2 rounded-full transition-all duration-300 ${
+            isInWishlist 
+              ? 'bg-error text-white shadow-glow' 
+              : 'bg-surface/80 backdrop-blur-sm text-text-secondary hover:text-error hover:bg-surface'
+          }`}
+        >
+          {isInWishlist ? (
+            <HeartSolid className="w-5 h-5" />
+          ) : (
+            <HeartIcon className="w-5 h-5" />
+          )}
+        </button>
+      )}
+
+      {/* Image Container */}
+      <div className="block relative overflow-hidden">
+        <Link to={`/product/${_id}`} className="block">
+          <div className="aspect-square bg-surface-hover relative w-full h-64">
+            {/* Main Image */}
+            <img
+              src={getOptimizedImageUrl(images[selectedImageIndex] || images[0]) || '/placeholder-image.svg'}
+              alt={title}
+              className={`w-full h-full object-cover transition-all duration-500 ${
+                isImageLoaded ? 'opacity-100' : 'opacity-0'
+              } ${isHovered ? 'scale-110' : 'scale-100'}`}
+              onLoad={handleImageLoad}
+              onError={(e) => {
+                e.target.src = '/placeholder-image.svg';
+              }}
+            />
+            
+            {/* Loading Skeleton */}
+            {!isImageLoaded && (
+              <div className="absolute inset-0 shimmer" />
+            )}
+          </div>
+        </Link>
+
+        {/* Image Gallery on Hover */}
+        {images.length > 1 && isHovered && (
+          <div className="absolute bottom-2 left-2 right-2 flex gap-1">
+            {images.slice(0, 4).map((image, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSelectedImageIndex(index);
+                }}
+                className={`flex-1 h-8 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                  index === selectedImageIndex 
+                    ? 'border-primary' 
+                    : 'border-white/50 hover:border-primary/50'
+                }`}
+              >
+                <img
+                  src={getOptimizedImageUrl(image)}
+                  alt={`${title} ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Quick Actions Overlay */}
+        <div className={`absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center gap-2 transition-all duration-300 ${
+          isHovered ? 'opacity-100' : 'opacity-0'
+        }`}>
+          <button
+            onClick={handleAddToCart}
+            disabled={isAddingToCart || stock <= 0}
+            className={`p-3 rounded-full transition-all duration-300 transform hover:scale-110 ${
+              stock <= 0 
+                ? 'bg-gray-500 text-white cursor-not-allowed' 
+                : 'bg-primary text-white hover:bg-primary-dark shadow-glow'
+            }`}
+          >
+            {isAddingToCart ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <ShoppingCartIcon className="w-5 h-5" />
+            )}
+          </button>
+          
+          {showQuickView && (
+            <Link
+              to={`/product/${_id}`}
+              className="p-3 rounded-full bg-surface/80 backdrop-blur-sm text-text-primary hover:bg-surface hover:shadow-glow transition-all duration-300 transform hover:scale-110"
+            >
+              <EyeIcon className="w-5 h-5" />
+            </Link>
+          )}
         </div>
       </div>
 
-      {viewMode === 'grid' && (
-        <div className={`absolute inset-0 bg-black/0 group-hover:bg-black/5 rounded-xl transition-colors`}></div>
-      )}
-      {viewMode === 'grid' && (
-        <div className={`absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity`}>
-          <button onClick={handleQuickAdd} className="bg-white rounded-full p-2 shadow hover:text-primary" title="Add to cart">
-            <ShoppingCartIcon className="w-5 h-5" />
-          </button>
+      {/* Content */}
+      <div className="p-4">
+        {/* Category */}
+        {category && (
+          <p className="text-xs text-text-muted mb-2 font-medium uppercase tracking-wide">
+            {category}
+          </p>
+        )}
+
+        {/* Title */}
+        <Link to={`/product/${_id}`}>
+          <h3 className="font-semibold text-text-primary mb-2 line-clamp-2 hover:text-primary transition-colors duration-200">
+            {title}
+          </h3>
+        </Link>
+
+        {/* Rating */}
+        {rating > 0 && (
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-1">
+              {renderRatingStars(rating)}
+            </div>
+            <span className="text-xs text-text-muted">
+              ({reviewCount})
+            </span>
+          </div>
+        )}
+
+        {/* Price */}
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-lg font-bold text-primary">
+            {getCurrencySymbol(currency)}{displayPrice}
+          </span>
+          {displayOriginalPrice && displayOriginalPrice > displayPrice && (
+            <span className="text-sm text-text-muted line-through">
+              {getCurrencySymbol(currency)}{displayOriginalPrice}
+            </span>
+          )}
+        </div>
+
+        {/* Stock Status */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${
+              stock > 10 ? 'bg-success' : stock > 0 ? 'bg-warning' : 'bg-error'
+            }`} />
+            <span className={`text-xs font-medium ${
+              stock > 10 ? 'text-success' : stock > 0 ? 'text-warning' : 'text-error'
+            }`}>
+              {stock > 10 ? 'In Stock' : stock > 0 ? `${stock} left` : 'Out of Stock'}
+            </span>
+          </div>
+
+          {/* Add to Cart Button */}
           <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); }}
-            className="bg-white rounded-full p-2 shadow hover:text-primary"
-            title="Quick view"
-            aria-label="Quick view"
+            onClick={handleAddToCart}
+            disabled={isAddingToCart || stock <= 0}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+              stock <= 0 
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                : 'bg-primary text-white hover:bg-primary-dark hover:shadow-glow transform hover:-translate-y-0.5'
+            }`}
           >
-            <EyeIcon className="w-5 h-5" />
+            {isAddingToCart ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Adding...
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <ShoppingCartIcon className="w-4 h-4" />
+                Add to Cart
+              </div>
+            )}
           </button>
         </div>
-      )}
-    </Link>
+      </div>
+    </div>
   );
 };
 
-// Memoize the component to prevent unnecessary re-renders
-export default memo(ProductCard, (prevProps, nextProps) => {
-  // Only re-render if product ID changes or small prop changes
-  return prevProps.product._id === nextProps.product._id && prevProps.small === nextProps.small && prevProps.viewMode === nextProps.viewMode;
-});
+export default ProductCard;

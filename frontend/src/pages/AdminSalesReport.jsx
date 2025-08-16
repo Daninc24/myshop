@@ -30,10 +30,10 @@ const AdminSalesReport = () => {
     setError('');
     try {
       const [summaryRes, shopkeeperRes, productRes, paymentRes] = await Promise.all([
-        axios.get(`/pos/sales/summary?period=${period}`),
-        axios.get('/pos/sales/by-shopkeeper'),
-        axios.get('/pos/sales/by-product'),
-        axios.get('/pos/sales/by-payment-method'),
+                  axios.get(`/api/pos/sales/summary?period=${period}`),
+        axios.get('/api/pos/sales/by-shopkeeper'),
+        axios.get('/api/pos/sales/by-product'),
+        axios.get('/api/pos/sales/by-payment-method'),
       ]);
       setSummary(summaryRes.data.summary || []);
       setByShopkeeper(shopkeeperRes.data.sales || []);

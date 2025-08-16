@@ -1,307 +1,427 @@
-import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCartIcon, ShoppingBagIcon, UserIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, CreditCardIcon, Squares2X2Icon, HomeIcon, ArrowRightOnRectangleIcon, UserPlusIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
-import { Input, Select, Badge, Button } from 'antd';
-import categoriesFallback from '../utils/categories';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useTheme } from '../contexts/ThemeContext';
+import CategoryDropdown from './CategoryDropdown';
+import MobileMenu from './MobileMenu';
 import axios from 'axios';
-
-const CategoryDropdown = React.lazy(() => import('./CategoryDropdown'));
-const MobileMenu = React.lazy(() => import('./MobileMenu'));
+import { 
+  MagnifyingGlassIcon, 
+  ShoppingCartIcon, 
+  UserIcon,
+  HeartIcon,
+  BellIcon,
+  Bars3Icon,
+  XMarkIcon,
+  SunIcon,
+  MoonIcon,
+  SparklesIcon
+} from '@heroicons/react/24/outline';
+import { 
+  MagnifyingGlassIcon as MagnifyingGlassSolid,
+  ShoppingCartIcon as ShoppingCartSolid,
+  HeartIcon as HeartSolid
+} from '@heroicons/react/24/solid';
 
 const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const categoryMenuRef = useRef(null);
+  const categoryButtonRef = useRef(null);
+  const hoverTimeoutRef = useRef(null);
+  const [currencies, setCurrencies] = useState([
+    { code: 'USD', symbol: '$', name: 'US Dollar' },
+    { code: 'EUR', symbol: '€', name: 'Euro' },
+    { code: 'GBP', symbol: '£', name: 'British Pound' },
+    { code: 'GMD', symbol: 'D', name: 'Gambian Dalasi' },
+    { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
+    { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+    { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+    { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' },
+    { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+    { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' },
+    { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
+    { code: 'HKD', symbol: 'HK$', name: 'Hong Kong Dollar' },
+    { code: 'ZAR', symbol: 'R', name: 'South African Rand' },
+    { code: 'NGN', symbol: '₦', name: 'Nigerian Naira' },
+    { code: 'KES', symbol: 'KSh', name: 'Kenyan Shilling' },
+    { code: 'GHS', symbol: 'GH₵', name: 'Ghanaian Cedi' }
+  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
   const { user, logout } = useAuth();
   const { cart, currency, setCurrency } = useCart();
+  const { isDarkMode, toggleDarkMode } = useTheme();
+  const navigate = useNavigate();
   const location = useLocation();
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
-  const navigate = useNavigate();
-  const [searchValue, setSearchValue] = useState('');
-
-  useEffect(() => {
-    setShowCategoryMenu(false);
-    setIsMobileMenuOpen(false);
-  }, [location]);
-
-  useEffect(() => {
-    const savedCurrency = localStorage.getItem('currency');
-    if (savedCurrency && savedCurrency !== currency) {
-      setCurrency(savedCurrency);
+  // Category menu hover management
+  const handleCategoryMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
     }
-  }, [currency, setCurrency]);
+    setShowCategoryMenu(true);
+  };
 
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const socketRef = useRef(null);
-  const [currencies, setCurrencies] = useState(['USD']);
-  const [categoriesList, setCategoriesList] = useState(categoriesFallback);
-  const [loadingCategories, setLoadingCategories] = useState(false);
-  const [categoriesError, setCategoriesError] = useState(null);
-  const categoriesLoadedRef = useRef(false);
+  const handleCategoryMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setShowCategoryMenu(false);
+    }, 150);
+  };
 
-  // Lazy-load categories on demand when the category menu is opened
+  // Scroll effect
   useEffect(() => {
-    if (!showCategoryMenu || categoriesLoadedRef.current) return;
-    let cancelled = false;
-    const controller = new AbortController();
-    const cached = localStorage.getItem('categories_cache');
-    if (cached && !categoriesLoadedRef.current) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length) {
-          setCategoriesList(parsed);
-          categoriesLoadedRef.current = true;
-          return;
-        }
-      } catch {}
-    }
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Load categories
+  useEffect(() => {
     const fetchCategories = async () => {
       try {
-        setLoadingCategories(true);
-        const res = await axios.get('/categories', { signal: controller.signal });
-        const list = Array.isArray(res.data)
-          ? res.data
-          : (Array.isArray(res.data?.categories) ? res.data.categories : []);
-        const mapped = list.map((c) => ({ id: c.id || c._id || c.name, name: c.name, subcategories: c.subcategories || [] }));
-        if (!cancelled && mapped.length) {
-          setCategoriesList(mapped);
-          localStorage.setItem('categories_cache', JSON.stringify(mapped));
-          categoriesLoadedRef.current = true;
+        const response = await axios.get('/api/categories');
+        const categoriesData = response.data;
+        
+        if (Array.isArray(categoriesData) && categoriesData.length > 0) {
+          setCategoriesList(categoriesData);
+        } else {
+          setCategoriesList([]);
         }
-      } catch (e) {
-        if (!cancelled && e.name !== 'CanceledError' && e.name !== 'AbortError') setCategoriesError('Failed to load categories');
-      } finally {
-        if (!cancelled) setLoadingCategories(false);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setCategoriesList([]);
       }
     };
     fetchCategories();
-    return () => { cancelled = true; controller.abort(); };
-  }, [showCategoryMenu]);
+  }, []);
 
+  // Load currencies
   useEffect(() => {
-    const onMessagesPage = location.pathname.startsWith('/messages');
-    if (!user || !onMessagesPage) {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
-      return;
-    }
-    if (socketRef.current) return;
-    let mounted = true;
-    import('socket.io-client').then(({ io }) => {
-      if (!mounted) return;
-      const socket = io(import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com', {
-        withCredentials: true,
-        transports: ['websocket'],
-      });
-      socketRef.current = socket;
-      socket.on('online_users', (users) => {
-        setOnlineUsers(users);
-      });
-      socket.emit('get_online_users');
-    });
-    return () => {
-      mounted = false;
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
+    const fetchCurrencies = async () => {
+      try {
+        const response = await axios.get('/api/payment/currency/list');
+        const currencyData = response.data;
+        
+        // Ensure we have a valid array of currencies
+        if (Array.isArray(currencyData) && currencyData.length > 0) {
+          setCurrencies(currencyData);
+        }
+        // If no valid data, keep the default currencies
+      } catch (error) {
+        console.error('Error fetching currencies:', error);
+        // Keep the default currencies on error
       }
     };
-  }, [user, location.pathname]);
+    fetchCurrencies();
+  }, []);
 
-  useEffect(() => {
-    if (currencies.length > 1) return;
-    axios.get('/payment/currency/list')
-      .then(res => setCurrencies(res.data.currencies))
-      .catch(() => setCurrencies(['USD']));
-  }, [currencies]);
+  // Search functionality
+  const handleSearch = async (term) => {
+    if (term.length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
 
-  const handleCurrencyChange = (e) => {
-    setCurrency(e.target.value);
-    localStorage.setItem('currency', e.target.value);
+    try {
+      const response = await axios.get(`/api/products/search?q=${encodeURIComponent(term)}&limit=5`);
+      setSearchResults(response.data || []);
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    }
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+      setShowSearch(false);
+      setSearchTerm('');
+      setShowSearchResults(false);
+    }
   };
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
-  const onSearch = (value) => {
-    const query = value?.trim();
-    if (!query) {
-      navigate('/products');
-      return;
-    }
-    navigate(`/products?search=${encodeURIComponent(query)}`);
-  };
-
-  const cartItemCount = useMemo(() => cart.reduce((total, item) => total + item.quantity, 0), [cart]);
-
-  const posRoles = ['admin', 'shopkeeper', 'staff', 'cashier', 'manager'];
-
-  const categoryProps = useMemo(() => ({
-    categories: categoriesList,
-    onClose: () => setShowCategoryMenu(false),
-    show: showCategoryMenu,
-    loading: loadingCategories,
-    error: categoriesError,
-  }), [categoriesList, showCategoryMenu, loadingCategories, categoriesError]);
+  const cartItemCount = cart.reduce((total, item) => total + (item.quantity || 1), 0);
 
   return (
-    <>
-            <nav className="bg-white sticky top-0 z-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 h-16 w-full">
-            {/* Left: Logo and Category */}
-            <div className="flex items-center gap-3 min-w-0">
-              <Link to="/" className="flex-shrink-0 flex items-center gap-2 md:gap-3 min-w-0">
-                <img src="/images/logo-footer.svg" alt="MyShopping Center official logo" className="h-10 w-10 rounded-xl bg-white" aria-label="MyShopping Center Logo" />
-                <span className="hidden sm:inline font-heading text-xl sm:text-2xl font-bold text-secondary">MyShopping Center</span>
-              </Link>
-              {/* Category Button */}
-              <div className="relative hidden md:block">
-                <button
-                  className="text-secondary hover:text-primary bg-gray-50 hover:bg-gray-100 p-2 rounded-lg transition-colors flex items-center justify-center focus:outline-none border border-gray-200"
-                  title="Categories"
-                  aria-haspopup="true"
-                  aria-expanded={showCategoryMenu}
-                  tabIndex={0}
-                  onClick={() => setShowCategoryMenu(v => !v)}
-                >
-                  <Squares2X2Icon className="h-6 w-6" />
-                </button>
-                <Suspense fallback={<div>Loading...</div>}>
-                  {showCategoryMenu && (
-                    <CategoryDropdown {...categoryProps} desktop id="category-menu-id" role="menu" />
-                  )}
-                </Suspense>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-surface/95 backdrop-blur-lg border-b border-border shadow-medium' 
+        : 'bg-transparent'
+    }`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 lg:h-20">
+          
+          {/* Logo */}
+          <div className="flex items-center space-x-4">
+            <Link to="/" className="flex items-center space-x-2 group">
+              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow group-hover:shadow-glow-lg transition-all duration-300">
+                <SparklesIcon className="w-6 h-6 text-white" />
               </div>
-            </div>
+              <span className="text-xl font-bold gradient-text">MyShop</span>
+            </Link>
+          </div>
 
-            {/* Center: Search */}
-            <div className="flex-1 hidden md:block">
-              <Input.Search
-                placeholder="Search products, suppliers and more"
-                allowClear
-                size="large"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                onSearch={onSearch}
-                enterButton
-              />
-            </div>
-
-            {/* Right: Icons and User Controls (Desktop) */}
-            <div className="hidden md:flex items-center gap-3">
-              <Link to="/" className="text-secondary hover:text-primary p-2 rounded-lg transition-colors" title="Home">
-                <HomeIcon className="h-6 w-6" />
-              </Link>
-              <Link to="/products" className="text-secondary hover:text-primary p-2 rounded-lg transition-colors" title="Products">
-                <ShoppingBagIcon className="h-6 w-6" />
-              </Link>
-              {user && (
-                <Link to="/messages" className="text-secondary hover:text-primary p-2 rounded-lg transition-colors" title="Messages">
-                  <ChatBubbleLeftRightIcon className="h-6 w-6" />
-                </Link>
-              )}
-              {user && posRoles.includes(user.role) && (
-                <Link to="/pos" className="text-secondary hover:text-primary p-2 rounded-lg transition-colors" title="POS">
-                  <CreditCardIcon className="h-6 w-6" />
-                </Link>
-              )}
-              {user?.role === 'admin' && (
-                <Link to="/admin" className="text-secondary hover:text-primary p-2 rounded-lg transition-colors" title="Admin Dashboard">
-                  <Cog6ToothIcon className="h-6 w-6" />
-                </Link>
-              )}
-              <Select
-                value={currency}
-                onChange={(value) => handleCurrencyChange({ target: { value } })}
-                size="middle"
-                style={{ minWidth: 100 }}
-                options={currencies.map(cur => ({ value: cur, label: cur }))}
-              />
-              <Link to="/cart" title="Cart">
-                <Badge count={cartItemCount} size="small" color="#ff6600">
-                  <ShoppingCartIcon className="h-6 w-6 text-secondary hover:text-primary transition-colors" />
-                </Badge>
-              </Link>
-              {!user ? (
-                <div className="flex items-center gap-2">
-                  <Link to="/login" title="Login">
-                    <Button type="text" className="text-secondary hover:text-primary p-2">
-                      <ArrowRightOnRectangleIcon className="h-6 w-6" />
-                    </Button>
-                  </Link>
-                  <Link to="/register" title="Register">
-                    <Button type="primary" className="rounded-lg">Sign up</Button>
-                  </Link>
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-8">
+            
+            {/* Categories Dropdown */}
+            <div className="relative">
+              <button
+                onMouseEnter={handleCategoryMouseEnter}
+                onMouseLeave={handleCategoryMouseLeave}
+                className="flex items-center space-x-1 text-text-secondary hover:text-primary transition-colors duration-200 font-medium"
+              >
+                <span>Categories</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {showCategoryMenu && (
+                <div
+                  onMouseEnter={handleCategoryMouseEnter}
+                  onMouseLeave={handleCategoryMouseLeave}
+                >
+                  <CategoryDropdown 
+                    show={showCategoryMenu}
+                    categories={categoriesList}
+                    onClose={() => setShowCategoryMenu(false)}
+                    desktop={true}
+                    loading={false}
+                    error={false}
+                  />
                 </div>
+              )}
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative">
+              <form onSubmit={handleSearchSubmit} className="relative">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    handleSearch(e.target.value);
+                  }}
+                  className="w-80 px-4 py-2 pl-10 pr-4 bg-surface border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary placeholder-text-muted transition-all duration-300"
+                />
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-text-muted hover:text-primary transition-colors duration-200"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </form>
+
+              {/* Search Results Dropdown */}
+              {showSearchResults && searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-border rounded-xl shadow-large z-50">
+                  {searchResults.map((product) => (
+                    <Link
+                      key={product._id}
+                      to={`/product/${product._id}`}
+                      className="flex items-center space-x-3 p-3 hover:bg-surface-hover transition-colors duration-200"
+                      onClick={() => {
+                        setShowSearchResults(false);
+                        setSearchTerm('');
+                      }}
+                    >
+                      <img
+                        src={product.images?.[0] || '/placeholder-image.svg'}
+                        alt={product.title}
+                        className="w-12 h-12 object-cover rounded-lg"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-text-primary truncate">{product.title}</p>
+                        <p className="text-xs text-text-muted">${product.price}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-4">
+            
+            {/* Currency Selector */}
+            <div className="hidden md:block relative">
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                className="bg-transparent border border-border rounded-lg px-3 py-1 text-sm text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+              >
+                {Array.isArray(currencies) && currencies.length > 0 ? (
+                  currencies.map((curr) => (
+                    <option key={curr.code} value={curr.code}>
+                      {curr.symbol} {curr.code} - {curr.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="USD">$ USD - US Dollar</option>
+                    <option value="EUR">€ EUR - Euro</option>
+                    <option value="GBP">£ GBP - British Pound</option>
+                    <option value="GMD">D GMD - Gambian Dalasi</option>
+                  </>
+                )}
+              </select>
+            </div>
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300 group"
+              aria-label="Toggle dark mode"
+            >
+              {isDarkMode ? (
+                <SunIcon className="w-5 h-5 text-warning group-hover:scale-110 transition-transform duration-200" />
               ) : (
-                <div className="relative group ml-2">
-                  <button className="flex items-center gap-2 p-2 rounded-lg text-secondary hover:text-primary focus:outline-none" title="Account">
-                    <UserIcon className="h-6 w-6" />
-                  </button>
-                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-20 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity">
-                    <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-t-xl">Profile</Link>
-                    <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 rounded-b-xl">Logout</button>
+                <MoonIcon className="w-5 h-5 text-text-secondary group-hover:scale-110 transition-transform duration-200" />
+              )}
+            </button>
+
+            {/* Notifications */}
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300 relative"
+              >
+                <BellIcon className="w-5 h-5 text-text-secondary" />
+                {notifications.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-error text-white text-xs rounded-full flex items-center justify-center">
+                    {notifications.length}
+                  </span>
+                )}
+              </button>
+              
+              {showNotifications && (
+                <div className="absolute top-full right-0 mt-2 w-80 bg-surface border border-border rounded-xl shadow-large z-50">
+                  <div className="p-4 border-b border-border">
+                    <h3 className="font-semibold text-text-primary">Notifications</h3>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.map((notification, index) => (
+                        <div key={index} className="p-3 border-b border-border last:border-b-0 hover:bg-surface-hover">
+                          <p className="text-sm text-text-primary">{notification.message}</p>
+                          <p className="text-xs text-text-muted mt-1">{notification.time}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-text-muted">
+                        <p className="text-sm">No notifications</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Mobile: cart + hamburger */}
-            <div className="flex md:hidden items-center ml-auto">
-              <Link to="/cart" className="relative group mr-2" title="Cart">
-                <Badge count={cartItemCount} size="small" color="#ff6600">
-                  <ShoppingCartIcon className="h-6 w-6 text-secondary" />
-                </Badge>
-              </Link>
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-lg text-secondary hover:text-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+            {/* Wishlist */}
+            <Link
+              to="/wishlist"
+              className="p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300 relative"
+            >
+              <HeartIcon className="w-5 h-5 text-text-secondary" />
+            </Link>
+
+            {/* Cart */}
+            <Link
+              to="/cart"
+              className="p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300 relative"
+            >
+              <ShoppingCartIcon className="w-5 h-5 text-text-secondary" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium">
+                  {cartItemCount}
+                </span>
+              )}
+            </Link>
+
+            {/* User Menu */}
+            {user ? (
+              <div className="relative">
+                <button className="flex items-center space-x-2 p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300">
+                  <UserIcon className="w-5 h-5 text-text-secondary" />
+                  <span className="hidden md:block text-sm font-medium text-text-primary">
+                    {user.name || user.email}
+                  </span>
+                </button>
+                {/* User dropdown menu would go here */}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="btn-primary"
               >
-                <span className="sr-only">Open main menu</span>
-                {isMobileMenuOpen ? (
-                  <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                ) : (
-                  <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                )}
-              </button>
-            </div>
-          </div>
-          {/* Mobile search */}
-          <div className="md:hidden pb-3">
-            <Input.Search
-              placeholder="Search products"
-              allowClear
-              size="middle"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onSearch={onSearch}
-              enterButton
-            />
+                Sign In
+              </Link>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="lg:hidden p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300"
+            >
+              {showMobileMenu ? (
+                <XMarkIcon className="w-5 h-5 text-text-secondary" />
+              ) : (
+                <Bars3Icon className="w-5 h-5 text-text-secondary" />
+              )}
+            </button>
           </div>
         </div>
-      </nav>
+      </div>
 
       {/* Mobile Menu */}
-      <Suspense fallback={<div>Loading...</div>}>
-        <MobileMenu
-          isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
+      {showMobileMenu && (
+        <MobileMenu 
+          isOpen={showMobileMenu} 
+          onClose={() => setShowMobileMenu(false)}
           user={user}
           handleLogout={handleLogout}
           cartItemCount={cartItemCount}
           currency={currency}
           currencies={currencies}
-          handleCurrencyChange={handleCurrencyChange}
-          posRoles={posRoles}
+          handleCurrencyChange={(newCurrency) => setCurrency(newCurrency)}
+          categories={categoriesList}
         />
-      </Suspense>
-    </>
+      )}
+    </nav>
   );
 };
 

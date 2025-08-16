@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { useAuth } from '../contexts/AuthContext';
 import { PlusIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { getOptimizedImageUrl } from '../utils/imageUtils';
 
 const paymentMethods = [
   { value: 'cash', label: 'Cash' },
@@ -99,7 +100,7 @@ const POS = () => {
   useEffect(() => {
     if (user && user.role === 'admin') {
       setUsersLoading(true);
-      axios.get('/users')
+      axios.get('/api/users')
         .then(res => setAllUsers(res.data.users || []))
         .catch((error) => {
     
@@ -111,7 +112,7 @@ const POS = () => {
 
   useEffect(() => {
     // Fetch products - this is a public endpoint
-    axios.get('/products')
+            axios.get('/api/products')
       .then(res => setProducts(res.data.products || res.data || []))
       .catch((error) => {
   
@@ -199,7 +200,7 @@ const POS = () => {
       return;
     }
     try {
-      const res = await axios.post('/customers', newCustomer);
+      const res = await axios.post('/api/customers', newCustomer);
       setSelectedCustomer(res.data.customer);
       setCustomerModal(false);
       setNewCustomer({ name: '', phone: '', email: '' });
@@ -213,7 +214,7 @@ const POS = () => {
     setCouponError('');
     if (!couponCode) return;
     try {
-      const res = await axios.post('/coupons/validate', { code: couponCode });
+      const res = await axios.post('/api/coupons/validate', { code: couponCode });
       setAppliedCoupon(res.data.coupon);
       setCouponError('');
     } catch (err) {
@@ -241,7 +242,7 @@ const POS = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post('/pos/sales', {
+      const res = await axios.post('/api/pos/sales', {
         items: cartWithDiscounts.map(item => ({
           product: item.product,
           quantity: item.quantity,
@@ -333,7 +334,7 @@ const POS = () => {
       return;
     }
     try {
-      const res = await axios.post('/pos/sales/return', {
+      const res = await axios.post('/api/pos/sales/return', {
         saleId: returnSale._id,
         items: itemsToReturn,
         reason: 'Customer return',
@@ -353,7 +354,7 @@ const POS = () => {
     setZReportError('');
     try {
       const today = new Date().toISOString().slice(0, 10);
-      const res = await axios.get('/pos/z-report', { params: { date: today } });
+      const res = await axios.get('/api/pos/z-report', { params: { date: today } });
       setZReport(res.data);
     } catch (err) {
       setZReportError('Failed to fetch Z-report');
@@ -365,10 +366,10 @@ const POS = () => {
   const handleUserRoleChange = async (userId, newRole) => {
     setRoleMsg('');
     try {
-      await axios.put(`/users/${userId}/role`, { role: newRole });
+      await axios.put(`/api/users/${userId}/role`, { role: newRole });
       setRoleMsg('Role updated successfully!');
       // Refresh users
-      const res = await axios.get('/users');
+      const res = await axios.get('/api/users');
       setAllUsers(res.data.users || []);
     } catch (err) {
       setRoleMsg('Failed to update role: ' + (err.response?.data?.message || err.message));
@@ -383,10 +384,10 @@ const POS = () => {
       return;
     }
     try {
-      await axios.put(`/users/${userId}/salary`, { salary: Number(salary) });
+      await axios.put(`/api/users/${userId}/salary`, { salary: Number(salary) });
       setRoleMsg('Salary updated successfully!');
       // Refresh users
-      const res = await axios.get('/users');
+      const res = await axios.get('/api/users');
       setAllUsers(res.data.users || []);
     } catch (err) {
       setRoleMsg('Failed to update salary: ' + (err.response?.data?.message || err.message));
@@ -425,7 +426,7 @@ const POS = () => {
       submitData.append('stock', addProductForm.stock);
       addProductImages.forEach(file => submitData.append('images', file));
       
-      const response = await axios.post('/products', submitData, {
+      const response = await axios.post('/api/products', submitData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
@@ -437,7 +438,7 @@ const POS = () => {
       setAddProductError('');
       
       // Refresh products
-      const productsResponse = await axios.get('/products');
+      const productsResponse = await axios.get('/api/products');
       
       
       // Debug image URLs
@@ -754,7 +755,7 @@ const POS = () => {
             <button className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl" onClick={() => setModalProduct(null)}>&times;</button>
             <div className="flex flex-col items-center">
               {modalProduct.images && modalProduct.images.length > 0 && (
-                <img src={modalProduct.images[0]} alt={modalProduct.title || modalProduct.name} className="w-40 h-40 object-cover rounded mb-4" />
+                                 <img src={getOptimizedImageUrl(modalProduct.images[0])} alt={modalProduct.title || modalProduct.name} className="w-40 h-40 object-cover rounded mb-4" />
               )}
               <h2 className="text-xl font-bold mb-2">{modalProduct.title || modalProduct.name}</h2>
               <div className="text-gray-600 mb-2">Ksh {modalProduct.price}</div>
@@ -817,7 +818,7 @@ const POS = () => {
               >
                 <div className="flex items-center gap-2">
                   {product.images && product.images[0] && (
-                    <img src={product.images[0]} alt={product.title || product.name} className="w-12 h-12 object-cover rounded" />
+                    <img src={getOptimizedImageUrl(product.images[0])} alt={product.title || product.name} className="w-12 h-12 object-cover rounded" />
                   )}
                   <div>
                     <div className="font-medium">{product.title || product.name}</div>

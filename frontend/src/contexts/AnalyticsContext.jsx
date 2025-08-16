@@ -12,7 +12,7 @@ export const AnalyticsProvider = ({ children }) => {
   const trackEvent = (event, data) => {
     // You can implement real analytics here
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Analytics] Event:', event, data);
+      // Analytics event logged
     }
   };
 

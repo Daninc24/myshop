@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShoppingCartIcon,
@@ -10,7 +10,10 @@ import {
   ArrowLeftOnRectangleIcon,
   UserPlusIcon,
   HomeIcon,
-  XMarkIcon
+  XMarkIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  Squares2X2Icon
 } from '@heroicons/react/24/outline';
 
 const MobileMenu = ({
@@ -23,30 +26,104 @@ const MobileMenu = ({
   currencies,
   handleCurrencyChange,
   posRoles,
+  categories = [],
 }) => {
+  const [expandedCategories, setExpandedCategories] = useState(new Set());
   if (!isOpen) {
     return null;
   }
 
+  const toggleCategory = (categoryId) => {
+    setExpandedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <div
-      className={`fixed top-0 left-0 w-64 h-full bg-blue-900 shadow-2xl z-50 transform transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      className={`fixed top-0 left-0 w-80 h-full bg-gradient-to-b from-blue-900 to-blue-800 shadow-2xl z-50 transform transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
-      <div className="flex justify-between items-center p-4 border-b border-gray-100">
-        <h2 className="text-xl font-bold text-yellow-400">Menu</h2>
-        <button onClick={onClose} className="text-white">
-          <XMarkIcon className="h-7 w-7" />
+      <div className="flex justify-between items-center p-6 border-b border-blue-700">
+        <h2 className="text-2xl font-bold text-yellow-400">Menu</h2>
+        <button onClick={onClose} className="text-white hover:text-yellow-400 transition-colors">
+          <XMarkIcon className="h-8 w-8" />
         </button>
       </div>
-      <div className="p-4 space-y-2">
+      
+      <div className="p-4 space-y-3 overflow-y-auto h-[calc(100vh-80px)]">
+        {/* Home Link */}
         <Link
           to="/"
-          className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
+          className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
           onClick={onClose}
           title="Home"
         >
-          <HomeIcon className="h-7 w-7" />
+          <HomeIcon className="h-6 w-6" />
+          <span className="font-medium">Home</span>
         </Link>
+
+        {/* Categories Section */}
+        <div className="border-t border-blue-700 pt-4">
+          <div className="flex items-center gap-3 px-4 py-2 mb-3">
+            <Squares2X2Icon className="h-6 w-6 text-yellow-400" />
+            <span className="text-yellow-400 font-semibold text-lg">Categories</span>
+          </div>
+          
+          {categories.filter(c => c.id !== 'all').map(category => (
+            <div key={category.id} className="mb-2">
+              <button
+                onClick={() => toggleCategory(category.id)}
+                className="w-full px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center justify-between transition-all duration-200"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center text-sm font-bold text-white">
+                    {category.name.charAt(0)}
+                  </div>
+                  <span className="font-medium">{category.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {category.subcategories && category.subcategories.length > 0 && (
+                    <span className="text-xs bg-yellow-400/20 text-yellow-400 px-2 py-1 rounded-full">
+                      {category.subcategories.length}
+                    </span>
+                  )}
+                  {category.subcategories && category.subcategories.length > 0 && (
+                    expandedCategories.has(category.id) ? (
+                      <ChevronDownIcon className="h-4 w-4" />
+                    ) : (
+                      <ChevronRightIcon className="h-4 w-4" />
+                    )
+                  )}
+                </div>
+              </button>
+              
+              {/* Subcategories */}
+              {expandedCategories.has(category.id) && category.subcategories && category.subcategories.length > 0 && (
+                <div className="ml-8 mt-2 space-y-1">
+                  {category.subcategories.map(subcategory => (
+                    <Link
+                      key={subcategory.id}
+                      to={`/products?category=${category.id}&subcategory=${subcategory.id}`}
+                      onClick={onClose}
+                      className="block px-4 py-2 rounded-lg text-blue-200 hover:bg-blue-700/30 hover:text-white transition-all duration-200 flex items-center gap-3"
+                    >
+                      <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center text-xs font-bold">
+                        {subcategory.name.charAt(0)}
+                      </div>
+                      <span className="text-sm">{subcategory.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
         {user?.role === 'admin' && (
           <Link
             to="/messages"

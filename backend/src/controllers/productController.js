@@ -1,6 +1,35 @@
 const Product = require('../models/Product');
 const InventoryLog = require('../models/InventoryLog');
 const { v4: uuidv4 } = require('uuid');
+const { productCache, apiCache } = require('../utils/cache');
+
+// Helper function to process image URLs - Cloudinary only
+const processImageUrls = (images) => {
+  if (!images) return [];
+  
+  // Handle legacy 'image' field
+  if (!Array.isArray(images)) {
+    images = images ? [images] : [];
+  }
+  
+  // Process image URLs - Cloudinary URLs only
+  return images.map(img => {
+    if (!img) return null;
+    
+    // If it's already a full URL (Cloudinary or other), return as is
+    if (img.startsWith('http') || img.startsWith('data:')) {
+      return img;
+    }
+    
+    // Skip any local upload paths - we only use Cloudinary
+    if (img.startsWith('/uploads/') || !img.includes('/')) {
+      console.warn('Skipping local image path:', img, '- Cloudinary URLs only');
+      return null;
+    }
+    
+    return img;
+  }).filter(img => img); // Remove empty/null images
+};
 
 // Helper function to generate SKU
 const generateSKU = (title, variantOptions = []) => {
@@ -83,36 +112,30 @@ const getAllProducts = async (req, res) => {
     const sortOptions = {};
     sortOptions[sort] = order === 'desc' ? -1 : 1;
     
-    // Get total count for pagination info
-    const total = await Product.countDocuments(query);
-    
-    // Check list cache first (cache key includes filters/pagination/sort)
-    const listCacheKey = JSON.stringify({ query, pageNum, limitNum, sortOptions });
-    const listNow = Date.now();
-    const cachedList = listCache.get(listCacheKey);
-    if (cachedList && (listNow - cachedList.timestamp) < LIST_TTL_MS) {
-      // Serve cached payload
-      res.set('Cache-Control', 'public, max-age=30');
-      return res.json(cachedList.value);
-    }
-
-    // Execute query with pagination and sorting (project only fields needed for PLP)
+    // Execute query with pagination and sorting
     const products = await Product.find(query)
-      .select('title price compareAtPrice images category subcategory stock updatedAt createdAt')
+      .select('title price compareAtPrice images category subcategory stock updatedAt createdAt rating reviewCount')
       .sort(sortOptions)
       .skip(skip)
       .limit(limitNum)
-      .lean(); // Use lean() for better performance when you don't need Mongoose document methods
+      .lean();
     
-    // Migrate old products that have 'image' field instead of 'images'
-    const migratedProducts = products.map(product => {
-      if (product.image && !product.images) {
-        return {
-          ...product,
-          images: [product.image]
-        };
+    // Get total count for pagination info
+    const total = await Product.countDocuments(query);
+    
+    // Process images and ensure they're properly formatted
+    const processedProducts = products.map(product => {
+      let images = product.images || [];
+      
+      // Handle legacy 'image' field
+      if (product.image && !images.length) {
+        images = [product.image];
       }
-      return product;
+      
+      return {
+        ...product,
+        images: processImageUrls(images)
+      };
     });
     
     // Facets (category and subcategory counts) based on current filters except the facet dimension
@@ -236,7 +259,7 @@ const getAllProducts = async (req, res) => {
 
     // Standardized response with pagination and facets
     const payload = {
-      products: migratedProducts,
+      products: processedProducts,
       pagination: {
         page: pageNum,
         limit: limitNum,
@@ -250,7 +273,6 @@ const getAllProducts = async (req, res) => {
         options: optionsFacet
       }
     };
-    listCache.set(listCacheKey, { timestamp: listNow, value: payload });
     res.set('Cache-Control', 'public, max-age=30');
     res.json(payload);
   } catch (error) {
@@ -515,24 +537,52 @@ const getBestSellingProducts = async (req, res) => {
     const { limit = 8 } = req.query;
     const limitNum = parseInt(limit);
     
+    // Use a more reliable sorting method - by rating and review count
     const products = await Product.find()
-      .sort({ salesCount: -1 })
+      .select('title price images category rating reviewCount createdAt')
+      .sort({ 
+        rating: -1, 
+        reviewCount: -1,
+        createdAt: -1 
+      })
       .limit(limitNum)
       .lean();
       
-    // Migrate old products that have 'image' field instead of 'images'
-    const migratedProducts = products.map(product => {
-      if (product.image && !product.images) {
-        return {
-          ...product,
-          images: [product.image]
-        };
+    // Process images and ensure they're properly formatted
+    const processedProducts = products.map(product => {
+      let images = product.images || [];
+      
+      // Handle legacy 'image' field
+      if (product.image && !images.length) {
+        images = [product.image];
       }
-      return product;
+      
+      return {
+        ...product,
+        images: processImageUrls(images)
+      };
     });
     
-    res.json(migratedProducts);
+    // Return in the same format as getAllProducts for consistency
+    const payload = {
+      products: processedProducts,
+      pagination: {
+        page: 1,
+        limit: limitNum,
+        total: processedProducts.length,
+        pages: 1
+      },
+      facets: {
+        categories: [],
+        subcategories: [],
+        priceRanges: [],
+        options: {}
+      }
+    };
+    
+    res.json(payload);
   } catch (error) {
+    console.error('Best selling products error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

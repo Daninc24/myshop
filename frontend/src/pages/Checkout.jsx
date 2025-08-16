@@ -26,7 +26,7 @@ const Checkout = () => {
 
       try {
         const productIds = cart.map(item => item.productId);
-        const response = await axios.get('/products');
+        const response = await axios.get('/api/products');
         const products = response.data.filter(product => 
           productIds.includes(product._id)
         );
@@ -135,13 +135,13 @@ const Checkout = () => {
               {cart.map(item => (
                 <div key={item.product} className="flex justify-between items-center">
                   <span>{item.name} x {item.quantity}</span>
-                  <span>{getCurrencySymbol(currency)}{convertPrice(item.price * item.quantity).toFixed(2)}</span>
+                  <span>{convertPrice(item.price * item.quantity)}</span>
                 </div>
               ))}
             </div>
             <div className="flex justify-between text-lg font-medium mt-4">
               <span>Total:</span>
-              <span>{getCurrencySymbol(currency)}{convertPrice(cart.reduce((sum, item) => sum + item.price * item.quantity, 0)).toFixed(2)}</span>
+                              <span>{convertPrice(cart.reduce((sum, item) => sum + item.price * item.quantity, 0))}</span>
             </div>
             <div className="mt-4">
               <Elements stripe={stripePromise}>

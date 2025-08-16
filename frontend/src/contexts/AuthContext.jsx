@@ -17,10 +17,22 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { error: showError } = useToast();
 
-  // Configure axios defaults
-  const apiBase = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com/api';
-  axios.defaults.baseURL = import.meta.env.VITE_API_URL;
-  axios.defaults.withCredentials = true;
+  // Configure axios defaults (matches logic in main.jsx)
+  (() => {
+    // In development, use the proxy (no base URL needed)
+    // In production, use the full API URL
+    if (import.meta.env.DEV) {
+      // Development: let Vite proxy handle API calls
+      axios.defaults.baseURL = '';
+    } else {
+      // Production: use the full API URL
+      const raw = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+      const trimmed = raw.replace(/\/+$/, ''); // remove trailing slashes
+      const base = /\/api\/?$/.test(trimmed) ? trimmed : `${trimmed}/api`;
+      axios.defaults.baseURL = base;
+    }
+    axios.defaults.withCredentials = true;
+  })();
 
   // Check if user is logged in on mount
   useEffect(() => {
@@ -30,11 +42,25 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const response = await axios.get('/auth/profile');
+
       setUser(response.data.user);
     } catch (error) {
       setUser(null);
-      if (error.response && error.response.status === 401 && window.location.pathname !== '/login' && window.location.pathname !== '/register' && !window.location.pathname.startsWith('/products/') && window.location.pathname !== '/') {
-        showError('You are not logged in. Please log in to access your account.');
+      // Don't show error for 401 on public pages - this is expected behavior
+      if (error.response && error.response.status === 401) {
+        const currentPath = window.location.pathname;
+        const publicPaths = ['/login', '/register', '/', '/products', '/product', '/faq', '/contact', '/about', '/events'];
+        const isPublicPath = publicPaths.some(path => 
+          currentPath === path || currentPath.startsWith(path + '/')
+        );
+        
+        // Only show error for protected routes
+        if (!isPublicPath) {
+          // User not authenticated - redirecting to login
+        }
+      } else {
+        // Show error for other types of errors
+        console.error('Auth check failed:', error.message);
       }
     } finally {
       setLoading(false);
@@ -43,7 +69,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      console.log('Sending login data:', { email, password });
+      // Sending login data
       const response = await axios.post('/auth/login', { email, password });
       setUser(response.data.user);
       return { success: true };
@@ -82,7 +108,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const loginWithGoogle = () => {
-    window.location.href = (import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com/api') + '/auth/google';
+    window.location.href = (import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com') + '/api/auth/google';
   };
 
   const value = {

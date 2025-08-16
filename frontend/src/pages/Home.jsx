@@ -2,8 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
+import AdvancedProductCard from '../components/AdvancedProductCard';
+import SmartSearch from '../components/SmartSearch';
+import RecommendationEngine from '../components/RecommendationEngine';
 import LoadingSpinner from '../components/LoadingSpinner';
+import DynamicPerformanceMonitor from '../components/DynamicPerformanceMonitor';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../contexts/AuthContext';
 import {
   ArrowRightIcon,
   StarIcon,
@@ -12,8 +17,13 @@ import {
   CreditCardIcon,
   ArrowPathIcon,
   MagnifyingGlassIcon,
-  Bars3Icon,
-  XMarkIcon
+  SparklesIcon,
+  FireIcon,
+  ClockIcon,
+  HeartIcon,
+  ShoppingBagIcon,
+  UserGroupIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 import { io } from 'socket.io-client';
 import { Helmet } from 'react-helmet';
@@ -31,9 +41,6 @@ function useDebounce(value, delay) {
 
 import { getOptimizedImageUrl } from '../utils/imageUtils';
 import { advertTemplates } from '../components/AdvertTemplates';
-import categoriesFallback from '../utils/categories';
-
-// Use shared advert templates
 
 const HERO_IMAGE = gambiaMarket;
 
@@ -44,9 +51,14 @@ const Home = () => {
   const [bestSelling, setBestSelling] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [loadingNewArrivals, setLoadingNewArrivals] = useState(true);
+  const [loadingBestSelling, setLoadingBestSelling] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const { error, info, success, warning } = useToast();
+  const { user } = useAuth();
   const socketRef = React.useRef(null);
   const [adverts, setAdverts] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
@@ -62,16 +74,54 @@ const Home = () => {
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const [bannerIndex, setBannerIndex] = useState(0);
   const bannerIntervalRef = useRef();
+  
   // Dynamic data states
-  const [categoriesList, setCategoriesList] = useState(Array.isArray(categoriesFallback) ? categoriesFallback : []);
-  const [assurances, setAssurances] = useState([
-    { key: 'assurance', title: 'Purchase Protection', subtitle: 'Coverage on eligible orders', icon: 'shield' },
-    { key: 'delivery', title: 'On-time Delivery', subtitle: 'Trackable shipping', icon: 'truck' },
-    { key: 'payments', title: 'Secure payments', subtitle: 'Multiple options', icon: 'card' },
-    { key: 'returns', title: 'Easy returns', subtitle: 'Hassle-free policy', icon: 'refresh' },
-  ]);
-  // Use topAdverts as banners for now
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [assurances, setAssurances] = useState([]);
+
+  // Enhanced features with better icons and descriptions
+  const features = [
+    {
+      icon: TruckIcon,
+      title: 'Free Shipping',
+      description: 'Free shipping on orders over $50',
+      gradient: 'from-blue-500 to-cyan-500'
+    },
+    {
+      icon: ShieldCheckIcon,
+      title: 'Secure Payment',
+      description: '100% secure payment processing',
+      gradient: 'from-green-500 to-emerald-500'
+    },
+    {
+      icon: ArrowPathIcon,
+      title: 'Easy Returns',
+      description: '30-day return policy',
+      gradient: 'from-purple-500 to-pink-500'
+    },
+    {
+      icon: CreditCardIcon,
+      title: 'Multiple Payment',
+      description: 'Credit card, PayPal, and more',
+      gradient: 'from-orange-500 to-red-500'
+    }
+  ];
+
+  // Enhanced stats for social proof
+  const stats = [
+    { number: '50K+', label: 'Happy Customers', icon: UserGroupIcon },
+    { number: '100K+', label: 'Products Sold', icon: ShoppingBagIcon },
+    { number: '24/7', label: 'Customer Support', icon: HeartIcon },
+    { number: '150+', label: 'Countries Served', icon: GlobeAltIcon }
+  ];
+
+  // Split adverts function
   const splitAdverts = (adverts) => {
+    // Ensure adverts is an array
+    if (!Array.isArray(adverts)) {
+      return { top: [], middle: [], bottom: [] };
+    }
+    
     if (adverts.length <= 3) return { top: adverts, middle: [], bottom: [] };
     return {
       top: adverts.slice(0, 2),
@@ -83,200 +133,335 @@ const Home = () => {
   // Fetch categories from backend for dynamic Source by Category
   const fetchCategories = async () => {
     try {
-      const res = await axios.get('/categories');
-      const list = Array.isArray(res.data)
-        ? res.data
-        : (Array.isArray(res.data?.categories) ? res.data.categories : []);
-      // Map to { id, name } if needed
-      const mapped = list.map((c) => ({ id: c.id || c._id || c.name, name: c.name }));
-      if (mapped.length) setCategoriesList((prev) => mapped);
-    } catch (e) {
-      // Fallback to util categories already set
+      setLoadingCategories(true);
+      const response = await fetchWithRetry('/api/categories', {
+        timeout: 10000 // Increased timeout for better reliability
+      });
+      if (Array.isArray(response.data)) {
+        setCategoriesList(response.data);
+      }
+    } catch (err) {
+      setCategoriesList([]);
+    } finally {
+      setLoadingCategories(false);
     }
   };
 
   // Fetch assurances from backend for dynamic Assurance Strip (optional endpoint)
   const fetchAssurances = async () => {
     try {
-      const res = await axios.get('/site/assurances');
-      const items = Array.isArray(res.data)
-        ? res.data
-        : (Array.isArray(res.data?.assurances) ? res.data.assurances : []);
-      if (items.length) setAssurances(items);
-    } catch (e) {
-      // keep defaults
-    }
-  };
-
-  const { top: topAdverts, middle: middleAdverts, bottom: bottomAdverts } = splitAdverts(adverts);
-  const banners = topAdverts.length > 0 ? topAdverts : adverts.slice(0, 3);
-  // Carousel auto-advance
-  useEffect(() => {
-    if (banners.length <= 1) return;
-    bannerIntervalRef.current = setInterval(() => {
-      setBannerIndex((prev) => (prev + 1) % banners.length);
-    }, 5000);
-    return () => clearInterval(bannerIntervalRef.current);
-  }, [banners.length]);
-  const handlePrevBanner = () => setBannerIndex((prev) => (prev - 1 + banners.length) % banners.length);
-  const handleNextBanner = () => setBannerIndex((prev) => (prev + 1) % banners.length);
-
-  // Fetch new arrivals
-  const fetchNewArrivals = async () => {
-    try {
-      const response = await axios.get('/products');
-      const data = response.data;
-      const list = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
-      const sorted = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
-      setNewArrivals(sorted);
-    } catch (err) {
-      console.error('Error fetching new arrivals:', err);
-      setNewArrivals([]);
-    }
-  };
-
-  // Fetch best selling
-  const fetchBestSelling = async () => {
-    try {
-      // Use the optimized endpoint with pagination, limit to 8 products
-      const response = await axios.get('/products/best-selling', {
-        params: { limit: 8 }
+      const res = await fetchWithRetry('/api/site/assurances', {
+        timeout: 10000
       });
-      const data = response.data;
-      const list = Array.isArray(data) ? data : (data.products || []);
-      setBestSelling(list);
-    } catch (err) {
-      console.error('Error fetching best selling:', err);
-      setBestSelling([]);
-    }
-  };
-
-  // Fetch events
-  const fetchEvents = async () => {
-    try {
-      const response = await axios.get('/events?upcoming=true');
-      setEvents(response.data || []);
-    } catch (err) {
-      setEvents([]);
-    }
-  };
-
-  // Fetch adverts
-  const fetchAdverts = async () => {
-    try {
-      const res = await axios.get('/adverts/active');
-      setAdverts(res.data.adverts || []);
-    } catch {
-      setAdverts([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchNewArrivals();
-    fetchBestSelling();
-    fetchEvents();
-    fetchAdverts();
-    fetchCategories();
-    fetchAssurances();
-    axios.get('/testimonials')
-      .then(res => setTestimonials(res.data.testimonials || []))
-      .catch(() => setTestimonials([]));
-    // Simulate fetching testimonials
-    // setTestimonials([
-    //   {
-    //     name: 'Sarah Johnson',
-    //     rating: 5,
-    //     comment: 'Amazing quality products and fast delivery. Highly recommended!'
-    //   },
-    //   {
-    //     name: 'Mike Chen',
-    //     rating: 5,
-    //     comment: 'Great customer service and competitive prices. Will shop again!'
-    //   },
-    //   {
-    //     name: 'Emily Davis',
-    //     rating: 5,
-    //     comment: 'Love the variety of products and easy checkout process.'
-    //   }
-    // ]);
-    // Real-time events
-    if (!socketRef.current) {
-      const socketUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://myshop-hhfv.onrender.com';
-      const socket = io(socketUrl, {
-        transports: ['websocket'],
-        withCredentials: true
-      });
-      socketRef.current = socket;
-      socket.on('connect_error', (err) => {
-        // error('Real-time connection failed. Some live features may not work.');
-      });
-      socket.on('event_created', (event) => {
-        fetchEvents();
-        success(`New event: ${event.title}`);
-      });
-      socket.on('event_updated', (event) => {
-        fetchEvents();
-        info(`Event updated: ${event.title}`);
-      });
-      socket.on('event_deleted', (eventId) => {
-        fetchEvents();
-        warning('An event was deleted');
-      });
-    }
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
+      if (Array.isArray(res.data)) {
+        setAssurances(res.data);
       }
-    };
-    // eslint-disable-next-line
-  }, []);
-
-  // Countdown timer for flash deals
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDealCountdown((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-  // Format countdown as HH:MM:SS
-  const formatCountdown = (seconds) => {
-    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${h}:${m}:${s}`;
+    } catch (e) {
+      // Fallback to default assurances already set
+    }
   };
-  // Recently viewed products from localStorage
-  useEffect(() => {
-    const viewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
-    setRecentlyViewed(viewed);
-  }, [products]);
 
-  const [loadingProducts, setLoadingProducts] = useState(true); // Only for product grid
+  // Fetch data functions with retry logic
+  const fetchWithRetry = async (url, options, maxRetries = 2) => {
+    for (let i = 0; i <= maxRetries; i++) {
+      try {
+        const response = await axios.get(url, options);
+        return response;
+      } catch (error) {
+        if (i === maxRetries) throw error;
+        // Wait before retrying (exponential backoff)
+        const delay = 1000 * (i + 1);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  };
 
-  // Fetch products from backend with search and category
   const fetchProducts = async (searchTerm = '', category = 'all') => {
     try {
       setLoadingProducts(true);
       const params = {};
       if (searchTerm) params.search = searchTerm;
       if (category && category !== 'all') params.category = category;
-      const response = await axios.get('/products', { params });
+      
+      const response = await fetchWithRetry('/api/products', { 
+        params,
+        timeout: 10000 // Increased timeout for better reliability
+      });
+      
       const data = response.data;
       const list = Array.isArray(data) ? data : (data.products || []);
-      setProducts(list);
+      
+      // Process images field - handle multiple formats (same as New Arrivals)
+      const processedList = list.map(product => {
+        let processedImages = [];
+        
+        if (typeof product.images === 'string') {
+          // Handle space-separated string
+          processedImages = product.images.split(' ').filter(img => img.trim());
+        } else if (Array.isArray(product.images)) {
+          // Handle array format
+          processedImages = product.images.filter(img => img);
+        }
+        
+        // Process images and ensure they're valid (same logic as New Arrivals)
+        processedImages = processedImages.filter(img => {
+          if (!img || !img.trim()) return false;
+          return true;
+        });
+        
+        // Add fallback images only if no images exist at all (same as New Arrivals)
+        if (processedImages.length === 0) {
+          const fallbackImages = {
+            'Electronics': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
+            'Fashion': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
+            'Home & Garden': 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=400&h=400&fit=crop',
+            'Sports & Outdoors': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+            'Books & Media': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
+            'Health & Beauty': 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop',
+            'Toys & Games': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop',
+            'Automotive': 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&h=400&fit=crop',
+            'Baby Products': 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=400&h=400&fit=crop',
+            'Pet Supplies': 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400&h=400&fit=crop',
+            'default': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop'
+          };
+          
+          processedImages = [fallbackImages[product.category] || fallbackImages.default];
+        }
+        
+        return {
+          ...product,
+          images: processedImages
+        };
+      });
+      
+      setProducts(processedList);
     } catch (err) {
       setProducts([]);
     } finally {
       setLoadingProducts(false);
     }
   };
-  // Debounced search effect for fetching products
+
+  const fetchNewArrivals = async () => {
+    try {
+      setLoadingNewArrivals(true);
+      const response = await fetchWithRetry('/api/products', { 
+        params: { sort: 'newest', limit: 8 },
+        timeout: 10000 // Increased timeout for better reliability
+      });
+      const data = response.data;
+      const list = Array.isArray(data) ? data : (data.products || []);
+      
+      // Process images field - handle multiple formats
+      const processedList = list.map(product => {
+        let processedImages = [];
+        
+        if (typeof product.images === 'string') {
+          // Handle space-separated string
+          processedImages = product.images.split(' ').filter(img => img.trim());
+        } else if (Array.isArray(product.images)) {
+          // Handle array format
+          processedImages = product.images.filter(img => img);
+        }
+        
+        // Process images and ensure they're valid
+        processedImages = processedImages.filter(img => {
+          if (!img || !img.trim()) return false;
+          return true;
+        });
+        
+        // Add fallback images only if no images exist at all
+        if (processedImages.length === 0) {
+          const fallbackImages = {
+            'Electronics': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
+            'Fashion': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
+            'Home & Garden': 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=400&h=400&fit=crop',
+            'Sports & Outdoors': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+            'Books & Media': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
+            'Health & Beauty': 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop',
+            'Toys & Games': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop',
+            'Automotive': 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&h=400&fit=crop',
+            'Baby Products': 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=400&h=400&fit=crop',
+            'Pet Supplies': 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400&h=400&fit=crop',
+            'default': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop'
+          };
+          
+          processedImages = [fallbackImages[product.category] || fallbackImages.default];
+        }
+        
+        return {
+          ...product,
+          images: processedImages
+        };
+      });
+      
+      setNewArrivals(processedList);
+    } catch (err) {
+      setNewArrivals([]);
+    } finally {
+      setLoadingNewArrivals(false);
+    }
+  };
+
+  const fetchBestSelling = async () => {
+    try {
+      setLoadingBestSelling(true);
+      const response = await fetchWithRetry('/api/products/best-selling', { 
+        params: { limit: 8 },
+        timeout: 10000 // Increased timeout for better reliability
+      });
+      const data = response.data;
+      const list = Array.isArray(data) ? data : (data.products || []);
+      
+      // Process images field - handle multiple formats
+      const processedList = list.map(product => {
+        let processedImages = [];
+        
+        if (typeof product.images === 'string') {
+          // Handle space-separated string
+          processedImages = product.images.split(' ').filter(img => img.trim());
+        } else if (Array.isArray(product.images)) {
+          // Handle array format
+          processedImages = product.images.filter(img => img);
+        }
+        
+        // Process images and ensure they're valid
+        processedImages = processedImages.filter(img => {
+          if (!img || !img.trim()) return false;
+          return true;
+        });
+        
+        // Add fallback images only if no images exist at all
+        if (processedImages.length === 0) {
+          const fallbackImages = {
+            'Electronics': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
+            'Fashion': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
+            'Home & Garden': 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=400&h=400&fit=crop',
+            'Sports & Outdoors': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
+            'Books & Media': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
+            'Health & Beauty': 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop',
+            'Toys & Games': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop',
+            'Automotive': 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&h=400&fit=crop',
+            'Baby Products': 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=400&h=400&fit=crop',
+            'Pet Supplies': 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400&h=400&fit=crop',
+            'default': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop'
+          };
+          
+          processedImages = [fallbackImages[product.category] || fallbackImages.default];
+        }
+        
+        return {
+          ...product,
+          images: processedImages
+        };
+      });
+      
+      setBestSelling(processedList);
+    } catch (err) {
+      setBestSelling([]);
+    } finally {
+      setLoadingBestSelling(false);
+    }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const response = await fetchWithRetry('/api/events', { 
+        params: { upcoming: true },
+        timeout: 10000
+      });
+      const eventsData = Array.isArray(response.data) ? response.data : [];
+      setEvents(eventsData);
+    } catch (err) {
+      setEvents([]);
+    }
+  };
+
+  const fetchAdverts = async () => {
+    try {
+      const response = await fetchWithRetry('/api/adverts/active', { 
+        timeout: 10000
+      });
+      // Ensure we always set an array
+      const advertsData = Array.isArray(response.data) ? response.data : [];
+      setAdverts(advertsData);
+    } catch (err) {
+      setAdverts([]);
+    }
+  };
+
+  const fetchTestimonials = async () => {
+    try {
+      const response = await fetchWithRetry('/api/testimonials', { 
+        timeout: 10000
+      });
+      const testimonialsData = Array.isArray(response.data) ? response.data : [];
+      setTestimonials(testimonialsData);
+    } catch (err) {
+      setTestimonials([]);
+    }
+  };
+
+  // Load data on component mount - OPTIMIZED for faster loading
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      
+      // Show hero section immediately
+      setLoading(false);
+      
+      // Load only critical data first (products only)
+      try {
+        await fetchProducts();
+          } catch (err) {
+      // Error loading products
+    }
+      
+      // Load categories after a short delay
+      setTimeout(async () => {
+        try {
+          await fetchCategories();
+            } catch (err) {
+      // Error loading categories
+    }
+      }, 200);
+      
+      // Load secondary data much later
+      setTimeout(async () => {
+        try {
+          await Promise.all([
+            fetchNewArrivals(),
+            fetchBestSelling()
+          ]);
+            } catch (err) {
+      // Error loading secondary data
+    }
+      }, 1000);
+      
+      // Load non-critical data last
+      setTimeout(async () => {
+        try {
+          await Promise.all([
+            fetchEvents(),
+            fetchAdverts(),
+            fetchTestimonials(),
+            fetchAssurances()
+          ]);
+            } catch (err) {
+      // Error loading non-critical data
+    }
+      }, 2000);
+    };
+    
+    loadData();
+  }, []);
+
+  // Debounced search effect
   useEffect(() => {
     fetchProducts(debouncedSearch, selectedCategory);
-    // eslint-disable-next-line
   }, [debouncedSearch, selectedCategory]);
-  // Autocomplete: fetch suggestions as user types
+
+  // Autocomplete suggestions
   useEffect(() => {
     if (!search) {
       setSearchSuggestions([]);
@@ -286,23 +471,34 @@ const Home = () => {
     let cancelled = false;
     const fetchSuggestions = async () => {
       try {
-        const res = await axios.get('/products', { params: { search } });
+        const res = await fetchWithRetry('/api/products', { 
+          params: { search },
+          timeout: 5000
+        });
         if (!cancelled) {
           const data = res.data;
           const list = Array.isArray(data) ? data : (data.products || []);
-          setSearchSuggestions(list.slice(0, 8));
+          
+          // Process images field - convert space-separated string to array
+          const processedList = list.map(product => ({
+            ...product,
+            images: typeof product.images === 'string' ? product.images.split(' ').filter(img => img.trim()) : product.images || []
+          }));
+          
+          setSearchSuggestions(processedList.slice(0, 8));
           setShowSuggestions(true);
         }
-      } catch {
-        if (!cancelled) {
-          setSearchSuggestions([]);
-          setShowSuggestions(false);
+              } catch (err) {
+          if (!cancelled) {
+            setSearchSuggestions([]);
+            setShowSuggestions(false);
+          }
         }
-      }
     };
     const timeout = setTimeout(fetchSuggestions, 200);
     return () => { cancelled = true; clearTimeout(timeout); };
   }, [search]);
+
   // Hide suggestions on click outside
   useEffect(() => {
     const handleClick = (e) => {
@@ -314,35 +510,34 @@ const Home = () => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  // Add a sample flash deals array (could be improved to fetch from backend)
-  const flashDeals = products.filter(p => p.isDeal || p.price < 20).slice(0, 6);
+  // Countdown timer for flash deals
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDealCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const features = [
-    {
-      icon: TruckIcon,
-      title: 'Free Shipping',
-      description: 'Free shipping on orders over $50'
-    },
-    {
-      icon: ShieldCheckIcon,
-      title: 'Secure Payment',
-      description: '100% secure payment processing'
-    },
-    {
-      icon: ArrowPathIcon,
-      title: 'Easy Returns',
-      description: '30-day return policy'
-    },
-    {
-      icon: CreditCardIcon,
-      title: 'Multiple Payment',
-      description: 'Credit card, PayPal, and more'
-    }
-  ];
+  // Format countdown as HH:MM:SS
+  const formatCountdown = (seconds) => {
+    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  };
+
+  // Recently viewed products from localStorage
+  useEffect(() => {
+    const viewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+    setRecentlyViewed(viewed);
+  }, [products]);
+
+  // Add a sample flash deals array
+  const flashDeals = products.filter(p => p.isDeal || p.price < 20).slice(0, 6);
 
   const nextEvent = events.length > 0 ? events[0] : null;
 
-  // Recommended for You: products from the same category as the most recently viewed, excluding already viewed
+  // Recommended for You: products from the same category as the most recently viewed
   let recommended = [];
   if (recentlyViewed.length > 0) {
     const lastViewed = recentlyViewed[0];
@@ -350,451 +545,310 @@ const Home = () => {
       p.category === lastViewed.category &&
       !recentlyViewed.some(rv => rv._id === p._id)
     ).slice(0, 8);
-    // If not enough, fill with best sellers not already viewed
     if (recommended.length < 8) {
       const bestFill = bestSelling.filter(p => !recentlyViewed.some(rv => rv._id === p._id) && !recommended.some(r => r._id === p._id)).slice(0, 8 - recommended.length);
       recommended = recommended.concat(bestFill);
     }
   }
 
+  // Split adverts
+  const { top: topAdverts, middle: middleAdverts, bottom: bottomAdverts } = splitAdverts(adverts);
+  const banners = topAdverts;
+
+  // Banner carousel functions
+  const handleNextBanner = () => {
+    setBannerIndex((prev) => (prev + 1) % banners.length);
+  };
+
+  const handlePrevBanner = () => {
+    setBannerIndex((prev) => (prev - 1 + banners.length) % banners.length);
+  };
+
+  useEffect(() => {
+    if (banners.length > 1) {
+      bannerIntervalRef.current = setInterval(handleNextBanner, 5000);
+      return () => clearInterval(bannerIntervalRef.current);
+    }
+  }, [banners.length]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       <Helmet>
-        <title>MyShopping Center - Home</title>
-        <meta name="description" content="Shop the best products, discover deals, and enjoy fast delivery at MyShopping Center. Electronics, fashion, home, and more!" />
-        <meta name="keywords" content="shopping, ecommerce, deals, electronics, fashion, home, delivery, online store" />
-        <meta property="og:title" content="MyShopping Center - Your One-Stop Shopping Destination" />
-        <meta property="og:description" content="Shop the best products, discover deals, and enjoy fast delivery at MyShopping Center." />
+        <title>MyShopping Center - Your Premium Shopping Destination</title>
+        <meta name="description" content="Discover amazing products, exclusive deals, and premium shopping experience at MyShopping Center. Fast delivery, secure payments, and exceptional customer service." />
+        <meta name="keywords" content="premium shopping, exclusive deals, fast delivery, secure payments, online store, ecommerce" />
+        <meta property="og:title" content="MyShopping Center - Your Premium Shopping Destination" />
+        <meta property="og:description" content="Discover amazing products, exclusive deals, and premium shopping experience at MyShopping Center." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://myshoppingcenter.com/" />
         <meta property="og:image" content="https://myshoppingcenter.com/logo.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="MyShopping Center - Your One-Stop Shopping Destination" />
-        <meta name="twitter:description" content="Shop the best products, discover deals, and enjoy fast delivery at MyShopping Center." />
-        <meta name="twitter:image" content="https://myshoppingcenter.com/logo.png" />
-        <link rel="canonical" href="https://myshoppingcenter.com/" />
-        <script type="application/ld+json">{`
-          {
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "MyShopping Center",
-            "url": "https://myshoppingcenter.com/",
-            "logo": "https://myshoppingcenter.com/logo.png",
-            "sameAs": [
-              "https://www.facebook.com/myshoppingcenter",
-              "https://twitter.com/myshoppingcenter"
-            ]
-          }
-        `}</script>
-        <script type="application/ld+json">{`
-          {
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            "name": "MyShopping Center",
-            "url": "https://myshoppingcenter.com/",
-            "potentialAction": {
-              "@type": "SearchAction",
-              "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": "https://myshoppingcenter.com/products?search={search_term_string}"
-              },
-              "query-input": "required name=search_term_string"
-            }
-          }
-        `}</script>
       </Helmet>
-      {/* Hero Section with Search (search bar over image, above Shop Now) */}
-      <section className="relative w-full h-[350px] md:h-[420px] flex items-center justify-center mb-8 bg-gradient-to-br from-orange-100 to-orange-200">
-        <img
-          decoding="async"
-          fetchpriority="high"
-          src={HERO_IMAGE}
-          alt="Gambia Market Hero - MyShopping Center"
-          srcSet={`${HERO_IMAGE}?size=small 600w, ${HERO_IMAGE}?size=medium 1200w, ${HERO_IMAGE}?size=large 1920w`}
-          sizes="100vw"
-          className="absolute inset-0 w-full h-full object-cover object-center z-0"
-        />
-        {/* Overlay for better text visibility */}
-        <div className="absolute inset-0 bg-black/40 z-0" />
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full">
-          {/* Search Bar (centered, above Shop Now) */}
-          <div className="w-full max-w-2xl mb-6">
-            <div className="relative" ref={searchInputRef}>
-              <input
-                type="text"
-                className="w-full rounded-full border border-gray-300 px-5 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-sm bg-white/90"
-                placeholder="Search for products, brands, or categories..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                onFocus={() => search && setShowSuggestions(true)}
-                autoComplete="off"
-              />
-              <MagnifyingGlassIcon className="w-6 h-6 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-              {/* Autocomplete Suggestions Dropdown */}
-              {showSuggestions && searchSuggestions.length > 0 && (
-                <ul className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-72 overflow-y-auto">
-                {searchSuggestions.map(suggestion => (
-                  <li
-                    key={suggestion._id}
-                    className="px-4 py-2 hover:bg-orange-100 cursor-pointer flex items-center gap-2"
-                    onClick={() => {
-                      setSearch(suggestion.title || suggestion.name);
-                      setShowSuggestions(false);
-                    }}
-                  >
-                    {suggestion.images && suggestion.images[0] && (
-                      <img loading="lazy" decoding="async" src={suggestion.images[0]} alt="" className="w-8 h-8 object-cover rounded mr-2" />
-                    )}
-                    <span>{suggestion.title || suggestion.name}</span>
-                    {suggestion.category && (
-                      <span className="ml-auto text-xs text-gray-400">{suggestion.category}</span>
-                    )}
-                  </li>
-                ))}
-                </ul>
-              )}
-            </div>
+
+      {/* Enhanced Hero Section - Always visible */}
+      <section className="relative w-full min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden">
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 animate-gradient-xy"></div>
+        
+        {/* Floating elements for visual interest */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full animate-float"></div>
+          <div className="absolute top-40 right-20 w-16 h-16 bg-white/10 rounded-full animate-float-delayed"></div>
+          <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-white/10 rounded-full animate-float"></div>
+        </div>
+
+        {/* Hero content */}
+        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-6xl mx-auto">
+          {/* Smart Search Bar */}
+          <div className="w-full max-w-2xl mb-8">
+            <SmartSearch 
+              onSearch={(query) => {
+                setSearch(query);
+                navigate(`/search?q=${encodeURIComponent(query)}`);
+              }}
+              placeholder="Search for products, brands, or categories..."
+            />
           </div>
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-white drop-shadow-lg mb-4 animate-fade-in" style={{textShadow:'0 2px 8px rgba(0,0,0,0.5)'}}>Welcome to MyShopping Center</h1>
-          <p className="text-lg md:text-2xl text-white mb-6 max-w-2xl animate-fade-in" style={{textShadow:'0 2px 8px rgba(0,0,0,0.4)'}}>Discover the best products, unbeatable deals, and a vibrant marketplace experience. Shop with confidence and enjoy fast delivery!</p>
-          <Link to="/products" className="btn-primary text-lg px-8 py-3 animate-bounce-in">Shop Now</Link>
+
+          {/* Enhanced hero text */}
+          <div className="space-y-6 mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <SparklesIcon className="w-8 h-8 text-yellow-300 animate-pulse" />
+              <span className="text-yellow-300 font-semibold text-lg">Premium Shopping Experience</span>
+              <SparklesIcon className="w-8 h-8 text-yellow-300 animate-pulse" />
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
+              <span className="block">Welcome to</span>
+              <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                MyShopping Center
+              </span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-white/90 max-w-3xl leading-relaxed">
+              Discover the best products, exclusive deals, and a premium marketplace experience. 
+              Shop with confidence and enjoy lightning-fast delivery!
+            </p>
+          </div>
+
+          {/* Enhanced CTA buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <Link 
+              to="/products" 
+              className="group relative px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-full text-lg shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                Start Shopping
+                <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </Link>
+            
+            <button className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full text-lg border border-white/30 hover:bg-white/30 transition-all duration-300">
+              Watch Demo
+            </button>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse"></div>
+          </div>
         </div>
       </section>
-      {/* Assurance Strip */}
-      <section className="max-w-6xl mx-auto -mt-6 mb-10 px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {assurances.slice(0,4).map((a, idx) => (
-            <div key={a.key || idx} className={`${idx === 3 ? 'hidden md:flex' : 'flex'} items-center gap-3 bg-white rounded-xl p-4 shadow-sm border border-orange-100`}>
-              {a.icon === 'shield' && <ShieldCheckIcon className="h-8 w-8 text-orange-600" />}
-              {a.icon === 'truck' && <TruckIcon className="h-8 w-8 text-orange-600" />}
-              {a.icon === 'card' && <CreditCardIcon className="h-8 w-8 text-orange-600" />}
-              {a.icon === 'refresh' && <ArrowPathIcon className="h-8 w-8 text-orange-600" />}
+
+      {/* Enhanced Assurance Strip */}
+      <section className="max-w-7xl mx-auto -mt-8 mb-16 px-4 relative z-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {assurances.slice(0, 4).map((a, idx) => (
+            <div 
+              key={a.key || idx} 
+              className={`${idx === 3 ? 'hidden md:flex' : 'flex'} items-center gap-4 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1`}
+            >
+              <div className="flex-shrink-0">
+                {a.icon === 'shield' && <ShieldCheckIcon className="h-10 w-10 text-green-500" />}
+                {a.icon === 'truck' && <TruckIcon className="h-10 w-10 text-blue-500" />}
+                {a.icon === 'card' && <CreditCardIcon className="h-10 w-10 text-purple-500" />}
+                {a.icon === 'refresh' && <ArrowPathIcon className="h-10 w-10 text-orange-500" />}
+              </div>
               <div>
-                <div className="text-sm font-semibold text-gray-900">{a.title}</div>
-                <div className="text-xs text-gray-500">{a.subtitle}</div>
+                <div className="text-sm font-bold text-gray-900">{a.title}</div>
+                <div className="text-xs text-gray-600">{a.subtitle}</div>
               </div>
             </div>
           ))}
         </div>
       </section>
-      {/* Main Banner Carousel (below hero) */}
-      {banners.length > 0 && (
-        <section className="max-w-5xl mx-auto mb-8 relative">
-          <div className="relative rounded-2xl overflow-hidden shadow-lg">
-            {banners.map((ad, idx) => {
-              const Template = advertTemplates.find(t => t.id === (ad.template || 'banner'))?.render;
-              return (
-                <div
-                  key={ad._id}
-                  className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${idx === bannerIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
-                >
-                  {Template ? Template({
-                    title: ad.title,
-                    message: ad.message,
-                    image: (ad.images && ad.images[0]) || ad.image,
-                    product: ad.product?.title || ad.product?.name,
-                    productId: ad.product?._id || ad.product
-                  }) : null}
+
+      {/* Progressive Loading Content */}
+      {!loading && (
+        <>
+          {/* Categories Section */}
+          <section className="max-w-7xl mx-auto mb-16 px-4">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8">
+              <div className="flex items-center mb-6">
+                <div className="flex items-center gap-3 mr-4">
+                  <GlobeAltIcon className="h-6 w-6 text-blue-500" />
+                  <h2 className="text-2xl font-bold text-gray-900">Shop by Category</h2>
                 </div>
-              );
-            })}
-            {/* Carousel Controls */}
-            {banners.length > 1 && (
-              <>
-                <button onClick={handlePrevBanner} className="absolute left-2 top-1/2 -translate-y-1/2 bg-orange-200/90 hover:bg-orange-300 text-orange-900 rounded-full p-2 shadow z-20 border border-orange-400"><ArrowRightIcon className="h-6 w-6 rotate-180" /></button>
-                <button onClick={handleNextBanner} className="absolute right-2 top-1/2 -translate-y-1/2 bg-orange-200/90 hover:bg-orange-300 text-orange-900 rounded-full p-2 shadow z-20 border border-orange-400"><ArrowRightIcon className="h-6 w-6" /></button>
-              </>
-            )}
-            {/* Dots */}
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-              {banners.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setBannerIndex(i)}
-                  className={`w-3 h-3 rounded-full border-2 ${i === bannerIndex ? 'bg-orange-600 border-orange-600' : 'bg-orange-200 border-orange-400'}`}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-      {/* Responsive Grid: Sidebar + Main Content */}
-      <div className="md:grid md:grid-cols-1 gap-8">
-        {/* Main Content */}
-        <main className="flex flex-col gap-8">
-          {/* Mobile: Horizontal Category Bar (improved) */}
-          <div className="md:hidden w-full overflow-x-auto flex gap-2 py-2 mb-4 sticky top-0 z-20 bg-white shadow-sm border-b border-orange-100">
-            {categoriesList.map(category => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex-shrink-0 px-4 py-2 rounded-full font-medium border transition-colors whitespace-nowrap ${selectedCategory === category.id ? 'bg-orange-600 text-white border-orange-600' : 'bg-orange-100 text-gray-900 border-orange-200 hover:bg-orange-200'}`}
-              >
-                {category.name}
-              </button>
-            ))}
-          </div>
-          {/* Flash Deals Section */}
-          {flashDeals.length > 0 && (
-            <section className="bg-gradient-to-r from-orange-400 to-yellow-200 rounded-2xl p-6 mb-4 shadow-lg">
-              <div className="flex items-center mb-4">
-                <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold mr-3">Flash Deals</span>
-                <span className="text-lg font-bold text-orange-900 mr-4">Limited Time Offers</span>
-                <span className="ml-auto bg-white text-orange-700 px-3 py-1 rounded-full text-xs font-mono font-bold shadow">{formatCountdown(dealCountdown)}</span>
+                <Link to="/categories" className="ml-auto text-blue-600 hover:text-blue-700 font-semibold">
+                  View all
+                </Link>
               </div>
-              <div className="overflow-x-auto flex gap-4 pb-2">
-                {flashDeals.map(product => (
-                  <div className="min-w-[180px] max-w-[200px] flex-shrink-0">
-                    <ProductCard key={product._id} product={{...product, isDeal: true}} small />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-          {/* Shop by Category */}
-          <section className="bg-white rounded-2xl p-6 shadow-sm border border-orange-100">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">Shop by Category</h2>
-              <Link to="/products" className="text-orange-600 hover:underline font-medium">View all</Link>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {categoriesList.filter(c => c.id !== 'all').slice(0, 12).map(cat => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedCategory(cat.id);
-                    navigate(`/products?category=${encodeURIComponent(cat.id)}`);
-                  }}
-                  className={`group flex flex-col items-center justify-center gap-2 rounded-xl p-4 border transition hover:shadow ${selectedCategory === cat.id ? 'border-orange-500 bg-orange-50' : 'border-orange-100 bg-white'}`}
-                  title={cat.name}
-                >
-                  <div className="h-12 w-12 rounded-full bg-orange-100 group-hover:bg-orange-200 flex items-center justify-center text-orange-700 font-bold">
-                    {cat.name.charAt(0)}
-                  </div>
-                  <span className="text-sm text-gray-700 text-center line-clamp-2">{cat.name}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-          {/* Top Adverts Section */}
-          {topAdverts.length > 0 && (
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {topAdverts.map(ad => {
-                const Template = advertTemplates.find(t => t.id === (ad.template || 'classic'))?.render;
-                return Template ? (
-                  <div key={ad._id}>{Template({
-                    title: ad.title,
-                    message: ad.message,
-                    image: (ad.images && ad.images[0]) || ad.image,
-                    product: ad.product?.title || ad.product?.name,
-                    productId: ad.product?._id || ad.product
-                  })}</div>
-                ) : null;
-              })}
-            </section>
-          )}
-          {/* Features Section */}
-          <section className="bg-gray-50 rounded-2xl p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((feature, index) => (
-                <div key={index} className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-600 text-white rounded-full mb-4">
-                    <feature.icon className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600">
-                    {feature.description}
-                  </p>
+              {loadingCategories ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="bg-gray-200 rounded-lg h-24 mb-2"></div>
+                      <div className="bg-gray-200 rounded h-4"></div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
-          {/* Product Grid Section - Responsive/Scrollable */}
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">{selectedCategory === 'all' ? 'Featured Products' : categoriesList.find(cat => cat.id === selectedCategory)?.name}</h2>
-              <Link to="/products" className="text-orange-600 hover:underline font-medium">View All</Link>
-            </div>
-            {/* Loading spinner only for product grid */}
-            {loadingProducts ? (
-              <div className="flex justify-center items-center py-12"><LoadingSpinner /></div>
-            ) : (
-              <>
-                {/* Mobile: Horizontal scroll */}
-                <div className="md:hidden overflow-x-auto flex gap-4 pb-2">
-                  {products && products.length > 0 ? (
-                    products.map((product) => (
-                      <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
-                        <ProductCard product={product} />
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {categoriesList.slice(0, 6).map((category, index) => (
+                    <Link
+                      key={category.id || category._id || index}
+                      to={`/products?category=${encodeURIComponent(category.name)}`}
+                      className="group bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                    >
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                        <span className="text-white font-bold text-lg">
+                          {(category.name || 'C')[0].toUpperCase()}
+                        </span>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-12 w-full">
-                      <p className="text-gray-500">No products found. Try a different search or category.</p>
-                    </div>
-                  )}
+                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                        {category.name}
+                      </h3>
+                    </Link>
+                  ))}
                 </div>
-                {/* Desktop: Grid */}
-                <div className="hidden md:grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {products && products.length > 0 ? (
-                    products.map((product) => (
-                      <ProductCard key={product._id} product={product} />
-                    ))
-                  ) : (
-                    <div className="col-span-full text-center py-12">
-                      <p className="text-gray-500">No products found. Try a different search or category.</p>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </section>
-          {/* Middle Adverts Section */}
-          {middleAdverts.length > 0 && (
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {middleAdverts.map(ad => {
-                const Template = advertTemplates.find(t => t.id === (ad.template || 'classic'))?.render;
-                return Template ? (
-                  <div key={ad._id}>{Template({
-                    title: ad.title,
-                    message: ad.message,
-                    image: (ad.images && ad.images[0]) || ad.image,
-                    product: ad.product?.title || ad.product?.name,
-                    productId: ad.product?._id || ad.product
-                  })}</div>
-                ) : null;
-              })}
-            </section>
-          )}
-          {/* New Arrivals & Best Selling (as horizontal carousels) */}
-          <section className="flex flex-col gap-8">
-            <div>
-              <div className="flex items-center mb-4">
-                <ArrowRightIcon className="h-6 w-6 text-orange-500 mr-2" />
-                <h2 className="text-xl font-bold text-gray-900">New Arrivals</h2>
-              </div>
-              <div className="overflow-x-auto flex gap-4 pb-2">
-                {newArrivals.map(product => (
-                  <div className="min-w-[180px] max-w-[200px] flex-shrink-0">
-                    <ProductCard key={product._id} product={product} small />
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center mb-4">
-                <StarIcon className="h-6 w-6 text-orange-500 mr-2" />
-                <h2 className="text-xl font-bold text-gray-900">Best Selling</h2>
-              </div>
-              <div className="overflow-x-auto flex gap-4 pb-2">
-                {bestSelling.map(product => (
-                  <div className="min-w-[180px] max-w-[200px] flex-shrink-0">
-                    <ProductCard key={product._id} product={product} small />
-                  </div>
-                ))}
-              </div>
+              )}
             </div>
           </section>
-          {/* Bottom Adverts Section */}
-          {bottomAdverts.length > 0 && (
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {bottomAdverts.map(ad => {
-                const Template = advertTemplates.find(t => t.id === (ad.template || 'classic'))?.render;
-                return Template ? (
-                  <div key={ad._id}>{Template({
-                    title: ad.title,
-                    message: ad.message,
-                    image: (ad.images && ad.images[0]) || ad.image,
-                    product: ad.product?.title || ad.product?.name,
-                    productId: ad.product?._id || ad.product
-                  })}</div>
-                ) : null;
-              })}
-            </section>
-          )}
-          {/* Live Events Section */}
-          {events.length > 0 && (
-            <section className="py-8 bg-purple-50 border-b border-purple-200 rounded-2xl">
-              <h2 className="text-xl font-bold text-purple-800 mb-4">Upcoming Live Events</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {events.slice(0, 3).map(event => (
-                  <div key={event._id} className="bg-white rounded shadow p-4 flex flex-col">
-                    {event.image && <img src={event.image} alt={event.title} className="w-full h-40 object-cover rounded mb-3" />}
-                    <h3 className="text-lg font-bold mb-1">{event.title}</h3>
-                    <div className="text-gray-500 text-sm mb-2">{new Date(event.date).toLocaleString()}</div>
-                    <p className="mb-2 line-clamp-2">{event.description}</p>
-                    {event.link && <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">Join/More Info</a>}
-                  </div>
-                ))}
+
+          {/* Products Section */}
+          <section className="max-w-7xl mx-auto mb-16 px-4">
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-8">
+              <div className="flex items-center mb-6">
+                <div className="flex items-center gap-3 mr-4">
+                  <ShoppingBagIcon className="h-6 w-6 text-orange-500" />
+                  <h2 className="text-2xl font-bold text-gray-900">Featured Products</h2>
+                </div>
+                <Link to="/products" className="ml-auto text-orange-600 hover:text-orange-700 font-semibold">
+                  View all
+                </Link>
               </div>
-              <div className="text-right mt-4">
-                <Link to="/events" className="text-purple-700 hover:underline font-medium">See all events</Link>
-              </div>
-            </section>
-          )}
-          {/* Testimonials Section */}
-          {testimonials.length > 0 && (
-            <section className="py-12 bg-gray-50 rounded-2xl">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                  What Our Customers Say
-                </h2>
-                <p className="text-lg text-gray-600">
-                  Don't just take our word for it
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {testimonials.map((testimonial, index) => (
-                  <div key={index} className="bg-white p-6 rounded-lg shadow-md">
-                    <div className="flex items-center mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <StarIcon key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                      ))}
+              {loadingProducts ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="bg-gray-200 rounded-lg h-48 mb-4"></div>
+                      <div className="bg-gray-200 rounded h-4 mb-2"></div>
+                      <div className="bg-gray-200 rounded h-4 w-3/4"></div>
                     </div>
-                    <p className="text-gray-600 mb-4">"{testimonial.message}"</p>
-                    <p className="font-semibold text-gray-900">{testimonial.name || 'Anonymous'}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {products.slice(0, 4).map(product => (
+                    <AdvancedProductCard key={product._id} product={product} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* New Arrivals Section */}
+          <section className="max-w-7xl mx-auto mb-16 px-4">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl p-8">
+              <div className="flex items-center mb-6">
+                <div className="flex items-center gap-3 mr-4">
+                  <FireIcon className="h-6 w-6 text-green-500" />
+                  <h2 className="text-2xl font-bold text-gray-900">New Arrivals</h2>
+                </div>
+                <Link to="/products?sort=newest" className="ml-auto text-green-600 hover:text-green-700 font-semibold">
+                  View all
+                </Link>
               </div>
-            </section>
-          )}
-        {/* Recently Viewed Section */}
-          {recentlyViewed.length > 0 && (
-            <section className="py-10">
-              <div className="flex items-center mb-4">
-                <ArrowRightIcon className="h-6 w-6 text-orange-500 mr-2" />
-                <h2 className="text-xl font-bold text-gray-900">Recently Viewed</h2>
+              {loadingNewArrivals ? (
+                <div className="overflow-x-auto flex gap-6 pb-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="min-w-[220px] max-w-[240px] flex-shrink-0 animate-pulse">
+                      <div className="bg-gray-200 rounded-lg h-48 mb-4"></div>
+                      <div className="bg-gray-200 rounded h-4 mb-2"></div>
+                      <div className="bg-gray-200 rounded h-4 w-3/4"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="overflow-x-auto flex gap-6 pb-4">
+                  {newArrivals.map(product => (
+                    <div key={product._id} className="min-w-[220px] max-w-[240px] flex-shrink-0">
+                      <ProductCard product={product} small />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Best Selling Section */}
+          <section className="max-w-7xl mx-auto mb-16 px-4">
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8">
+              <div className="flex items-center mb-6">
+                <div className="flex items-center gap-3 mr-4">
+                  <StarIcon className="h-6 w-6 text-yellow-500 fill-current" />
+                  <h2 className="text-2xl font-bold text-gray-900">Best Selling</h2>
+                </div>
+                <Link to="/products?sort=popular" className="ml-auto text-purple-600 hover:text-purple-700 font-semibold">
+                  View all
+                </Link>
               </div>
-              <div className="overflow-x-auto flex gap-4 pb-2">
-                {recentlyViewed.map(product => (
-                  <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
-                    <ProductCard product={product} small />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-          {/* Recommended for You Section */}
-          {recommended.length > 0 && (
-            <section className="py-10">
-              <div className="flex items-center mb-4">
-                <StarIcon className="h-6 w-6 text-orange-500 mr-2" />
-                <h2 className="text-xl font-bold text-gray-900">Recommended for You</h2>
-              </div>
-              <div className="overflow-x-auto flex gap-4 pb-2">
-                {recommended.map(product => (
-                  <div className="min-w-[180px] max-w-[200px] flex-shrink-0" key={product._id}>
-                    <ProductCard product={product} small />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-          </main>
-        </div>
+              {loadingBestSelling ? (
+                <div className="overflow-x-auto flex gap-6 pb-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="min-w-[220px] max-w-[240px] flex-shrink-0 animate-pulse">
+                      <div className="bg-gray-200 rounded-lg h-48 mb-4"></div>
+                      <div className="bg-gray-200 rounded h-4 mb-2"></div>
+                      <div className="bg-gray-200 rounded h-4 w-3/4"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="overflow-x-auto flex gap-6 pb-4">
+                  {bestSelling.map(product => (
+                    <div key={product._id} className="min-w-[220px] max-w-[240px] flex-shrink-0">
+                      <ProductCard product={product} small />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* AI Recommendations Section - Load separately */}
+      <section className="max-w-7xl mx-auto mb-16 px-4">
+        <RecommendationEngine
+          userId={user?.id || null}
+          type="personalized"
+        />
+      </section>
+      
+      {/* Dynamic Performance Monitor */}
+      {/* Temporarily disabled for faster loading
+      <DynamicPerformanceMonitor />
+      */}
     </div>
   );
 };

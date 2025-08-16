@@ -120,9 +120,9 @@ exports.getActiveAdverts = async (req, res) => {
       if (ad.startDate && ad.startDate > now) reasons.push('startDate in future');
       if (ad.endDate && ad.endDate < now) reasons.push('endDate in past');
       if (reasons.length > 0) {
-        console.log(`Advert ${ad._id} is not active because: ${reasons.join(', ')}`);
+        // Advert not active
       } else {
-        console.log(`Advert ${ad._id} is active and within date range.`);
+        // Advert is active
       }
     });
     const adverts = allAdverts.filter(ad => ad.active && (!ad.startDate || ad.startDate <= now) && (!ad.endDate || ad.endDate >= now));

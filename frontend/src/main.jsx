@@ -6,37 +6,53 @@ import './index.css'
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ToastProvider } from './contexts/ToastContext.jsx';
 import { CartProvider } from './contexts/CartContext.jsx';
+import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import axios from 'axios';
 import 'antd/dist/reset.css';
 import { ConfigProvider, theme as antdTheme } from 'antd';
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+// Configure axios to work with Vite proxy
+(() => {
+  // In development, use the proxy (no base URL needed)
+  // In production, use the full API URL
+  if (import.meta.env.DEV) {
+    // Development: let Vite proxy handle API calls
+    axios.defaults.baseURL = '';
+  } else {
+    // Production: use the full API URL
+    const raw = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+    const trimmed = raw.replace(/\/+$/, ''); // remove trailing slashes
+    const base = /\/api\/?$/.test(trimmed) ? trimmed : `${trimmed}/api`;
+    axios.defaults.baseURL = base;
+  }
+  axios.defaults.withCredentials = true;
+})();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <ToastProvider>
-      <AuthProvider>
-        <CartProvider>
-          <BrowserRouter>
-            <HelmetProvider>
-              <ConfigProvider
-                theme={{
-                  token: {
-                    colorPrimary: '#ff6600',
-                    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
-                    borderRadius: 10,
-                  },
-                  algorithm: antdTheme.defaultAlgorithm,
-                }}
-              >
+  <BrowserRouter>
+    <HelmetProvider>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: '#ff6600',
+            fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+            borderRadius: 10,
+          },
+          algorithm: antdTheme.defaultAlgorithm,
+        }}
+      >
+        <ThemeProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <CartProvider>
                 <App />
-              </ConfigProvider>
-            </HelmetProvider>
-          </BrowserRouter>
-        </CartProvider>
-      </AuthProvider>
-    </ToastProvider>
-  </React.StrictMode>,
+              </CartProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </ThemeProvider>
+      </ConfigProvider>
+    </HelmetProvider>
+  </BrowserRouter>,
 )

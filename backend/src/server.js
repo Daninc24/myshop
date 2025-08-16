@@ -53,9 +53,14 @@ const advertsRoutes = require('./routes/adverts');
 const testimonialsRoutes = require('./routes/testimonials');
 const pageViewRoutes = require('./routes/pageViews');
 const categoryRoutes = require('./routes/categoryRoutes');
+const siteRoutes = require('./routes/site');
+const recommendationsRoutes = require('./routes/recommendations');
 
 
 const { credentialCache, loadCredentials } = require('./utils/credentialCache');
+const { createIndexes } = require('./utils/databaseIndexes');
+const compressionMiddleware = require('./middleware/compression');
+const { addSampleCategories } = require('./utils/sampleCategories');
 
 const app = express();
 const server = http.createServer(app);
@@ -246,6 +251,9 @@ function throttle(func, delay) {
 app.use(securityHeaders);
 app.use(requestId);
 app.use(logger);
+// Enable compression for better performance
+app.use(compressionMiddleware);
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
@@ -329,6 +337,8 @@ app.use('/api/adverts', advertsRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
 app.use('/api/pageviews', pageViewRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/site', siteRoutes);
+app.use('/api/recommendations', recommendationsRoutes);
 
 // Handle OPTIONS requests for image uploads
 app.options('/uploads/:filename', (req, res) => {
@@ -466,6 +476,16 @@ app.use('*', (req, res) => {
 app.use(errorHandler);
 app.use('/uploads/profiles', express.static(path.join(__dirname, '../uploads/profiles')));
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage()
+  });
+});
+
 app.use(passport.initialize());
 
 passport.serializeUser((user, done) => {
@@ -487,11 +507,29 @@ passport.deserializeUser(async (id, done) => {
     const PORT = process.env.PORT || 5002;
     const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/myshoppingcenter';
 
-    await mongoose.connect(MONGO_URI);
+    await mongoose.connect(MONGO_URI, {
+      serverSelectionTimeoutMS: 5000, // 5 second timeout
+      socketTimeoutMS: 45000, // 45 second timeout
+      bufferCommands: false // Disable mongoose buffering
+    });
 
     console.log('✅ MongoDB connected');
 
     await loadCredentials(); // Load Stripe, PayPal, Mpesa, Google credentials
+    
+    // Create database indexes for performance optimization (non-blocking)
+    createIndexes().then(() => {
+      console.log('✅ Database indexes created successfully');
+    }).catch(error => {
+      console.error('❌ Error creating database indexes:', error);
+    });
+     
+     // Add sample categories (non-blocking)
+    addSampleCategories().then(() => {
+      console.log('✅ Sample categories process completed!');
+    }).catch(error => {
+      console.error('❌ Error adding sample categories:', error);
+    });
 
     // Only initialize Google OAuth if credentials are available
     if (credentialCache.google && credentialCache.google.clientId && credentialCache.google.clientSecret) {

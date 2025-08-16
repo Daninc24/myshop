@@ -37,7 +37,7 @@ const AdminProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('/products');
+      const response = await axios.get('/api/products');
       const data = response.data;
       const list = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
       setProducts(list);
@@ -122,14 +122,14 @@ const AdminProducts = () => {
       });
 
       if (editingProduct) {
-        await axios.put(`/products/${editingProduct._id}`, submitData, {
+        await axios.put(`/api/products/${editingProduct._id}`, submitData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
         success('Product updated');
       } else {
-        await axios.post('/products', submitData, {
+        await axios.post('/api/products', submitData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -180,7 +180,7 @@ const AdminProducts = () => {
   const handleDelete = async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await axios.delete(`/products/${productId}`);
+        await axios.delete(`/api/products/${productId}`);
         fetchProducts();
       } catch (error) {
         console.error('Error deleting product:', error);

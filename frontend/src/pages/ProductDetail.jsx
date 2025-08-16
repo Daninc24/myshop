@@ -24,7 +24,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`/products/${id}`);
+        const response = await axios.get(`/api/products/${id}`);
         setProduct(response.data);
       } catch (error) {
         showError('Failed to load product details.');
@@ -202,7 +202,7 @@ const ProductDetail = () => {
               <img
                 src={getOptimizedImageUrl(product.images && product.images[selectedImage]) || 'https://myshoppingcenter.com/logo.png'}
                 alt={product.title + ' main image'}
-                className="w-full h-96 object-contain rounded-2xl bg-white"
+                className="w-full max-w-md mx-auto h-64 object-contain rounded-2xl bg-white shadow-lg"
                 loading="lazy"
               />
             </div>
@@ -231,7 +231,7 @@ const ProductDetail = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <span className="text-3xl font-bold text-blue-600">{getCurrencySymbol(currency)}{convertPrice(displayPrice).toFixed(2)}</span>
+              <span className="text-3xl font-bold text-blue-600">{convertPrice(displayPrice)}</span>
               <span className="text-sm text-gray-500">Stock: {availableStock}</span>
             </div>
 
@@ -334,7 +334,7 @@ const ProductDetail = () => {
       {/* Sticky Add-to-Cart Bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t z-40 p-3 sm:p-4 flex items-center justify-between gap-3">
         <div className="flex items-baseline gap-2">
-          <span className="text-lg sm:text-2xl font-bold text-blue-600">{getCurrencySymbol(currency)}{convertPrice(displayPrice).toFixed(2)}</span>
+                          <span className="text-lg sm:text-2xl font-bold text-blue-600">{convertPrice(displayPrice)}</span>
           <span className="text-xs sm:text-sm text-gray-500">{availableStock > 0 ? `${availableStock} in stock` : 'Out of stock'}</span>
         </div>
         <div className="flex items-center gap-2">

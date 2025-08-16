@@ -33,7 +33,7 @@ const Cart = () => {
 
       try {
         const productIds = cart.map(item => item.productId || item._id);
-        const response = await axios.get('/products');
+        const response = await axios.get('/api/products');
         const products = response.data.filter(product => 
           productIds.includes(product._id)
         );
@@ -173,7 +173,7 @@ const Cart = () => {
                       <h2 className="text-xl font-heading font-bold text-secondary mb-1">{item.name}</h2>
                       <div className="flex justify-between items-center">
                         <span>{item.title} x {item.quantity}</span>
-                        <span>{getCurrencySymbol(currency)}{convertPrice(item.price * item.quantity).toFixed(2)}</span>
+                        <span>{convertPrice(item.price * item.quantity)}</span>
                       </div>
                       <div className="flex items-center gap-2 mt-2">
                         <button onClick={() => updateQuantity(item.product, item.quantity - 1)} className="btn-secondary px-3 py-1">-</button>
@@ -191,19 +191,19 @@ const Cart = () => {
               <h2 className="text-2xl font-heading font-bold text-secondary mb-2">Order Summary</h2>
               <div className="flex justify-between text-lg font-medium mt-4">
                 <span>Subtotal:</span>
-                <span>{getCurrencySymbol(currency)}{convertPrice(subtotal).toFixed(2)}</span>
+                <span>{convertPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between text-lg font-medium mt-1">
                 <span>Shipping:</span>
-                <span>{getCurrencySymbol(currency)}{convertPrice(shipping).toFixed(2)}</span>
+                <span>{convertPrice(shipping)}</span>
               </div>
               <div className="flex justify-between text-lg font-medium mt-1">
                 <span>Tax (8%):</span>
-                <span>{getCurrencySymbol(currency)}{convertPrice(tax).toFixed(2)}</span>
+                <span>{convertPrice(tax)}</span>
               </div>
               <div className="flex justify-between text-lg font-bold mt-4">
                 <span>Total:</span>
-                <span>{getCurrencySymbol(currency)}{convertPrice(total).toFixed(2)}</span>
+                <span>{convertPrice(total)}</span>
               </div>
               <button className="btn-primary w-full mt-4" onClick={handleCheckout}>Proceed to Checkout</button>
             </div>

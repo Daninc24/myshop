@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Test</title>
+</head>
+<body>
+    <h1>Testing Cloudinary Images</h1>
+    
+    <h2>Test 1: Direct Cloudinary URL</h2>
+    <img src="https://res.cloudinary.com/dj6hepktb/image/upload/v1754607616/myshoppingcenter/products/ouvqaizlgj8rnv2616y6.webp" 
+         alt="Test Image 1" 
+         style="width: 200px; height: 200px; object-fit: cover; border: 1px solid #ccc;"
+         onload="console.log('Image 1 loaded successfully')"
+         onerror="console.log('Image 1 failed to load')">
+    
+    <h2>Test 2: Optimized Cloudinary URL</h2>
+    <img src="https://res.cloudinary.com/dj6hepktb/image/upload/w_400,h_400,c_crop/v1754607616/myshoppingcenter/products/ouvqaizlgj8rnv2616y6.webp" 
+         alt="Test Image 2" 
+         style="width: 200px; height: 200px; object-fit: cover; border: 1px solid #ccc;"
+         onload="console.log('Image 2 loaded successfully')"
+         onerror="console.log('Image 2 failed to load')">
+    
+    <h2>Test 3: Placeholder Image</h2>
+    <img src="/placeholder-image.svg" 
+         alt="Placeholder" 
+         style="width: 200px; height: 200px; object-fit: cover; border: 1px solid #ccc;"
+         onload="console.log('Placeholder loaded successfully')"
+         onerror="console.log('Placeholder failed to load')">
+    
+    <script>
+        console.log('Image test page loaded');
+    </script>
+</body>
+</html>
