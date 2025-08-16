@@ -16,7 +16,10 @@ import {
   XMarkIcon,
   SunIcon,
   MoonIcon,
-  SparklesIcon
+  SparklesIcon,
+  ShoppingBagIcon,
+  Cog6ToothIcon,
+  ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import { 
   MagnifyingGlassIcon as MagnifyingGlassSolid,
@@ -56,6 +59,7 @@ const Navbar = () => {
   ]);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const { user, logout } = useAuth();
   const { cart, currency, setCurrency } = useCart();
@@ -94,6 +98,18 @@ const Navbar = () => {
       }
     };
   }, []);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showUserMenu && !event.target.closest('.user-menu')) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showUserMenu]);
 
   // Load categories
   useEffect(() => {
@@ -230,6 +246,28 @@ const Navbar = () => {
                 </div>
               )}
             </div>
+
+            {/* Admin Dashboard Link - Only for Admin Users */}
+            {(user?.role === 'admin' || user?.role === 'shopkeeper' || user?.role === 'manager' || user?.role === 'warehouse_manager' || user?.role === 'store_manager') && (
+              <Link
+                to="/admin"
+                className="flex items-center space-x-2 text-text-secondary hover:text-primary transition-colors duration-200 font-medium"
+              >
+                <Cog6ToothIcon className="w-5 h-5" />
+                <span>Admin Dashboard</span>
+              </Link>
+            )}
+
+            {/* POS Link - Only for Shopkeepers and Warehouse Managers */}
+            {(user?.role === 'shopkeeper' || user?.role === 'warehouse_manager' || user?.role === 'admin') && (
+              <Link
+                to="/pos"
+                className="flex items-center space-x-2 text-text-secondary hover:text-primary transition-colors duration-200 font-medium"
+              >
+                <ShoppingBagIcon className="w-5 h-5" />
+                <span>POS System</span>
+              </Link>
+            )}
 
             {/* Search Bar */}
             <div className="relative">
@@ -384,14 +422,64 @@ const Navbar = () => {
 
             {/* User Menu */}
             {user ? (
-              <div className="relative">
-                <button className="flex items-center space-x-2 p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300">
+              <div className="relative user-menu">
+                <button 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center space-x-2 p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300"
+                >
                   <UserIcon className="w-5 h-5 text-text-secondary" />
                   <span className="hidden md:block text-sm font-medium text-text-primary">
                     {user.name || user.email}
                   </span>
+                  <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
-                {/* User dropdown menu would go here */}
+                
+                {/* User Dropdown Menu */}
+                {showUserMenu && (
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-surface border border-border rounded-xl shadow-large z-50">
+                    <div className="p-3 border-b border-border">
+                      <p className="text-sm font-medium text-text-primary">{user.name || user.email}</p>
+                      <p className="text-xs text-text-muted">{user.role || 'User'}</p>
+                    </div>
+                    <div className="p-1">
+                      <Link
+                        to="/profile"
+                        className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-hover rounded-lg transition-colors duration-200"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        <span>Profile</span>
+                      </Link>
+                      <Link
+                        to="/orders"
+                        className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-hover rounded-lg transition-colors duration-200"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <ShoppingBagIcon className="w-4 h-4" />
+                        <span>Orders</span>
+                      </Link>
+                      {(user.role === 'admin' || user.role === 'shopkeeper' || user.role === 'manager' || user.role === 'warehouse_manager' || user.role === 'store_manager') && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-hover rounded-lg transition-colors duration-200"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <Cog6ToothIcon className="w-4 h-4" />
+                          <span>Admin Panel</span>
+                        </Link>
+                      )}
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-error hover:bg-error/10 rounded-lg transition-colors duration-200"
+                      >
+                        <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <Link

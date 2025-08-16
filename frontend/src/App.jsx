@@ -8,6 +8,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import POSRoute from './components/POSRoute';
+import SuperAdminRoute from './components/SuperAdminRoute';
 
 // Lazy-loaded components
 import {
@@ -93,9 +95,9 @@ const App = () => {
               </ProtectedRoute>
             } />
             <Route path="/pos" element={
-              <ProtectedRoute>
+              <POSRoute>
                 <POS />
-              </ProtectedRoute>
+              </POSRoute>
             } />
 
             {/* Admin Routes */}
@@ -115,9 +117,9 @@ const App = () => {
               </AdminRoute>
             } />
             <Route path="/admin/users" element={
-              <AdminRoute>
+              <SuperAdminRoute>
                 <AdminUsers />
-              </AdminRoute>
+              </SuperAdminRoute>
             } />
             <Route path="/admin/categories" element={
               <AdminRoute>
@@ -140,9 +142,9 @@ const App = () => {
               </AdminRoute>
             } />
             <Route path="/admin/payment-settings" element={
-              <AdminRoute>
+              <SuperAdminRoute>
                 <AdminPaymentSettings />
-              </AdminRoute>
+              </SuperAdminRoute>
             } />
             <Route path="/admin/inventory-logs" element={
               <AdminRoute>

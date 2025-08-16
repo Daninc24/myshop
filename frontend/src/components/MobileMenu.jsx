@@ -134,17 +134,17 @@ const MobileMenu = ({
             <ChatBubbleLeftRightIcon className="h-7 w-7" />
           </Link>
         )}
-        {user && posRoles.includes(user.role) && (
+        {(user?.role === 'shopkeeper' || user?.role === 'warehouse_manager' || user?.role === 'admin') && (
           <Link
             to="/pos"
             className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
             onClick={onClose}
-            title="POS"
+            title="POS System"
           >
             <CreditCardIcon className="h-7 w-7" />
           </Link>
         )}
-        {user?.role === 'admin' && (
+        {(user?.role === 'admin' || user?.role === 'shopkeeper' || user?.role === 'manager' || user?.role === 'warehouse_manager' || user?.role === 'store_manager') && (
           <Link
             to="/admin"
             className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"

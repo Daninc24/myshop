@@ -1,8 +1,8 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-const AdminRoute = ({ children }) => {
-  const { user, isAuthenticated, isAdmin, isShopkeeper, isStoreManager, isWarehouseManager, loading } = useAuth();
+const SuperAdminRoute = ({ children }) => {
+  const { user, isAuthenticated, isAdmin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -16,14 +16,12 @@ const AdminRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Check if user has any admin role
-  const hasAdminAccess = isAdmin || isShopkeeper || isStoreManager || isWarehouseManager || user?.role === 'manager';
-  
-  if (!hasAdminAccess) {
+  // Only admin role has access
+  if (!isAdmin) {
     return <Navigate to="/" replace />;
   }
 
   return children;
 };
 
-export default AdminRoute; 
+export default SuperAdminRoute;
