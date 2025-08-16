@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      const response = await axios.get('/api/auth/profile');
+      const response = await axios.get('/auth/profile');
 
       setUser(response.data.user);
     } catch (error) {
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       // Sending login data
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await axios.post('/auth/login', { email, password });
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     try {
-      const response = await axios.post('/api/auth/register', { name, email, password });
+      const response = await axios.post('/auth/register', { name, email, password });
       setUser(response.data.user);
       return { success: true };
     } catch (error) {
@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('/api/auth/logout');
+      await axios.post('/auth/logout');
       setUser(null);
       // Clear any stored cart data
       localStorage.removeItem('cart');
@@ -114,7 +114,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const loginWithGoogle = () => {
-            window.location.href = (import.meta.env.VITE_API_URL || 'http://localhost:5002') + '/api/auth/google';
+            window.location.href = (import.meta.env.VITE_API_URL || 'http://localhost:5002') + '/auth/google';
   };
 
   const value = {

@@ -76,7 +76,7 @@ const PerformanceMonitor = () => {
 
   const sendMetricsToAnalytics = async (metrics) => {
     try {
-      await axios.post('/api/analytics/performance', {
+              await axios.post('/analytics/performance', {
         ...metrics,
         userAgent: navigator.userAgent,
         url: window.location.href,

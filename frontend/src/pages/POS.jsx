@@ -369,7 +369,7 @@ const POS = () => {
               await axios.put(`/users/${userId}/role`, { role: newRole });
       setRoleMsg('Role updated successfully!');
       // Refresh users
-      const res = await axios.get('/api/users');
+              const res = await axios.get('/users');
       setAllUsers(res.data.users || []);
     } catch (err) {
       setRoleMsg('Failed to update role: ' + (err.response?.data?.message || err.message));
