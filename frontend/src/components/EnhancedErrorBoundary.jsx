@@ -53,7 +53,7 @@ class EnhancedErrorBoundary extends React.Component {
     };
 
     // In production, send to error tracking service
-    if (process.env.NODE_ENV === 'production') {
+    if (import.meta.env.MODE === 'production') {
       // Example: Sentry, LogRocket, etc.
       console.error('Error logged to service:', errorData);
     } else {
@@ -187,7 +187,7 @@ class EnhancedErrorBoundary extends React.Component {
                 Go to Home
               </button>
               
-              {process.env.NODE_ENV === 'development' && (
+              {import.meta.env.MODE === 'development' && (
                 <button
                   onClick={this.handleReportError}
                   className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
@@ -197,7 +197,7 @@ class EnhancedErrorBoundary extends React.Component {
               )}
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.MODE === 'development' && this.state.error && (
               <details className="mt-6 text-left">
                 <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
                   Error Details (Development)

@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ToastProvider } from './contexts/ToastContext.jsx';
 import { CartProvider } from './contexts/CartContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
+import { AnalyticsProvider } from './contexts/AnalyticsContext.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import axios from 'axios';
@@ -46,7 +47,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <ToastProvider>
             <AuthProvider>
               <CartProvider>
-                <App />
+                <AnalyticsProvider>
+                  <App />
+                </AnalyticsProvider>
               </CartProvider>
             </AuthProvider>
           </ToastProvider>

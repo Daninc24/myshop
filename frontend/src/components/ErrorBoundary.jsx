@@ -17,7 +17,7 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     // You can log the error to an error reporting service here
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.MODE === 'development') {
       // Only log errors in development
       console.error('Error caught by boundary:', error, errorInfo);
     }
@@ -75,7 +75,7 @@ class ErrorBoundary extends React.Component {
               </button>
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.MODE === 'development' && this.state.error && (
               <details className="mt-6 text-left">
                 <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
                   Error Details (Development)

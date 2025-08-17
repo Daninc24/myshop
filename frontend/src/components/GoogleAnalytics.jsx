@@ -2,11 +2,17 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 // Google Analytics 4 Configuration
-const GA_TRACKING_ID = process.env.VITE_GA_ID || 'G-XXXXXXXXXX';
+const GA_TRACKING_ID = import.meta.env.VITE_GA_ID || 'G-XXXXXXXXXX';
 
 // Initialize Google Analytics
 const initializeGA = () => {
   if (typeof window !== 'undefined' && window.gtag) {
+    return;
+  }
+
+  // Don't initialize if tracking ID is not set or is the default placeholder
+  if (!GA_TRACKING_ID || GA_TRACKING_ID === 'G-XXXXXXXXXX') {
+    console.warn('Google Analytics tracking ID not configured. Analytics will be disabled.');
     return;
   }
 
@@ -41,7 +47,7 @@ const GoogleAnalytics = () => {
 
   useEffect(() => {
     // Track page views on route changes
-    if (window.gtag) {
+    if (window.gtag && GA_TRACKING_ID && GA_TRACKING_ID !== 'G-XXXXXXXXXX') {
       window.gtag('config', GA_TRACKING_ID, {
         page_title: document.title,
         page_location: window.location.href,

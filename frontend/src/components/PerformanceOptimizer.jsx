@@ -129,7 +129,7 @@ const PerformanceOptimizer = ({
       {children}
       
       {/* Performance metrics display (development only) */}
-      {process.env.NODE_ENV === 'development' && loadTime > 0 && (
+              {import.meta.env.MODE === 'development' && loadTime > 0 && (
         <div className="text-xs text-gray-400 mt-2 p-2 bg-gray-50 rounded">
           <div className="flex justify-between items-center">
             <span>Load time: {loadTime.toFixed(2)}ms</span>
