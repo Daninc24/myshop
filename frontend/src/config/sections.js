@@ -76,7 +76,7 @@ export const SECTIONS_CONFIG = {
       interval: 5000,
       showCloseButton: true,
       showNavigation: true,
-      className: 'mb-4', // Compact spacing for better visual separation
+      className: 'mb-2', // Ultra-compact spacing for better visual separation
       priority: 'high'
     },
 
@@ -89,7 +89,7 @@ export const SECTIONS_CONFIG = {
       autoPlay: false,
       showCloseButton: false,
       showNavigation: true,
-      className: 'my-6', // Compact spacing for better flow
+      className: 'my-2', // Ultra-compact spacing for better flow
       priority: 'high'
     },
 
@@ -103,7 +103,7 @@ export const SECTIONS_CONFIG = {
       interval: 4000,
       showCloseButton: true,
       showNavigation: true,
-      className: 'my-4', // Compact spacing after categories
+      className: 'my-2', // Ultra-compact spacing after categories
       priority: 'medium'
     },
 
@@ -116,7 +116,7 @@ export const SECTIONS_CONFIG = {
       autoPlay: false,
       showCloseButton: false,
       showNavigation: false,
-      className: 'mb-4', // Compact spacing before featured products
+      className: 'mb-2', // Ultra-compact spacing before featured products
       priority: 'medium'
     },
 
@@ -129,7 +129,7 @@ export const SECTIONS_CONFIG = {
       autoPlay: false,
       showCloseButton: true,
       showNavigation: false,
-      className: 'mb-4', // Compact spacing before new arrivals
+      className: 'mb-2', // Ultra-compact spacing before new arrivals
       priority: 'medium'
     },
 
@@ -142,7 +142,7 @@ export const SECTIONS_CONFIG = {
       autoPlay: false,
       showCloseButton: true,
       showNavigation: false,
-      className: 'mb-4', // Compact spacing before best selling
+      className: 'mb-2', // Ultra-compact spacing before best selling
       priority: 'medium'
     },
 
@@ -156,7 +156,7 @@ export const SECTIONS_CONFIG = {
       interval: 6000,
       showCloseButton: true,
       showNavigation: true,
-      className: 'mt-8 mb-4', // Compact spacing for exit intent
+      className: 'mt-4 mb-2', // Ultra-compact spacing for exit intent
       priority: 'high'
     },
 
