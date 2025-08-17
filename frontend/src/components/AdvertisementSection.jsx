@@ -84,13 +84,14 @@ const AdvertisementSection = ({
       transition={{ duration: 0.5 }}
       className={className}
     >
-      <AdvertisementBanner
-        ads={ads}
-        {...sectionProps}
-        onAdClick={(ad) => {
-          advertisementService.trackClick(ad.id, sectionName, 'banner', ad.link);
-        }}
-      />
+             <AdvertisementBanner
+         ads={ads}
+         {...sectionProps}
+         template="compact-banner"
+         onAdClick={(ad) => {
+           advertisementService.trackClick(ad.id, sectionName, 'banner', ad.link);
+         }}
+       />
     </motion.div>
   );
 };
@@ -99,49 +100,49 @@ const AdvertisementSection = ({
 export const TopBannerAd = () => (
   <AdvertisementSection 
     sectionName="topBanner" 
-    className="mb-6"
+    className="mb-2"
   />
 );
 
 export const HeroAd = () => (
   <AdvertisementSection 
     sectionName="heroAd" 
-    className="my-8"
+    className="my-2"
   />
 );
 
 export const CategoryAd = () => (
   <AdvertisementSection 
     sectionName="categoryAd" 
-    className="my-6"
+    className="my-2"
   />
 );
 
 export const FeaturedAd = () => (
   <AdvertisementSection 
     sectionName="featuredAd" 
-    className="mb-6"
+    className="mb-2"
   />
 );
 
 export const NewArrivalsAd = () => (
   <AdvertisementSection 
     sectionName="newArrivalsAd" 
-    className="mb-6"
+    className="mb-2"
   />
 );
 
 export const BestSellingAd = () => (
   <AdvertisementSection 
     sectionName="bestSellingAd" 
-    className="mb-6"
+    className="mb-2"
   />
 );
 
 export const BottomBannerAd = () => (
   <AdvertisementSection 
     sectionName="bottomBanner" 
-    className="mt-8"
+    className="mt-2"
   />
 );
 
@@ -200,16 +201,17 @@ export const AdvertisementGrid = ({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3, delay: index * 0.1 }}
         >
-          <AdvertisementBanner
-            ads={[ad]}
-            type="inline"
-            autoPlay={false}
-            showCloseButton={false}
-            showNavigation={false}
-            onAdClick={(ad) => {
-              advertisementService.trackClick(ad.id, sectionName, 'grid', ad.link);
-            }}
-          />
+                     <AdvertisementBanner
+             ads={[ad]}
+             type="inline"
+             template="compact-card"
+             autoPlay={false}
+             showCloseButton={false}
+             showNavigation={false}
+             onAdClick={(ad) => {
+               advertisementService.trackClick(ad.id, sectionName, 'grid', ad.link);
+             }}
+           />
         </motion.div>
       ))}
     </div>
@@ -256,17 +258,18 @@ export const AdvertisementCarousel = ({
 
   return (
     <div className={className}>
-      <AdvertisementBanner
-        ads={ads}
-        type="banner"
-        autoPlay={autoPlay}
-        interval={interval}
-        showCloseButton={true}
-        showNavigation={true}
-        onAdClick={(ad) => {
-          advertisementService.trackClick(ad.id, sectionName, 'carousel', ad.link);
-        }}
-      />
+             <AdvertisementBanner
+         ads={ads}
+         type="banner"
+         template="compact-banner"
+         autoPlay={autoPlay}
+         interval={interval}
+         showCloseButton={true}
+         showNavigation={true}
+         onAdClick={(ad) => {
+           advertisementService.trackClick(ad.id, sectionName, 'carousel', ad.link);
+         }}
+       />
     </div>
   );
 };

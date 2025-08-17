@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { getAdvertTemplateById } from './AdvertTemplates';
 
 const AdvertisementBanner = ({ 
   type = 'banner', // 'banner', 'sidebar', 'inline', 'popup'
@@ -9,7 +10,8 @@ const AdvertisementBanner = ({
   interval = 5000,
   showCloseButton = true,
   showNavigation = true,
-  className = ''
+  className = '',
+  template = 'compact-banner' // Default to compact banner template
 }) => {
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
@@ -70,6 +72,9 @@ const AdvertisementBanner = ({
 
   const currentAd = ads[currentAdIndex];
 
+  // Get the template to use
+  const selectedTemplate = getAdvertTemplateById(template);
+
   // Different styles based on type and position
   const getBannerStyles = () => {
     const baseStyles = 'relative overflow-hidden transition-all duration-300';
@@ -78,26 +83,26 @@ const AdvertisementBanner = ({
       case 'banner':
         return `${baseStyles} w-full`;
       case 'sidebar':
-        return `${baseStyles} w-64 h-10`;
+        return `${baseStyles} w-64`;
       case 'inline':
         return `${baseStyles} w-full max-w-4xl mx-auto`;
       case 'popup':
-        return `${baseStyles} fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-96 h-10`;
+        return `${baseStyles} fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-96`;
       default:
         return baseStyles;
     }
   };
 
   const getContainerStyles = () => {
-    const baseStyles = 'relative bg-white rounded-lg shadow-lg';
+    const baseStyles = 'relative';
     
     switch (position) {
       case 'top':
-        return `${baseStyles} mb-6`;
+        return `${baseStyles} mb-2`;
       case 'middle':
-        return `${baseStyles} my-8`;
+        return `${baseStyles} my-2`;
       case 'bottom':
-        return `${baseStyles} mt-6`;
+        return `${baseStyles} mt-2`;
       case 'sidebar':
         return `${baseStyles} sticky top-4`;
       default:
@@ -112,46 +117,30 @@ const AdvertisementBanner = ({
         {showCloseButton && type !== 'inline' && (
           <button
             onClick={closeBanner}
-            className="absolute top-2 right-2 z-10 p-1 bg-black/20 hover:bg-black/40 text-white rounded-full transition-colors"
+            className="absolute top-1 right-1 z-10 p-1 bg-black/20 hover:bg-black/40 text-white rounded-full transition-colors"
             aria-label="Close advertisement"
           >
-            <XMarkIcon className="w-4 h-4" />
+            <XMarkIcon className="w-3 h-3" />
           </button>
         )}
 
-        {/* Ad content */}
+        {/* Ad content using compact template */}
         <div
           className="relative cursor-pointer group"
           onClick={() => handleAdClick(currentAd)}
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {/* Ad image */}
-          <img
-            src={currentAd.image}
-            alt={currentAd.title || 'Advertisement'}
-            className="w-full h-auto object-cover"
-            loading="lazy"
-          />
+          {/* Render the compact template */}
+          {selectedTemplate && selectedTemplate.render({
+            title: currentAd.title,
+            message: currentAd.description,
+            image: currentAd.image,
+            product: currentAd.product,
+            productId: currentAd.productId || currentAd.id
+          })}
 
-          {/* Ad overlay with text */}
-          {currentAd.title && (
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end">
-              <div className="p-4 text-white">
-                <h3 className="font-semibold text-lg mb-1">{currentAd.title}</h3>
-                {currentAd.description && (
-                  <p className="text-sm opacity-90">{currentAd.description}</p>
-                )}
-                {currentAd.cta && (
-                  <span className="inline-block mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium transition-colors">
-                    {currentAd.cta}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Navigation arrows */}
+          {/* Navigation arrows for multiple ads */}
           {showNavigation && ads.length > 1 && (
             <>
               <button
@@ -159,33 +148,33 @@ const AdvertisementBanner = ({
                   e.stopPropagation();
                   prevAd();
                 }}
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                className="absolute left-1 top-1/2 transform -translate-y-1/2 p-1 bg-black/20 hover:bg-black/40 text-white rounded-full transition-colors opacity-0 group-hover:opacity-100"
                 aria-label="Previous advertisement"
               >
-                <ChevronLeftIcon className="w-4 h-4" />
+                <ChevronLeftIcon className="w-3 h-3" />
               </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   nextAd();
                 }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 bg-black/20 hover:bg-black/40 text-white rounded-full transition-colors opacity-0 group-hover:opacity-100"
                 aria-label="Next advertisement"
               >
-                <ChevronRightIcon className="w-4 h-4" />
+                <ChevronRightIcon className="w-3 h-3" />
               </button>
             </>
           )}
         </div>
 
-        {/* Ad indicators */}
+        {/* Ad indicators for multiple ads */}
         {ads.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
+          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex space-x-1">
             {ads.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentAdIndex(index)}
-                className={`w-2 h-2 rounded-full transition-colors ${
+                className={`w-1.5 h-1.5 rounded-full transition-colors ${
                   index === currentAdIndex ? 'bg-white' : 'bg-white/50'
                 }`}
                 aria-label={`Go to advertisement ${index + 1}`}
@@ -195,7 +184,7 @@ const AdvertisementBanner = ({
         )}
 
         {/* Ad label */}
-        <div className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded">
+        <div className="absolute top-1 left-1 bg-orange-500 text-white text-xs px-1 py-0.5 rounded">
           Ad
         </div>
       </div>
