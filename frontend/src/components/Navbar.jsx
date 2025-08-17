@@ -65,6 +65,18 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const { cart, currency, setCurrency } = useCart();
   const { isDarkMode, toggleDarkMode } = useTheme();
+  
+  // Get wishlist count from localStorage
+  const getWishlistCount = () => {
+    if (!user) return 0;
+    try {
+      const stored = localStorage.getItem(`wishlist_${user._id}`);
+      const items = stored ? JSON.parse(stored) : [];
+      return items.length;
+    } catch (error) {
+      return 0;
+    }
+  };
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -406,6 +418,11 @@ const Navbar = () => {
               className="p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300 relative"
             >
               <HeartIcon className="w-5 h-5 text-text-secondary" />
+              {getWishlistCount() > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                  {getWishlistCount()}
+                </span>
+              )}
             </Link>
 
             {/* Cart */}
@@ -521,6 +538,11 @@ const Navbar = () => {
           currencies={currencies}
           handleCurrencyChange={(newCurrency) => setCurrency(newCurrency)}
           categories={categoriesList}
+          isDarkMode={isDarkMode}
+          toggleDarkMode={toggleDarkMode}
+          onSearchClick={() => setShowSearch(true)}
+          onNotificationsClick={() => setShowNotifications(true)}
+          wishlistCount={getWishlistCount()}
         />
       )}
     </nav>

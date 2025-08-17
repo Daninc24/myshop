@@ -29,6 +29,9 @@ import RecommendationEngine from '../components/RecommendationEngine';
 import FloatingActionButton from '../components/FloatingActionButton';
 import MobileSearchModal from '../components/MobileSearchModal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import BlogSection from '../components/BlogSection';
+import LocalSEO from '../components/LocalSEO';
+import SocialMediaIntegration from '../components/SocialMediaIntegration';
 
 // Advertisement Components
 import {
@@ -579,6 +582,15 @@ const Home = () => {
           type="personalized"
         />
       </section>
+
+      {/* Blog Section - Content Marketing */}
+      <BlogSection />
+
+      {/* Local SEO Section */}
+      <LocalSEO />
+
+      {/* Social Media Integration */}
+      <SocialMediaIntegration />
 
       {/* Bottom Banner Advertisement */}
       <BottomBannerAd />

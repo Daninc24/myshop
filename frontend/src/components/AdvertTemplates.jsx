@@ -48,9 +48,9 @@ export const advertTemplates = [
     id: 'compact-banner',
     name: 'Compact Banner',
     category: 'banner',
-    description: 'Small 40px height banner for minimal space',
+    description: 'Small 80px height banner for minimal space',
     render: ({ title, message, image, product, productId }) => (
-      <div className="relative h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg overflow-hidden group cursor-pointer">
+      <div className="relative h-20 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg overflow-hidden group cursor-pointer">
         {/* Background image if provided */}
         {image && (
           <img 
@@ -81,9 +81,9 @@ export const advertTemplates = [
     id: 'compact-image-banner',
     name: 'Compact Image Banner',
     category: 'banner',
-    description: '40px height banner with background image',
+    description: '80px height banner with background image',
     render: ({ title, message, image, product, productId }) => (
-      <div className="relative h-10 rounded-lg overflow-hidden group cursor-pointer">
+      <div className="relative h-20 rounded-lg overflow-hidden group cursor-pointer">
         {/* Background image */}
         {image ? (
           <img 
@@ -119,7 +119,7 @@ export const advertTemplates = [
     description: 'Small card design with minimal content',
     render: ({ title, message, image, product, productId }) => (
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group cursor-pointer">
-        <div className="h-10 flex items-center justify-between px-3">
+        <div className="h-20 flex items-center justify-between px-3">
           <div className="flex items-center gap-2">
             {image ? (
               <img 
@@ -151,7 +151,7 @@ export const advertTemplates = [
     category: 'gradient',
     description: 'Small gradient banner with modern design',
     render: ({ title, message, image, product, productId }) => (
-      <div className="relative h-10 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 rounded-lg overflow-hidden group cursor-pointer">
+      <div className="relative h-20 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 rounded-lg overflow-hidden group cursor-pointer">
         <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent" />
         <div className="relative h-full flex items-center justify-between px-4 text-white">
           <div className="flex items-center gap-2">
@@ -173,7 +173,7 @@ export const advertTemplates = [
     description: 'Clean minimal design with focus on content',
     render: ({ title, message, image, product, productId }) => (
       <div className="bg-gray-50 border border-gray-200 rounded-lg hover:border-orange-300 transition-colors duration-200 group cursor-pointer">
-        <div className="h-10 flex items-center justify-between px-3">
+        <div className="h-20 flex items-center justify-between px-3">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded bg-orange-500 flex items-center justify-center">
               <TagIcon className="w-2.5 h-2.5 text-white" />
@@ -196,7 +196,7 @@ export const advertTemplates = [
     category: 'featured',
     description: 'Featured style with prominent branding',
     render: ({ title, message, image, product, productId }) => (
-      <div className="relative h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg overflow-hidden group cursor-pointer">
+      <div className="relative h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg overflow-hidden group cursor-pointer">
         <div className="absolute inset-0 bg-gradient-to-r from-black/15 to-transparent" />
         <div className="relative h-full flex items-center justify-between px-4 text-white">
           <div className="flex items-center gap-2">
@@ -220,7 +220,7 @@ export const advertTemplates = [
     category: 'sale',
     description: 'Sale-focused design with urgency',
     render: ({ title, message, image, product, productId }) => (
-      <div className="relative h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg overflow-hidden group cursor-pointer">
+      <div className="relative h-20 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg overflow-hidden group cursor-pointer">
         <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
         <div className="relative h-full flex items-center justify-between px-4 text-white">
           <div className="flex items-center gap-2">
@@ -244,7 +244,7 @@ export const advertTemplates = [
     category: 'new',
     description: 'New product announcement style',
     render: ({ title, message, image, product, productId }) => (
-      <div className="relative h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg overflow-hidden group cursor-pointer">
+      <div className="relative h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg overflow-hidden group cursor-pointer">
         <div className="absolute inset-0 bg-gradient-to-r from-black/15 to-transparent" />
         <div className="relative h-full flex items-center justify-between px-4 text-white">
           <div className="flex items-center gap-2">
@@ -269,7 +269,7 @@ export const advertTemplates = [
     description: 'Traditional banner style in compact form',
     render: ({ title, message, image, product, productId }) => (
       <div className="bg-white border-2 border-orange-500 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group cursor-pointer">
-        <div className="h-10 flex items-center justify-between px-3">
+        <div className="h-20 flex items-center justify-between px-3">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
               <ShoppingBagIcon className="w-3 h-3 text-white" />
@@ -292,7 +292,7 @@ export const advertTemplates = [
     category: 'premium',
     description: 'Premium design with gold accents',
     render: ({ title, message, image, product, productId }) => (
-      <div className="relative h-10 bg-gradient-to-r from-yellow-600 via-orange-500 to-red-500 rounded-lg overflow-hidden group cursor-pointer">
+      <div className="relative h-20 bg-gradient-to-r from-yellow-600 via-orange-500 to-red-500 rounded-lg overflow-hidden group cursor-pointer">
         <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent" />
         <div className="relative h-full flex items-center justify-between px-4 text-white">
           <div className="flex items-center gap-2">
@@ -317,7 +317,7 @@ export const advertTemplates = [
     description: 'Simple and clean design',
     render: ({ title, message, image, product, productId }) => (
       <div className="bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 group cursor-pointer">
-        <div className="h-10 flex items-center justify-between px-3">
+        <div className="h-20 flex items-center justify-between px-3">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded bg-gray-600 flex items-center justify-center">
               <TagIcon className="w-2.5 h-2.5 text-white" />

@@ -62,7 +62,7 @@ const AdvertisementSection = ({
   if (loading) {
     return (
       <div className={`${className} animate-pulse`}>
-        <div className="bg-gray-200 rounded-lg h-10 flex items-center justify-center">
+                 <div className="bg-gray-200 rounded-lg h-20 flex items-center justify-center">
           <div className="text-gray-400">Loading advertisements...</div>
         </div>
       </div>
@@ -183,9 +183,9 @@ export const AdvertisementGrid = ({
   if (loading) {
     return (
       <div className={`${className} grid grid-cols-1 md:grid-cols-${columns} gap-4 animate-pulse`}>
-        {[...Array(columns)].map((_, i) => (
-          <div key={i} className="bg-gray-200 rounded-lg h-10"></div>
-        ))}
+                 {[...Array(columns)].map((_, i) => (
+           <div key={i} className="bg-gray-200 rounded-lg h-20"></div>
+         ))}
       </div>
     );
   }
@@ -249,7 +249,7 @@ export const AdvertisementCarousel = ({
   if (loading) {
     return (
       <div className={`${className} animate-pulse`}>
-        <div className="bg-gray-200 rounded-lg h-10"></div>
+        <div className="bg-gray-200 rounded-lg h-20"></div>
       </div>
     );
   }

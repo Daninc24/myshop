@@ -13,7 +13,13 @@ import {
   XMarkIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  Squares2X2Icon
+  Squares2X2Icon,
+  HeartIcon,
+  MagnifyingGlassIcon,
+  BellIcon,
+  SunIcon,
+  MoonIcon,
+  ShoppingBagIcon
 } from '@heroicons/react/24/outline';
 
 const MobileMenu = ({
@@ -27,8 +33,16 @@ const MobileMenu = ({
   handleCurrencyChange,
   posRoles,
   categories = [],
+  isDarkMode,
+  toggleDarkMode,
+  onSearchClick,
+  onNotificationsClick,
+  wishlistCount = 0
 }) => {
   const [expandedCategories, setExpandedCategories] = useState(new Set());
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  
   if (!isOpen) {
     return null;
   }
@@ -45,6 +59,15 @@ const MobileMenu = ({
     });
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      // Navigate to products with search term
+      window.location.href = `/products?search=${encodeURIComponent(searchTerm.trim())}`;
+      onClose();
+    }
+  };
+
   return (
     <div
       className={`fixed top-0 left-0 w-80 h-full bg-gradient-to-b from-blue-900 to-blue-800 shadow-2xl z-50 transform transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
@@ -57,16 +80,108 @@ const MobileMenu = ({
       </div>
       
       <div className="p-4 space-y-3 overflow-y-auto h-[calc(100vh-80px)]">
-        {/* Home Link */}
-        <Link
-          to="/"
-          className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
-          onClick={onClose}
-          title="Home"
-        >
-          <HomeIcon className="h-6 w-6" />
-          <span className="font-medium">Home</span>
-        </Link>
+        {/* Search Bar */}
+        <div className="mb-4">
+          <form onSubmit={handleSearch} className="relative">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-3 pl-12 pr-4 bg-blue-800 border border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white placeholder-blue-300 transition-all duration-300"
+            />
+            <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-300" />
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-blue-300 hover:text-yellow-400 transition-colors duration-200"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </form>
+        </div>
+
+        {/* Quick Actions Grid */}
+        <div className="grid grid-cols-4 gap-2 mb-4">
+          {/* Home */}
+          <Link
+            to="/"
+            className="flex flex-col items-center p-3 rounded-xl text-white hover:bg-blue-700/50 transition-all duration-200"
+            onClick={onClose}
+            title="Home"
+          >
+            <HomeIcon className="h-6 w-6 mb-1" />
+            <span className="text-xs">Home</span>
+          </Link>
+
+          {/* Wishlist */}
+          <Link
+            to="/wishlist"
+            className="flex flex-col items-center p-3 rounded-xl text-white hover:bg-blue-700/50 transition-all duration-200 relative"
+            onClick={onClose}
+            title="Wishlist"
+          >
+            <HeartIcon className="h-6 w-6 mb-1" />
+            <span className="text-xs">Wishlist</span>
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Cart */}
+          <Link
+            to="/cart"
+            className="flex flex-col items-center p-3 rounded-xl text-white hover:bg-blue-700/50 transition-all duration-200 relative"
+            onClick={onClose}
+            title="Cart"
+          >
+            <ShoppingCartIcon className="h-6 w-6 mb-1" />
+            <span className="text-xs">Cart</span>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-yellow-400 text-blue-900 text-xs rounded-full px-1.5 py-0.5 font-bold">
+                {cartItemCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Notifications */}
+          <button
+            onClick={() => {
+              if (onNotificationsClick) onNotificationsClick();
+              onClose();
+            }}
+            className="flex flex-col items-center p-3 rounded-xl text-white hover:bg-blue-700/50 transition-all duration-200 relative"
+            title="Notifications"
+          >
+            <BellIcon className="h-6 w-6 mb-1" />
+            <span className="text-xs">Alerts</span>
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+        </div>
+
+        {/* Theme Toggle */}
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={toggleDarkMode}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-white hover:bg-blue-700/50 transition-all duration-200"
+            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {isDarkMode ? (
+              <>
+                <SunIcon className="h-5 w-5" />
+                <span className="text-sm">Light Mode</span>
+              </>
+            ) : (
+              <>
+                <MoonIcon className="h-5 w-5" />
+                <span className="text-sm">Dark Mode</span>
+              </>
+            )}
+          </button>
+        </div>
 
         {/* Categories Section */}
         <div className="border-t border-blue-700 pt-4">
@@ -124,41 +239,60 @@ const MobileMenu = ({
             </div>
           ))}
         </div>
-        {user?.role === 'admin' && (
-          <Link
-            to="/messages"
-            className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
-            onClick={onClose}
-            title="Messages"
-          >
-            <ChatBubbleLeftRightIcon className="h-7 w-7" />
-          </Link>
-        )}
-        {(user?.role === 'shopkeeper' || user?.role === 'warehouse_manager' || user?.role === 'admin') && (
-          <Link
-            to="/pos"
-            className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
-            onClick={onClose}
-            title="POS System"
-          >
-            <CreditCardIcon className="h-7 w-7" />
-          </Link>
-        )}
-        {(user?.role === 'admin' || user?.role === 'shopkeeper' || user?.role === 'manager' || user?.role === 'warehouse_manager' || user?.role === 'store_manager') && (
-          <Link
-            to="/admin"
-            className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center"
-            onClick={onClose}
-            title="Admin Dashboard"
-          >
-            <Cog6ToothIcon className="h-7 w-7" />
-          </Link>
-        )}
-        <div className="border-t border-gray-100 pt-2">
+
+        {/* Admin/Staff Links */}
+        <div className="border-t border-blue-700 pt-4">
+          <div className="flex items-center gap-3 px-4 py-2 mb-3">
+            <Cog6ToothIcon className="h-6 w-6 text-yellow-400" />
+            <span className="text-yellow-400 font-semibold text-lg">Admin Tools</span>
+          </div>
+          
+          {user?.role === 'admin' && (
+            <Link
+              to="/messages"
+              className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
+              onClick={onClose}
+              title="Messages"
+            >
+              <ChatBubbleLeftRightIcon className="h-6 w-6" />
+              <span className="font-medium">Messages</span>
+            </Link>
+          )}
+          
+          {(user?.role === 'shopkeeper' || user?.role === 'warehouse_manager' || user?.role === 'admin') && (
+            <Link
+              to="/pos"
+              className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
+              onClick={onClose}
+              title="POS System"
+            >
+              <CreditCardIcon className="h-6 w-6" />
+              <span className="font-medium">POS System</span>
+            </Link>
+          )}
+          
+          {(user?.role === 'admin' || user?.role === 'shopkeeper' || user?.role === 'manager' || user?.role === 'warehouse_manager' || user?.role === 'store_manager') && (
+            <Link
+              to="/admin"
+              className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
+              onClick={onClose}
+              title="Admin Dashboard"
+            >
+              <Cog6ToothIcon className="h-6 w-6" />
+              <span className="font-medium">Admin Dashboard</span>
+            </Link>
+          )}
+        </div>
+
+        {/* Currency Selector */}
+        <div className="border-t border-blue-700 pt-4">
+          <div className="flex items-center gap-3 px-4 py-2 mb-3">
+            <span className="text-yellow-400 font-semibold text-lg">Currency</span>
+          </div>
           <select
             value={currency}
             onChange={handleCurrencyChange}
-            className="block w-full border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-blue-900 text-yellow-400"
+            className="block w-full border border-blue-600 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-blue-800 text-white"
             style={{ minWidth: 100 }}
             title="Select currency"
           >
@@ -167,60 +301,69 @@ const MobileMenu = ({
             ))}
           </select>
         </div>
-        <Link
-          to="/cart"
-          className="block px-3 py-2 rounded-xl text-white hover:bg-primary/10 flex items-center justify-center relative"
-          onClick={onClose}
-          title="Cart"
-        >
-          <ShoppingCartIcon className="h-7 w-7" />
-          {cartItemCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-soft">
-              {cartItemCount}
-            </span>
+
+        {/* User Actions */}
+        <div className="border-t border-blue-700 pt-4">
+          <div className="flex items-center gap-3 px-4 py-2 mb-3">
+            <UserIcon className="h-6 w-6 text-yellow-400" />
+            <span className="text-yellow-400 font-semibold text-lg">Account</span>
+          </div>
+          
+          {!user ? (
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                to="/login"
+                className="block text-center text-white hover:text-yellow-400 px-4 py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-200"
+                onClick={onClose}
+                title="Login"
+              >
+                <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                <span className="font-medium">Login</span>
+              </Link>
+              <Link
+                to="/register"
+                className="block text-center text-white hover:text-yellow-400 px-4 py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-200"
+                onClick={onClose}
+                title="Register"
+              >
+                <UserPlusIcon className="h-5 w-5" />
+                <span className="font-medium">Register</span>
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Link
+                to="/profile"
+                className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
+                onClick={onClose}
+                title="Profile"
+              >
+                <UserIcon className="h-6 w-6" />
+                <span className="font-medium">Profile</span>
+              </Link>
+              <Link
+                to="/orders"
+                className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
+                onClick={onClose}
+                title="Orders"
+              >
+                <ShoppingBagIcon className="h-6 w-6" />
+                <span className="font-medium">Orders</span>
+              </Link>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  onClose();
+                }}
+                className="block w-full text-left px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/20 flex items-center gap-3 transition-all duration-200"
+                title="Logout"
+              >
+                <ArrowLeftOnRectangleIcon className="h-6 w-6" />
+                <span className="font-medium">Logout</span>
+              </button>
+            </div>
           )}
-        </Link>
-        {!user ? (
-          <div className="pt-2 flex gap-2">
-            <Link
-              to="/login"
-              className="block w-full text-center text-white hover:text-primary px-3 py-2 rounded-xl flex items-center justify-center"
-              onClick={onClose}
-              title="Login"
-            >
-              <ArrowRightOnRectangleIcon className="h-7 w-7 mx-auto" />
-            </Link>
-            <Link
-              to="/register"
-              className="block w-full text-center text-white hover:text-primary px-3 py-2 rounded-xl flex items-center justify-center"
-              onClick={onClose}
-              title="Register"
-            >
-              <UserPlusIcon className="h-7 w-7 mx-auto" />
-            </Link>
-          </div>
-        ) : (
-          <div className="pt-2 flex gap-2">
-            <Link
-              to="/profile"
-              className="block w-full text-center text-white hover:text-primary px-3 py-2 rounded-xl flex items-center justify-center"
-              onClick={onClose}
-              title="Profile"
-            >
-              <UserIcon className="h-7 w-7 mx-auto" />
-            </Link>
-            <button
-              onClick={() => {
-                handleLogout();
-                onClose();
-              }}
-              className="block w-full text-center px-3 py-2 rounded-xl text-red-600 hover:text-primary flex items-center justify-center"
-              title="Logout"
-            >
-              <ArrowLeftOnRectangleIcon className="h-7 w-7 mx-auto" />
-            </button>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
