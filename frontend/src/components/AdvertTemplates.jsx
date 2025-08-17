@@ -51,12 +51,56 @@ export const advertTemplates = [
     description: 'Small 40px height banner for minimal space',
     render: ({ title, message, image, product, productId }) => (
       <div className="relative h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg overflow-hidden group cursor-pointer">
+        {/* Background image if provided */}
+        {image && (
+          <img 
+            src={image} 
+            alt={title || 'Advertisement'} 
+            className="absolute inset-0 w-full h-full object-cover opacity-20"
+            loading="lazy"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
         <div className="relative h-full flex items-center justify-between px-4 text-white">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
               <FireIcon className="w-3 h-3 text-yellow-300" />
               <span className="text-xs font-medium text-yellow-300">SALE</span>
+            </div>
+            <h3 className="text-sm font-semibold truncate">{title}</h3>
+            {message && <p className="text-xs opacity-90 hidden sm:block truncate">{message}</p>}
+          </div>
+          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="outline" />
+        </div>
+      </div>
+    ),
+  },
+
+  // Compact Image Banner Template (40px height with image)
+  {
+    id: 'compact-image-banner',
+    name: 'Compact Image Banner',
+    category: 'banner',
+    description: '40px height banner with background image',
+    render: ({ title, message, image, product, productId }) => (
+      <div className="relative h-10 rounded-lg overflow-hidden group cursor-pointer">
+        {/* Background image */}
+        {image ? (
+          <img 
+            src={image} 
+            alt={title || 'Advertisement'} 
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-400 to-gray-600" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
+        <div className="relative h-full flex items-center justify-between px-4 text-white">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <SparklesIcon className="w-3 h-3 text-yellow-300" />
+              <span className="text-xs font-medium text-yellow-300">FEATURED</span>
             </div>
             <h3 className="text-sm font-semibold truncate">{title}</h3>
             {message && <p className="text-xs opacity-90 hidden sm:block truncate">{message}</p>}
@@ -77,9 +121,18 @@ export const advertTemplates = [
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group cursor-pointer">
         <div className="h-10 flex items-center justify-between px-3">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
-              <ShoppingBagIcon className="w-3 h-3 text-white" />
-            </div>
+            {image ? (
+              <img 
+                src={image} 
+                alt={title || 'Advertisement'} 
+                className="w-6 h-6 rounded object-cover flex-shrink-0"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-6 h-6 rounded bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
+                <ShoppingBagIcon className="w-3 h-3 text-white" />
+              </div>
+            )}
             <div className="min-w-0">
               <h3 className="text-sm font-semibold text-gray-900 truncate">{title}</h3>
               {message && <p className="text-xs text-gray-600 truncate">{message}</p>}
