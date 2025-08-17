@@ -64,6 +64,116 @@ export const SECTIONS_CONFIG = {
     ]
   },
 
+  // Advertisement Sections
+  advertisements: {
+    // Top Banner Advertisement - HIGHEST PRIORITY
+    topBanner: {
+      enabled: true,
+      type: 'banner',
+      position: 'top',
+      maxDisplay: 3,
+      autoPlay: true,
+      interval: 5000,
+      showCloseButton: true,
+      showNavigation: true,
+      className: 'mb-8', // Increased spacing for better visual separation
+      priority: 'high'
+    },
+
+    // Hero Advertisement - SECONDARY ENGAGEMENT
+    heroAd: {
+      enabled: true,
+      type: 'inline',
+      position: 'middle',
+      maxDisplay: 2,
+      autoPlay: false,
+      showCloseButton: false,
+      showNavigation: true,
+      className: 'my-10', // Increased spacing for better flow
+      priority: 'high'
+    },
+
+    // Category Advertisement - CONTEXTUAL PLACEMENT
+    categoryAd: {
+      enabled: true,
+      type: 'banner',
+      position: 'middle',
+      maxDisplay: 2,
+      autoPlay: true,
+      interval: 4000,
+      showCloseButton: true,
+      showNavigation: true,
+      className: 'my-8', // Better spacing after categories
+      priority: 'medium'
+    },
+
+    // Featured Products Advertisement - PRE-SHOPPING
+    featuredAd: {
+      enabled: true,
+      type: 'inline',
+      position: 'middle',
+      maxDisplay: 1,
+      autoPlay: false,
+      showCloseButton: false,
+      showNavigation: false,
+      className: 'mb-8', // Better spacing before featured products
+      priority: 'medium'
+    },
+
+    // New Arrivals Advertisement - DISCOVERY
+    newArrivalsAd: {
+      enabled: true,
+      type: 'banner',
+      position: 'middle',
+      maxDisplay: 1,
+      autoPlay: false,
+      showCloseButton: true,
+      showNavigation: false,
+      className: 'mb-8', // Better spacing before new arrivals
+      priority: 'medium'
+    },
+
+    // Best Selling Advertisement - SOCIAL PROOF
+    bestSellingAd: {
+      enabled: true,
+      type: 'inline',
+      position: 'middle',
+      maxDisplay: 1,
+      autoPlay: false,
+      showCloseButton: true,
+      showNavigation: false,
+      className: 'mb-8', // Better spacing before best selling
+      priority: 'medium'
+    },
+
+    // Bottom Banner Advertisement - EXIT INTENT
+    bottomBanner: {
+      enabled: true,
+      type: 'banner',
+      position: 'bottom',
+      maxDisplay: 2,
+      autoPlay: true,
+      interval: 6000,
+      showCloseButton: true,
+      showNavigation: true,
+      className: 'mt-12 mb-8', // Better spacing for exit intent
+      priority: 'high'
+    },
+
+    // Sidebar Advertisement - DESKTOP ONLY
+    sidebarAd: {
+      enabled: true,
+      type: 'sidebar',
+      position: 'sidebar',
+      maxDisplay: 1,
+      autoPlay: false,
+      showCloseButton: false,
+      showNavigation: false,
+      className: 'hidden lg:block sticky top-4',
+      priority: 'low'
+    }
+  },
+
   // Categories Section
   categories: {
     enabled: true,
@@ -98,116 +208,114 @@ export const SECTIONS_CONFIG = {
   bestSelling: {
     enabled: true,
     title: 'Best Selling',
-    subtitle: 'Most popular products among our customers',
+    subtitle: 'Most popular products our customers love',
     maxDisplay: 3, // Reduced from 4
     showViewAll: true,
     viewAllLink: '/products?sort=popular'
   },
 
-  // Stats Section (Simplified)
+  // AI Recommendations Section (Non-critical, loads after main content)
+  aiRecommendations: {
+    enabled: true,
+    title: 'Recommended for You',
+    subtitle: 'Personalized suggestions based on your preferences',
+    maxDisplay: 4,
+    showViewAll: true,
+    viewAllLink: '/products?recommended=true'
+  },
+
+  // Stats Section (Social proof)
   stats: {
-    enabled: false, // Disabled to reduce clutter
-    title: 'Our Numbers',
-    subtitle: 'Trusted by thousands of customers',
+    enabled: true,
+    title: 'Why Customers Choose Us',
+    subtitle: 'Join thousands of satisfied customers',
     items: [
       {
-        number: '50K+',
+        number: '10K+',
         label: 'Happy Customers',
         icon: 'UserGroupIcon',
         enabled: true
       },
       {
-        number: '100K+',
-        label: 'Products Sold',
+        number: '50K+',
+        label: 'Products Available',
         icon: 'ShoppingBagIcon',
         enabled: true
       },
       {
         number: '24/7',
         label: 'Customer Support',
-        icon: 'HeartIcon',
+        icon: 'GlobeAltIcon',
         enabled: true
       },
       {
-        number: '150+',
-        label: 'Countries Served',
-        icon: 'GlobeAltIcon',
+        number: '99%',
+        label: 'Satisfaction Rate',
+        icon: 'StarIcon',
         enabled: true
       }
     ]
-  },
-
-  // Newsletter Section (Simplified)
-  newsletter: {
-    enabled: false, // Disabled to reduce clutter
-    title: 'Stay Updated',
-    subtitle: 'Subscribe to our newsletter for exclusive offers and updates',
-    placeholder: 'Enter your email address',
-    buttonText: 'Subscribe',
-    successMessage: 'Thank you for subscribing!'
-  },
-
-  // Testimonials Section (Simplified)
-  testimonials: {
-    enabled: false, // Disabled to reduce clutter
-    title: 'What Our Customers Say',
-    subtitle: 'Real reviews from real customers',
-    maxDisplay: 3,
-    autoPlay: true,
-    autoPlayInterval: 5000
-  },
-
-  // Events Section (Simplified)
-  events: {
-    enabled: false, // Disabled to reduce clutter
-    title: 'Upcoming Events',
-    subtitle: 'Join us for exciting events and promotions',
-    maxDisplay: 3,
-    showViewAll: true,
-    viewAllLink: '/events'
   }
 };
 
 // Helper functions for sections
-export const isSectionEnabled = (sectionName) => {
-  return SECTIONS_CONFIG[sectionName]?.enabled || false;
-};
-
 export const getSectionConfig = (sectionName) => {
-  return SECTIONS_CONFIG[sectionName] || {};
-};
-
-export const getEnabledSections = () => {
-  return Object.keys(SECTIONS_CONFIG).filter(section => 
-    SECTIONS_CONFIG[section].enabled
-  );
-};
-
-export const getSectionItems = (sectionName) => {
-  const section = SECTIONS_CONFIG[sectionName];
-  if (!section || !section.items) return [];
-  
-  return section.items.filter(item => item.enabled !== false);
+  return SECTIONS_CONFIG[sectionName] || null;
 };
 
 export const getSectionTitle = (sectionName) => {
-  return SECTIONS_CONFIG[sectionName]?.title || '';
+  const config = getSectionConfig(sectionName);
+  return config?.title || '';
 };
 
 export const getSectionSubtitle = (sectionName) => {
-  return SECTIONS_CONFIG[sectionName]?.subtitle || '';
+  const config = getSectionConfig(sectionName);
+  return config?.subtitle || '';
 };
 
 export const getSectionMaxDisplay = (sectionName) => {
-  return SECTIONS_CONFIG[sectionName]?.maxDisplay || 4;
+  const config = getSectionConfig(sectionName);
+  return config?.maxDisplay || 4;
 };
 
 export const shouldShowViewAll = (sectionName) => {
-  return SECTIONS_CONFIG[sectionName]?.showViewAll || false;
+  const config = getSectionConfig(sectionName);
+  return config?.showViewAll || false;
 };
 
 export const getViewAllLink = (sectionName) => {
-  return SECTIONS_CONFIG[sectionName]?.viewAllLink || '';
+  const config = getSectionConfig(sectionName);
+  return config?.viewAllLink || '/products';
+};
+
+export const isSectionEnabled = (sectionName) => {
+  const config = getSectionConfig(sectionName);
+  return config?.enabled || false;
+};
+
+// Advertisement specific helpers
+export const getAdSectionConfig = (adSectionName) => {
+  return SECTIONS_CONFIG.advertisements?.[adSectionName] || null;
+};
+
+export const isAdSectionEnabled = (adSectionName) => {
+  const config = getAdSectionConfig(adSectionName);
+  return config?.enabled || false;
+};
+
+export const getAdSectionProps = (adSectionName) => {
+  const config = getAdSectionConfig(adSectionName);
+  if (!config) return null;
+  
+  return {
+    type: config.type,
+    position: config.position,
+    autoPlay: config.autoPlay,
+    interval: config.interval,
+    showCloseButton: config.showCloseButton,
+    showNavigation: config.showNavigation,
+    className: config.className
+  };
 };
 
 export default SECTIONS_CONFIG;

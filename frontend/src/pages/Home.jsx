@@ -30,6 +30,18 @@ import FloatingActionButton from '../components/FloatingActionButton';
 import MobileSearchModal from '../components/MobileSearchModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 
+// Advertisement Components
+import {
+  TopBannerAd,
+  HeroAd,
+  CategoryAd,
+  FeaturedAd,
+  NewArrivalsAd,
+  BestSellingAd,
+  BottomBannerAd,
+  SidebarAd
+} from '../components/AdvertisementSection';
+
 // Configuration
 import { 
   getSEOTitle, 
@@ -358,6 +370,9 @@ const Home = () => {
         </script>
       </Helmet>
 
+      {/* Top Banner Advertisement */}
+      <TopBannerAd />
+
       {/* Premium Hero Section */}
       <PremiumHero
         heroContent={heroContent}
@@ -369,6 +384,9 @@ const Home = () => {
 
       {/* Premium Features Section */}
       <PremiumFeatures />
+
+      {/* Hero Advertisement */}
+      <HeroAd />
 
       {/* Enhanced Assurance Strip */}
       <section className="max-w-7xl mx-auto -mt-8 mb-16 px-4 relative z-20">
@@ -436,6 +454,12 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Category Advertisement */}
+      <CategoryAd />
+
+      {/* Featured Products Advertisement */}
+      <FeaturedAd />
+
       {/* Featured Products Section */}
       <section className="max-w-7xl mx-auto mb-16 px-4">
         <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-4 md:p-8">
@@ -469,6 +493,9 @@ const Home = () => {
           )}
         </div>
       </section>
+
+      {/* New Arrivals Advertisement */}
+      <NewArrivalsAd />
 
       {/* New Arrivals Section */}
       <section className="max-w-7xl mx-auto mb-16 px-4">
@@ -505,6 +532,9 @@ const Home = () => {
           )}
         </div>
       </section>
+
+      {/* Best Selling Advertisement */}
+      <BestSellingAd />
 
       {/* Best Selling Section */}
       <section className="max-w-7xl mx-auto mb-16 px-4">
@@ -549,6 +579,9 @@ const Home = () => {
           type="personalized"
         />
       </section>
+
+      {/* Bottom Banner Advertisement */}
+      <BottomBannerAd />
       
       {/* Floating Action Button for Mobile */}
       <FloatingActionButton 
