@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { ToastProvider } from './contexts/ToastContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -70,16 +70,18 @@ const App = () => {
   return (
     <HelmetProvider>
       <Router>
-        <AuthProvider>
-          <ToastProvider>
-            <CartProvider>
-              <ThemeProvider>
-                <AnalyticsProvider>
-                  {/* Google Analytics */}
-                  <GoogleAnalytics />
-                  
-                  <Layout>
-                    <Routes>
+        <ErrorBoundary>
+          <AuthProvider>
+            <ToastProvider>
+              <CartProvider>
+                <ThemeProvider>
+                  <AnalyticsProvider>
+                    {/* Google Analytics */}
+                    <GoogleAnalytics />
+                    
+                    <AppLayout>
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <Routes>
                       {/* Public Routes */}
                       <Route path="/" element={<Home />} />
                       <Route path="/products" element={<Products />} />
@@ -184,15 +186,17 @@ const App = () => {
                           </div>
                         </div>
                       } />
-                    </Routes>
-                  </Layout>
+                      </Routes>
+                    </Suspense>
+                  </AppLayout>
                 </AnalyticsProvider>
               </ThemeProvider>
             </CartProvider>
           </ToastProvider>
         </AuthProvider>
-      </Router>
-    </HelmetProvider>
+      </ErrorBoundary>
+    </Router>
+  </HelmetProvider>
   );
 };
 
