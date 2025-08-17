@@ -15,7 +15,7 @@ export const useCart = () => {
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, user } = useContext(AuthContext);
   const [currency, setCurrency] = useState(() => localStorage.getItem('currency') || 'USD');
   const [rates, setRates] = useState({ 
     USD: 1,
@@ -63,19 +63,25 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('currency', currency);
   }, [currency]);
 
-  // Load cart from server when user is authenticated
+  // Load cart from server when user is authenticated, or from localStorage when not
   useEffect(() => {
     if (isAuthenticated) {
       loadCart();
     } else {
-      setCart([]);
+      loadGuestCart();
     }
   }, [isAuthenticated]);
 
+  // Sync guest cart to server when user logs in
   useEffect(() => {
-              axios.get('/payment/currency/rates')
+    if (isAuthenticated && user) {
+      syncGuestCartToServer();
+    }
+  }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    axios.get('/payment/currency/rates')
       .then(res => {
-        // Handle both formats: direct rates object or nested rates object
         const ratesData = res.data.rates || res.data;
         setRates(ratesData);
       })
@@ -85,7 +91,7 @@ export const CartProvider = ({ children }) => {
   const loadCart = async () => {
     try {
       setLoading(true);
-                  const response = await axios.get('/api/cart');
+      const response = await axios.get('/api/cart');
       setCart(response.data.cart || []);
     } catch (error) {
       setCart([]);
@@ -94,28 +100,61 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const loadGuestCart = () => {
+    try {
+      const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      setCart(localCart);
+    } catch (error) {
+      setCart([]);
+    }
+  };
+
+  const syncGuestCartToServer = async () => {
+    try {
+      const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      if (localCart.length > 0) {
+        // Merge guest cart with server cart
+        for (const item of localCart) {
+          await addToCart(item.productId, item.quantity, item.variantSku);
+        }
+        // Clear local cart after successful sync
+        localStorage.removeItem('cart');
+      }
+    } catch (error) {
+      console.error('Failed to sync guest cart:', error);
+    }
+  };
+
   const addToCart = async (productId, quantity = 1, variantSku = null) => {
     try {
       if (!isAuthenticated) {
         // For non-authenticated users, store in localStorage
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const existingItem = localCart.find(item => item.productId === productId && (item.variantSku || null) === (variantSku || null));
+        const existingItem = localCart.find(item => 
+          item.productId === productId && 
+          (item.variantSku || null) === (variantSku || null)
+        );
         
         if (existingItem) {
           existingItem.quantity += quantity;
         } else {
-          localCart.push({ productId, quantity, variantSku: variantSku || null });
+          localCart.push({ 
+            productId, 
+            quantity, 
+            variantSku: variantSku || null,
+            addedAt: new Date().toISOString()
+          });
         }
         
         localStorage.setItem('cart', JSON.stringify(localCart));
         setCart(localCart);
-        return { success: true };
+        return { success: true, message: 'Added to cart successfully!' };
       }
 
       // For authenticated users, save to server
-              const response = await axios.post('/api/cart', { productId, quantity, variantSku });
+      const response = await axios.post('/api/cart', { productId, quantity, variantSku });
       setCart(response.data.cart);
-      return { success: true };
+      return { success: true, message: 'Added to cart successfully!' };
     } catch (error) {
       return { 
         success: false, 
@@ -129,16 +168,18 @@ export const CartProvider = ({ children }) => {
       if (!isAuthenticated) {
         // For non-authenticated users, remove from localStorage
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const updatedCart = localCart.filter(item => !(item.productId === productId && (item.variantSku || null) === (variantSku || null)));
+        const updatedCart = localCart.filter(item => 
+          !(item.productId === productId && (item.variantSku || null) === (variantSku || null))
+        );
         localStorage.setItem('cart', JSON.stringify(updatedCart));
         setCart(updatedCart);
-        return { success: true };
+        return { success: true, message: 'Removed from cart successfully!' };
       }
 
       // For authenticated users, remove from server
       const response = await axios.delete(`/api/cart/${productId}`, { params: { variantSku } });
       setCart(response.data.cart);
-      return { success: true };
+      return { success: true, message: 'Removed from cart successfully!' };
     } catch (error) {
       return { 
         success: false, 
@@ -152,19 +193,21 @@ export const CartProvider = ({ children }) => {
       if (!isAuthenticated) {
         // For non-authenticated users, update in localStorage
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const item = localCart.find(item => item.productId === productId && (item.variantSku || null) === (variantSku || null));
+        const item = localCart.find(item => 
+          item.productId === productId && (item.variantSku || null) === (variantSku || null)
+        );
         if (item) {
-          item.quantity = quantity;
+          item.quantity = Math.max(1, quantity); // Ensure quantity is at least 1
           localStorage.setItem('cart', JSON.stringify(localCart));
           setCart(localCart);
         }
-        return { success: true };
+        return { success: true, message: 'Quantity updated successfully!' };
       }
 
       // For authenticated users, update on server
-      const response = await axios.put(`/cart/${productId}`, { quantity, variantSku });
+      const response = await axios.put(`/api/cart/${productId}`, { quantity, variantSku });
       setCart(response.data.cart);
-      return { success: true };
+      return { success: true, message: 'Quantity updated successfully!' };
     } catch (error) {
       return { 
         success: false, 
@@ -178,12 +221,12 @@ export const CartProvider = ({ children }) => {
       if (!isAuthenticated) {
         localStorage.removeItem('cart');
         setCart([]);
-        return { success: true };
+        return { success: true, message: 'Cart cleared successfully!' };
       }
 
-              await axios.delete('/api/cart');
+      await axios.delete('/api/cart');
       setCart([]);
-      return { success: true };
+      return { success: true, message: 'Cart cleared successfully!' };
     } catch (error) {
       return { 
         success: false, 
@@ -196,71 +239,77 @@ export const CartProvider = ({ children }) => {
     return cart.reduce((total, item) => total + (item.quantity || 1), 0);
   };
 
+  const getCartTotal = () => {
+    return cart.reduce((total, item) => {
+      const price = item.price || 0;
+      const quantity = item.quantity || 1;
+      return total + (price * quantity);
+    }, 0);
+  };
+
   const convertPrice = (usdAmount) => {
     if (!usdAmount || isNaN(usdAmount)) return 0;
-    if (!rates || !rates[currency]) return usdAmount;
-    
-    const converted = usdAmount * rates[currency];
-    
-    // Format based on currency
-    const currencyFormatters = {
-      USD: (val) => `$${val.toFixed(2)}`,
-      EUR: (val) => `€${val.toFixed(2)}`,
-      GBP: (val) => `£${val.toFixed(2)}`,
-      GMD: (val) => `D${val.toFixed(2)}`,
-      CAD: (val) => `C$${val.toFixed(2)}`,
-      AUD: (val) => `A$${val.toFixed(2)}`,
-      JPY: (val) => `¥${Math.round(val)}`,
-      CHF: (val) => `CHF ${val.toFixed(2)}`,
-      CNY: (val) => `¥${val.toFixed(2)}`,
-      INR: (val) => `₹${val.toFixed(2)}`,
-      BRL: (val) => `R$${val.toFixed(2)}`,
-      MXN: (val) => `$${val.toFixed(2)}`,
-      SGD: (val) => `S$${val.toFixed(2)}`,
-      HKD: (val) => `HK$${val.toFixed(2)}`,
-      NZD: (val) => `NZ$${val.toFixed(2)}`,
-      SEK: (val) => `${val.toFixed(2)} kr`,
-      NOK: (val) => `${val.toFixed(2)} kr`,
-      DKK: (val) => `${val.toFixed(2)} kr`,
-      PLN: (val) => `${val.toFixed(2)} zł`,
-      CZK: (val) => `${val.toFixed(2)} Kč`,
-      HUF: (val) => `${Math.round(val)} Ft`,
-      RUB: (val) => `${val.toFixed(2)} ₽`,
-      TRY: (val) => `${val.toFixed(2)} ₺`,
-      ZAR: (val) => `R ${val.toFixed(2)}`,
-      KRW: (val) => `₩${Math.round(val)}`,
-      THB: (val) => `฿${val.toFixed(2)}`,
-      MYR: (val) => `RM${val.toFixed(2)}`,
-      IDR: (val) => `Rp${Math.round(val)}`,
-      PHP: (val) => `₱${val.toFixed(2)}`,
-      VND: (val) => `₫${Math.round(val)}`,
-      EGP: (val) => `E£${val.toFixed(2)}`,
-      NGN: (val) => `₦${val.toFixed(2)}`,
-      KES: (val) => `KSh${val.toFixed(2)}`,
-      UGX: (val) => `USh${Math.round(val)}`,
-      TZS: (val) => `TSh${Math.round(val)}`,
-      GHS: (val) => `GH₵${val.toFixed(2)}`,
-      XOF: (val) => `${Math.round(val)} CFA`,
-      XAF: (val) => `${Math.round(val)} FCFA`
+    const rate = rates[currency] || 1;
+    return usdAmount * rate;
+  };
+
+  const formatPrice = (amount, currencyCode = currency) => {
+    const convertedAmount = convertPrice(amount);
+    const currencySymbols = {
+      USD: '$',
+      EUR: '€',
+      GBP: '£',
+      GMD: 'D',
+      CAD: 'C$',
+      AUD: 'A$',
+      JPY: '¥',
+      CNY: '¥',
+      INR: '₹',
+      BRL: 'R$',
+      SGD: 'S$',
+      HKD: 'HK$',
+      ZAR: 'R',
+      NGN: '₦',
+      KES: 'KSh',
+      GHS: 'GH₵'
     };
+
+    const symbol = currencySymbols[currencyCode] || currencyCode;
     
-    const formatter = currencyFormatters[currency];
-    return formatter ? formatter(converted) : `${converted.toFixed(2)}`;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(convertedAmount);
+  };
+
+  const isCartEmpty = () => {
+    return cart.length === 0;
+  };
+
+  const getCartItem = (productId, variantSku = null) => {
+    return cart.find(item => 
+      item.productId === productId && (item.variantSku || null) === (variantSku || null)
+    );
   };
 
   const value = {
     cart,
     loading,
+    currency,
+    setCurrency,
     addToCart,
     removeFromCart,
     updateQuantity,
     clearCart,
     getCartItemCount,
-    cartItemCount: getCartItemCount(),
-    currency,
-    setCurrency,
-    rates,
+    getCartTotal,
     convertPrice,
+    formatPrice,
+    isCartEmpty,
+    getCartItem,
+    isAuthenticated
   };
 
   return (

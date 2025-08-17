@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import { useTheme } from '../contexts/ThemeContext';
 import CategoryDropdown from './CategoryDropdown';
 import MobileMenu from './MobileMenu';
+import SmartNotificationSystem from './SmartNotificationSystem';
 import axios from 'axios';
 import { 
   MagnifyingGlassIcon, 
@@ -211,7 +212,7 @@ const Navbar = () => {
               <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow group-hover:shadow-glow-lg transition-all duration-300">
                 <SparklesIcon className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold gradient-text">MyShop</span>
+              <span className="text-xl font-bold gradient-text">LuxeCart</span>
             </Link>
           </div>
 
@@ -419,6 +420,9 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
+
+            {/* Notification System */}
+            <SmartNotificationSystem />
 
             {/* User Menu */}
             {user ? (

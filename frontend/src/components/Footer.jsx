@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { getBrandName, getBrandEmail, getBrandPhone, getSocialLinks } from '../config/branding';
 
 const EventsPreview = () => {
   const [events, setEvents] = useState([]);
@@ -50,10 +51,9 @@ const EventsPreview = () => {
 
 const whatsappNumber = '254791991154';
 const whatsappLink = `https://wa.me/${whatsappNumber}`;
-const phoneNumber = '+254791991154';
-const email = 'info@myshoppingcenter.com';
-const facebookLink = 'https://facebook.com/myshoppingcenter';
-const twitterLink = 'https://twitter.com/myshoppingcenter';
+const phoneNumber = getBrandPhone();
+const email = getBrandEmail();
+const socialLinks = getSocialLinks();
 const eventsLink = '/events';
 
 // Dark mode utility
@@ -161,8 +161,8 @@ const Footer = () => {
         </div>
         <div className="flex flex-col gap-2 col-span-1 items-center sm:items-start">
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-2 w-full">
-  <img src="/images/logo-footer.svg" alt="Logo" className="w-10 h-10 rounded-xl shadow-lg bg-white p-1 mx-auto sm:mx-0" aria-label="MyShopping Center Logo" />
-  <span className="font-heading text-xl sm:text-2xl font-bold text-yellow-400 drop-shadow text-center sm:text-left">MyShopping Center</span>
+  <img src="/images/logo-footer.svg" alt="Logo" className="w-10 h-10 rounded-xl shadow-lg bg-white p-1 mx-auto sm:mx-0" aria-label="LuxeCart Logo" />
+<span className="font-heading text-xl sm:text-2xl font-bold text-yellow-400 drop-shadow text-center sm:text-left">{getBrandName()}</span>
 </div>
           <p className="text-gray-500 dark:text-gray-400 mb-2">Your one-stop shop for everything awesome. Enjoy seamless shopping, fast delivery, and great deals!</p>
           <form className="flex flex-col gap-2 w-full" onSubmit={e => { e.preventDefault(); alert('Subscribed!'); }}>
@@ -173,8 +173,8 @@ const Footer = () => {
   </div>
 </form>
           <div className="flex gap-3 mt-4 justify-center sm:justify-start">
-            <a href={facebookLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/facebook.svg" alt="Facebook" className="w-6 h-6" /></a>
-            <a href={twitterLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/twitter.svg" alt="Twitter" className="w-6 h-6" /></a>
+            <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/facebook.svg" alt="Facebook" className="w-6 h-6" /></a>
+            <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/twitter.svg" alt="Twitter" className="w-6 h-6" /></a>
             <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/whatsapp.svg" alt="WhatsApp" className="w-6 h-6" /></a>
           </div>
           
@@ -213,7 +213,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="border-t border-yellow-300 mt-6 pt-2 text-center text-xs text-yellow-100 flex flex-col sm:flex-row justify-between items-center gap-2">
-        <span>&copy; {new Date().getFullYear()} MyShopping Center. All rights reserved.</span>
+        <span>&copy; {new Date().getFullYear()} {getBrandName()}. All rights reserved.</span>
         <a href="#top" className="text-primary hover:underline">Back to Top ↑</a>
       </div>
     </footer>

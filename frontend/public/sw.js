@@ -1,27 +1,32 @@
 const CACHE_NAME = 'myshop-v1.0.0';
 const STATIC_CACHE = 'static-v1.0.0';
 const DYNAMIC_CACHE = 'dynamic-v1.0.0';
+const API_CACHE = 'api-v1.0.0';
 
 // Files to cache immediately
 const STATIC_FILES = [
   '/',
   '/index.html',
-  '/favicon.svg',
-  '/placeholder-image.svg',
   '/static/js/bundle.js',
-  '/static/css/main.css'
+  '/static/css/main.css',
+  '/favicon.ico',
+  '/manifest.json',
+  '/offline.html',
+  '/images/logo.png',
+  '/images/placeholder-image.svg'
 ];
 
 // API endpoints to cache
-const API_CACHE_PATTERNS = [
+const API_ENDPOINTS = [
   '/api/products',
   '/api/categories',
-  '/api/cart'
+  '/api/events'
 ];
 
 // Install event - cache static files
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing...');
+  
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then((cache) => {
@@ -41,12 +46,15 @@ self.addEventListener('install', (event) => {
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Activating...');
+  
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
-            if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+            if (cacheName !== STATIC_CACHE && 
+                cacheName !== DYNAMIC_CACHE && 
+                cacheName !== API_CACHE) {
               console.log('Service Worker: Deleting old cache', cacheName);
               return caches.delete(cacheName);
             }
@@ -60,7 +68,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - serve from cache or network
+// Fetch event - handle requests
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -70,24 +78,87 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Handle API requests
+  // Handle different types of requests
   if (url.pathname.startsWith('/api/')) {
+    // API requests - Network first with cache fallback
     event.respondWith(handleApiRequest(request));
-    return;
-  }
-
-  // Handle static file requests
-  if (url.origin === self.location.origin) {
+  } else if (url.pathname.startsWith('/images/') || url.pathname.startsWith('/static/')) {
+    // Static assets - Cache first with network fallback
     event.respondWith(handleStaticRequest(request));
-    return;
+  } else {
+    // HTML pages - Network first with cache fallback
+    event.respondWith(handlePageRequest(request));
   }
-
-  // Handle external requests (images, fonts, etc.)
-  event.respondWith(handleExternalRequest(request));
 });
 
-// Handle API requests with cache-first strategy
+// Handle API requests
 async function handleApiRequest(request) {
+  try {
+    // Try network first
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse.ok) {
+      // Cache successful responses
+      const cache = await caches.open(API_CACHE);
+      cache.put(request, networkResponse.clone());
+      return networkResponse;
+    }
+    
+    throw new Error('Network response not ok');
+  } catch (error) {
+    // Fallback to cache
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    // Return offline response for API requests
+    return new Response(
+      JSON.stringify({ 
+        error: 'You are offline. Please check your connection.',
+        offline: true 
+      }),
+      {
+        status: 503,
+        statusText: 'Service Unavailable',
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
+}
+
+// Handle static asset requests
+async function handleStaticRequest(request) {
+  const cachedResponse = await caches.match(request);
+  
+  if (cachedResponse) {
+    // Return cached version immediately
+    return cachedResponse;
+  }
+  
+  try {
+    // Try network
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse.ok) {
+      // Cache for future use
+      const cache = await caches.open(DYNAMIC_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    // Return placeholder for images
+    if (request.url.includes('/images/')) {
+      return caches.match('/images/placeholder-image.svg');
+    }
+    
+    throw error;
+  }
+}
+
+// Handle page requests
+async function handlePageRequest(request) {
   try {
     // Try network first
     const networkResponse = await fetch(request);
@@ -99,86 +170,16 @@ async function handleApiRequest(request) {
       return networkResponse;
     }
     
-    // If network fails, try cache
+    throw new Error('Network response not ok');
+  } catch (error) {
+    // Fallback to cache
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
       return cachedResponse;
     }
     
-    return networkResponse;
-  } catch (error) {
-    // Network failed, try cache
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    
-    // Return offline response
-    return new Response(
-      JSON.stringify({ 
-        error: 'Offline - No cached data available',
-        message: 'Please check your internet connection'
-      }),
-      {
-        status: 503,
-        statusText: 'Service Unavailable',
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
-  }
-}
-
-// Handle static file requests with cache-first strategy
-async function handleStaticRequest(request) {
-  const cachedResponse = await caches.match(request);
-  
-  if (cachedResponse) {
-    return cachedResponse;
-  }
-  
-  try {
-    const networkResponse = await fetch(request);
-    
-    if (networkResponse.ok) {
-      const cache = await caches.open(STATIC_CACHE);
-      cache.put(request, networkResponse.clone());
-    }
-    
-    return networkResponse;
-  } catch (error) {
-    // Return offline page for navigation requests
-    if (request.destination === 'document') {
-      return caches.match('/offline.html');
-    }
-    
-    throw error;
-  }
-}
-
-// Handle external requests with network-first strategy
-async function handleExternalRequest(request) {
-  try {
-    const networkResponse = await fetch(request);
-    
-    if (networkResponse.ok) {
-      // Cache images and fonts
-      if (request.destination === 'image' || request.destination === 'font') {
-        const cache = await caches.open(DYNAMIC_CACHE);
-        cache.put(request, networkResponse.clone());
-      }
-    }
-    
-    return networkResponse;
-  } catch (error) {
-    // Try cache for images and fonts
-    if (request.destination === 'image' || request.destination === 'font') {
-      const cachedResponse = await caches.match(request);
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-    }
-    
-    throw error;
+    // Return offline page
+    return caches.match('/offline.html');
   }
 }
 
@@ -191,28 +192,28 @@ self.addEventListener('sync', (event) => {
 
 async function doBackgroundSync() {
   try {
-    // Sync offline cart items
-    const offlineCart = await getOfflineCart();
-    if (offlineCart.length > 0) {
-      await syncOfflineCart(offlineCart);
-    }
+    // Get pending actions from IndexedDB
+    const pendingActions = await getPendingActions();
     
-    // Sync offline orders
-    const offlineOrders = await getOfflineOrders();
-    if (offlineOrders.length > 0) {
-      await syncOfflineOrders(offlineOrders);
+    for (const action of pendingActions) {
+      try {
+        await processPendingAction(action);
+        await removePendingAction(action.id);
+      } catch (error) {
+        console.error('Background sync failed for action:', action, error);
+      }
     }
   } catch (error) {
-    console.error('Background sync failed:', error);
+    console.error('Background sync error:', error);
   }
 }
 
-// Push notification handling
+// Push notifications
 self.addEventListener('push', (event) => {
   const options = {
-    body: event.data ? event.data.text() : 'New notification from MyShop',
-    icon: '/favicon.svg',
-    badge: '/favicon.svg',
+    body: event.data ? event.data.text() : 'New notification from MyShopping Center',
+    icon: '/images/logo.png',
+    badge: '/images/badge.png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -222,22 +223,22 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'View',
-        icon: '/favicon.svg'
+        icon: '/images/checkmark.png'
       },
       {
         action: 'close',
         title: 'Close',
-        icon: '/favicon.svg'
+        icon: '/images/xmark.png'
       }
     ]
   };
 
   event.waitUntil(
-    self.registration.showNotification('MyShop', options)
+    self.registration.showNotification('MyShopping Center', options)
   );
 });
 
-// Notification click handling
+// Notification click
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
@@ -248,34 +249,42 @@ self.addEventListener('notificationclick', (event) => {
   }
 });
 
-// Utility functions for offline data
-async function getOfflineCart() {
-  // Implementation for getting offline cart data
+// Helper functions for background sync
+async function getPendingActions() {
+  // This would typically use IndexedDB
+  // For now, return empty array
   return [];
 }
 
-async function syncOfflineCart(cartItems) {
-  // Implementation for syncing offline cart
-  console.log('Syncing offline cart items:', cartItems);
+async function processPendingAction(action) {
+  // Process pending action (e.g., sync cart, orders)
+  console.log('Processing pending action:', action);
 }
 
-async function getOfflineOrders() {
-  // Implementation for getting offline orders
-  return [];
+async function removePendingAction(actionId) {
+  // Remove processed action from storage
+  console.log('Removing action:', actionId);
 }
 
-async function syncOfflineOrders(orders) {
-  // Implementation for syncing offline orders
-  console.log('Syncing offline orders:', orders);
-}
-
-// Message handling for communication with main thread
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+// Cache size management
+async function cleanOldCaches() {
+  const cacheNames = await caches.keys();
   
-  if (event.data && event.data.type === 'GET_VERSION') {
-    event.ports[0].postMessage({ version: CACHE_NAME });
+  for (const cacheName of cacheNames) {
+    if (cacheName.startsWith('dynamic-') || cacheName.startsWith('api-')) {
+      const cache = await caches.open(cacheName);
+      const keys = await cache.keys();
+      
+      // Keep only the 50 most recent items
+      if (keys.length > 50) {
+        const keysToDelete = keys.slice(0, keys.length - 50);
+        await Promise.all(keysToDelete.map(key => cache.delete(key)));
+      }
+    }
   }
-});
+}
+
+// Periodic cache cleanup
+setInterval(cleanOldCaches, 24 * 60 * 60 * 1000); // Daily
+
+console.log('Service Worker: Loaded');

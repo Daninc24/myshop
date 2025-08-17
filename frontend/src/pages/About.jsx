@@ -6,7 +6,7 @@ export default function About() {
       <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-blue-900 dark:text-yellow-400">About Us</h1>
       <section className="max-w-2xl w-full mb-6">
         <h2 className="text-xl font-semibold mb-2 text-blue-800 dark:text-yellow-300">Who We Are</h2>
-        <p className="text-lg text-gray-700 dark:text-gray-200 mb-4">Welcome to MyShopping Center! We are passionate about delivering the best shopping experience with a diverse range of products, unbeatable deals, and top-notch customer service. Based in Nairobi, Kenya, we proudly serve customers nationwide.</p>
+        <p className="text-lg text-gray-700 dark:text-gray-200 mb-4">Welcome to LuxeCart! We are passionate about delivering the best shopping experience with a diverse range of products, unbeatable deals, and top-notch customer service. Based in Nairobi, Kenya, we proudly serve customers nationwide.</p>
       </section>
       <section className="max-w-2xl w-full mb-6">
         <h2 className="text-xl font-semibold mb-2 text-blue-800 dark:text-yellow-300">Our Mission</h2>

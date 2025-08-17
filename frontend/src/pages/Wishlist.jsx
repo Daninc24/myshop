@@ -103,7 +103,7 @@ const Wishlist = () => {
   return (
     <>
       <Helmet>
-        <title>My Wishlist - MyShop</title>
+        <title>My Wishlist - LuxeCart</title>
         <meta name="description" content="View and manage your saved products" />
       </Helmet>
 

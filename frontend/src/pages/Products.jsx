@@ -352,19 +352,19 @@ const Products = () => {
   return (
     <>
       <Helmet>
-        <title>Products - MyShopping Center</title>
-        <meta name="description" content="Browse all products at MyShopping Center. Find the best deals in electronics, fashion, home, and more!" />
-        <meta name="keywords" content="products, shopping, deals, electronics, fashion, home, online store" />
-        <meta property="og:title" content="Products - MyShopping Center" />
-        <meta property="og:description" content="Browse all products at MyShopping Center. Find the best deals in electronics, fashion, home, and more!" />
+        <title>Products - LuxeCart</title>
+        <meta name="description" content="Browse all products at LuxeCart. Find the best deals in electronics, fashion, home, and more!" />
+        <meta name="keywords" content="products, shopping, deals, electronics, fashion, home, online store, LuxeCart" />
+        <meta property="og:title" content="Products - LuxeCart" />
+        <meta property="og:description" content="Browse all products at LuxeCart. Find the best deals in electronics, fashion, home, and more!" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://myshoppingcenter.com/products" />
-        <meta property="og:image" content="https://myshoppingcenter.com/logo.png" />
+        <meta property="og:url" content="https://luxecart.com/products" />
+        <meta property="og:image" content="https://luxecart.com/logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Products - MyShopping Center" />
-        <meta name="twitter:description" content="Browse all products at MyShopping Center. Find the best deals in electronics, fashion, home, and more!" />
-        <meta name="twitter:image" content="https://myshoppingcenter.com/logo.png" />
-        <link rel="canonical" href="https://myshoppingcenter.com/products" />
+        <meta name="twitter:title" content="Products - LuxeCart" />
+        <meta name="twitter:description" content="Browse all products at LuxeCart. Find the best deals in electronics, fashion, home, and more!" />
+        <meta name="twitter:image" content="https://luxecart.com/logo.png" />
+        <link rel="canonical" href="https://luxecart.com/products" />
         <script type="application/ld+json">{`
           {
             "@context": "https://schema.org",
@@ -374,13 +374,13 @@ const Products = () => {
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Home",
-                "item": "https://myshoppingcenter.com/"
+                "item": "https://luxecart.com/"
               },
               {
                 "@type": "ListItem",
                 "position": 2,
                 "name": "Products",
-                "item": "https://myshoppingcenter.com/products"
+                "item": "https://luxecart.com/products"
               }
             ]
           }

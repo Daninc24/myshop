@@ -140,18 +140,18 @@ const Cart = () => {
   return (
     <>
       <Helmet>
-        <title>Cart - MyShopping Center</title>
-        <meta name="description" content="View and manage your shopping cart at MyShopping Center. Ready for checkout!" />
-        <meta property="og:title" content="Cart - MyShopping Center" />
-        <meta property="og:description" content="View and manage your shopping cart at MyShopping Center. Ready for checkout!" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://myshoppingcenter.com/cart" />
-        <meta property="og:image" content="https://myshoppingcenter.com/logo.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Cart - MyShopping Center" />
-        <meta name="twitter:description" content="View and manage your shopping cart at MyShopping Center. Ready for checkout!" />
-        <meta name="twitter:image" content="https://myshoppingcenter.com/logo.png" />
-        <link rel="canonical" href="https://myshoppingcenter.com/cart" />
+        <title>Cart - LuxeCart</title>
+<meta name="description" content="View and manage your shopping cart at LuxeCart. Ready for checkout!" />
+<meta property="og:title" content="Cart - LuxeCart" />
+<meta property="og:description" content="View and manage your shopping cart at LuxeCart. Ready for checkout!" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://luxecart.com/cart" />
+<meta property="og:image" content="https://luxecart.com/logo.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Cart - LuxeCart" />
+<meta name="twitter:description" content="View and manage your shopping cart at LuxeCart. Ready for checkout!" />
+<meta name="twitter:image" content="https://luxecart.com/logo.png" />
+<link rel="canonical" href="https://luxecart.com/cart" />
       </Helmet>
       {/* Modernize cart container and summary */}
       <div className="max-w-4xl mx-auto py-10 animate-fade-in">

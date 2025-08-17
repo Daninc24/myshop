@@ -303,7 +303,12 @@ const allowedOrigins = [
   'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
   'https://myshop-git-main-daniel-mailus-projects.vercel.app',
   'https://myshop-hhfv.vercel.app',
-  'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app'
+  'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app',
+  // Production URLs - Add your actual production domains here
+  'https://luxecart.com',
+  'https://www.luxecart.com',
+  'https://your-frontend-domain.com',
+  'https://your-production-domain.com'
 ];
 
 const corsOptions = {
