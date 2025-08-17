@@ -118,7 +118,7 @@ const AdvancedAnalytics = () => {
   // Send analytics data to server
   const sendAnalyticsData = async (type, data) => {
     try {
-      await fetch('/api/analytics/track', {
+              await fetch('/analytics/track', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

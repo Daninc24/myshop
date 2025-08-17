@@ -94,7 +94,7 @@ const PushNotificationManager = () => {
   const sendSubscriptionToServer = async (subscription) => {
     try {
       // Send subscription to your backend
-      await fetch('/api/push/subscribe', {
+              await fetch('/push/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const PushNotificationManager = () => {
   const removeSubscriptionFromServer = async (subscription) => {
     try {
       // Remove subscription from your backend
-      await fetch('/api/push/unsubscribe', {
+              await fetch('/push/unsubscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ const PushNotificationManager = () => {
   const sendTestNotification = async () => {
     try {
       // Send test notification from your server
-      await fetch('/api/push/test', {
+              await fetch('/push/test', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

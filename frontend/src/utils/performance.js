@@ -370,7 +370,7 @@ class PerformanceMonitor {
 
     // Send to custom analytics endpoint
     if (process.env.NODE_ENV === 'production') {
-      fetch('/api/analytics/performance', {
+      fetch('/analytics/performance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)

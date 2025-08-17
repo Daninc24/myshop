@@ -67,7 +67,7 @@ const AIRecommendations = ({ currentProduct, userBehavior, maxItems = 4 }) => {
         setLoading(true);
         
         // Fetch all products (in a real app, this would be an API call)
-        const response = await fetch('/api/products');
+        const response = await fetch('/products');
         const products = await response.json();
 
         // Get user behavior data
