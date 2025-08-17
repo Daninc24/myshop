@@ -78,11 +78,11 @@ const AdvertisementBanner = ({
       case 'banner':
         return `${baseStyles} w-full`;
       case 'sidebar':
-        return `${baseStyles} w-64 h-96`;
+        return `${baseStyles} w-64 h-64`;
       case 'inline':
         return `${baseStyles} w-full max-w-4xl mx-auto`;
       case 'popup':
-        return `${baseStyles} fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-96 h-64`;
+        return `${baseStyles} fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-96 h-48`;
       default:
         return baseStyles;
     }

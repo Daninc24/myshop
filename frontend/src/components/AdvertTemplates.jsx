@@ -50,7 +50,7 @@ export const advertTemplates = [
     category: 'hero',
     description: 'Large hero banner with gradient overlay',
     render: ({ title, message, image, product, productId }) => (
-      <div className="relative h-64 rounded-2xl overflow-hidden group cursor-pointer">
+      <div className="relative h-40 rounded-2xl overflow-hidden group cursor-pointer">
         <img 
           loading="lazy" 
           decoding="async" 
@@ -86,7 +86,7 @@ export const advertTemplates = [
     description: 'Clean card design with hover effects',
     render: ({ title, message, image, product, productId }) => (
       <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden group cursor-pointer">
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-32 overflow-hidden">
           <img 
             loading="lazy" 
             decoding="async" 
@@ -120,7 +120,7 @@ export const advertTemplates = [
     category: 'banner',
     description: 'Colorful gradient background with modern typography',
     render: ({ title, message, image, product, productId }) => (
-      <div className="relative h-48 rounded-2xl overflow-hidden group cursor-pointer">
+      <div className="relative h-36 rounded-2xl overflow-hidden group cursor-pointer">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
         <img 
@@ -232,7 +232,7 @@ export const advertTemplates = [
           )}
           <CtaButton to={productId ? `/products/${productId}` : undefined} variant="primary" />
         </div>
-        <div className="relative h-64 md:h-auto">
+        <div className="relative h-40 md:h-auto">
           <img 
             loading="lazy" 
             decoding="async" 
@@ -252,7 +252,7 @@ export const advertTemplates = [
     category: 'overlay',
     description: 'Image with text overlay and gradient',
     render: ({ title, message, image, product, productId }) => (
-      <div className="relative h-56 rounded-2xl overflow-hidden group cursor-pointer">
+      <div className="relative h-40 rounded-2xl overflow-hidden group cursor-pointer">
         <img 
           loading="lazy" 
           decoding="async" 
