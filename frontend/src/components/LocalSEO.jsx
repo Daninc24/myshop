@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  MapPinIcon, 
-  PhoneIcon, 
-  EnvelopeIcon, 
+import {
+  MapPinIcon,
+  PhoneIcon,
+  EnvelopeIcon,
   ClockIcon,
   StarIcon,
   UserGroupIcon,
   CheckCircleIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  ChatBubbleLeftIcon,
+  HeartIcon
 } from '@heroicons/react/24/outline';
 
 const LocalSEO = () => {
   const [businessInfo, setBusinessInfo] = useState({
     name: 'LuxeCart Kenya',
-    address: 'Nairobi, Kenya',
+    address: 'Westlands, Nairobi, Kenya',
     phone: '+254 791 991 154',
     email: 'info@luxecart.com',
     website: 'https://luxecart.com',
@@ -29,42 +31,73 @@ const LocalSEO = () => {
     },
     rating: 4.8,
     reviewCount: 127,
-    categories: ['E-commerce', 'Online Shopping', 'Premium Products'],
-    description: 'Your premium shopping destination in Kenya. We offer the best quality products with fast delivery and secure payments.',
+    categories: ['E-commerce', 'Online Shopping', 'Premium Products', 'Electronics', 'Fashion'],
+    description: 'Your premium shopping destination in Kenya. We offer the best quality products with fast delivery and secure payments. Shop with confidence for electronics, fashion, home decor, and more.',
     coordinates: {
       lat: -1.2921,
       lng: 36.8219
-    }
+    },
+    socialMedia: {
+      facebook: 'https://facebook.com/luxecart',
+      instagram: 'https://instagram.com/luxecart',
+      twitter: 'https://twitter.com/luxecart',
+      linkedin: 'https://linkedin.com/company/luxecart'
+    },
+    services: [
+      'Online Shopping',
+      'Fast Delivery',
+      'Secure Payments',
+      'Customer Support',
+      'Returns & Exchanges',
+      'Gift Cards'
+    ]
   });
 
   const [reviews, setReviews] = useState([
     {
       id: 1,
       author: 'Sarah M.',
+      authorAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face',
       rating: 5,
       date: '2024-12-10',
-      comment: 'Excellent service! Fast delivery and quality products. Highly recommended!',
-      verified: true
+      comment: 'Excellent service! Fast delivery and quality products. The customer support team was very helpful when I had questions about my order. Highly recommended!',
+      verified: true,
+      helpful: 12
     },
     {
       id: 2,
       author: 'John K.',
+      authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face',
       rating: 5,
       date: '2024-12-08',
-      comment: 'Great shopping experience. The products are exactly as described.',
-      verified: true
+      comment: 'Great shopping experience. The products are exactly as described and the delivery was on time. Will definitely shop here again!',
+      verified: true,
+      helpful: 8
     },
     {
       id: 3,
       author: 'Mary W.',
+      authorAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face',
       rating: 4,
       date: '2024-12-05',
-      comment: 'Good prices and fast shipping. Will definitely shop here again.',
-      verified: true
+      comment: 'Good prices and fast shipping. The website is easy to navigate and the checkout process was smooth. Very satisfied with my purchase.',
+      verified: true,
+      helpful: 5
+    },
+    {
+      id: 4,
+      author: 'David O.',
+      authorAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+      rating: 5,
+      date: '2024-12-03',
+      comment: 'Amazing customer service! They helped me find exactly what I was looking for and the product quality exceeded my expectations.',
+      verified: true,
+      helpful: 15
     }
   ]);
 
   const [showMap, setShowMap] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   // Generate structured data for local business
   const generateLocalBusinessSchema = () => {
@@ -133,7 +166,8 @@ const LocalSEO = () => {
       "priceRange": "$$",
       "paymentAccepted": ["Cash", "Credit Card", "Mobile Money", "Bank Transfer"],
       "currenciesAccepted": "KES",
-      "areaServed": "Kenya"
+      "areaServed": "Kenya",
+      "sameAs": Object.values(businessInfo.socialMedia)
     };
   };
 
@@ -145,7 +179,9 @@ const LocalSEO = () => {
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
     };
   }, []);
 
@@ -168,6 +204,40 @@ const LocalSEO = () => {
     });
   };
 
+  const handleImageError = (e) => {
+    e.target.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face';
+  };
+
+  const handleContactAction = (action) => {
+    switch (action) {
+      case 'call':
+        window.open(`tel:${businessInfo.phone}`, '_self');
+        break;
+      case 'email':
+        window.open(`mailto:${businessInfo.email}`, '_self');
+        break;
+      case 'website':
+        window.open(businessInfo.website, '_blank');
+        break;
+      case 'chat':
+        // Implement live chat functionality
+        console.log('Opening live chat...');
+        break;
+      default:
+        break;
+    }
+  };
+
+  const loadMap = () => {
+    if (!mapLoaded) {
+      setMapLoaded(true);
+      // In a real implementation, you would load Google Maps or another mapping service
+      setTimeout(() => setShowMap(true), 500);
+    } else {
+      setShowMap(!showMap);
+    }
+  };
+
   return (
     <section className="max-w-7xl mx-auto mb-16 px-4">
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -182,7 +252,7 @@ const LocalSEO = () => {
               <p className="text-orange-100">Your Premium Shopping Destination</p>
             </div>
           </div>
-          
+
           {/* Rating */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -197,7 +267,7 @@ const LocalSEO = () => {
           {/* Business Information */}
           <div className="lg:col-span-2">
             <h3 className="text-2xl font-bold text-gray-900 mb-6">Business Information</h3>
-            
+
             <div className="space-y-6">
               {/* Contact Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -208,7 +278,7 @@ const LocalSEO = () => {
                     <p className="text-gray-600">{businessInfo.address}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <PhoneIcon className="w-6 h-6 text-orange-500 mt-1" />
                   <div>
@@ -218,7 +288,7 @@ const LocalSEO = () => {
                     </a>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <EnvelopeIcon className="w-6 h-6 text-orange-500 mt-1" />
                   <div>
@@ -228,7 +298,7 @@ const LocalSEO = () => {
                     </a>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <GlobeAltIcon className="w-6 h-6 text-orange-500 mt-1" />
                   <div>
@@ -251,6 +321,19 @@ const LocalSEO = () => {
                     <div key={day} className="flex justify-between py-2 border-b border-gray-100">
                       <span className="font-medium text-gray-700 capitalize">{day}</span>
                       <span className="text-gray-600">{hours}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Services */}
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3">Our Services</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {businessInfo.services.map((service, index) => (
+                    <div key={index} className="flex items-center gap-2 text-sm">
+                      <CheckCircleIcon className="w-4 h-4 text-green-500" />
+                      <span className="text-gray-600">{service}</span>
                     </div>
                   ))}
                 </div>
@@ -289,7 +372,7 @@ const LocalSEO = () => {
                 <UserGroupIcon className="w-5 h-5 text-orange-500" />
                 Customer Reviews
               </h3>
-              
+
               <div className="space-y-4">
                 {reviews.map((review) => (
                   <motion.div
@@ -300,6 +383,12 @@ const LocalSEO = () => {
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
+                        <img
+                          src={review.authorAvatar}
+                          alt={review.author}
+                          className="w-8 h-8 rounded-full"
+                          onError={handleImageError}
+                        />
                         <span className="font-semibold text-gray-900">{review.author}</span>
                         {review.verified && (
                           <CheckCircleIcon className="w-4 h-4 text-green-500" />
@@ -307,16 +396,26 @@ const LocalSEO = () => {
                       </div>
                       <span className="text-sm text-gray-500">{formatDate(review.date)}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-1 mb-2">
                       {renderStars(review.rating)}
                     </div>
-                    
-                    <p className="text-gray-600 text-sm">{review.comment}</p>
+
+                    <p className="text-gray-600 text-sm mb-2">{review.comment}</p>
+
+                    <div className="flex items-center justify-between">
+                      <button className="flex items-center gap-1 text-xs text-gray-500 hover:text-orange-500 transition-colors">
+                        <HeartIcon className="w-3 h-3" />
+                        Helpful ({review.helpful})
+                      </button>
+                      <button className="text-xs text-gray-500 hover:text-orange-500 transition-colors">
+                        Reply
+                      </button>
+                    </div>
                   </motion.div>
                 ))}
               </div>
-              
+
               <button className="w-full mt-4 bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors">
                 Write a Review
               </button>
@@ -325,19 +424,27 @@ const LocalSEO = () => {
             {/* Map */}
             <div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Location</h3>
-              
+
               <div className="bg-gray-100 rounded-lg p-4 h-48 flex items-center justify-center">
                 {showMap ? (
-                  <div className="text-center">
-                    <p className="text-gray-600 mb-2">Interactive Map</p>
-                    <p className="text-sm text-gray-500">
-                      Latitude: {businessInfo.coordinates.lat}<br />
-                      Longitude: {businessInfo.coordinates.lng}
-                    </p>
+                  <div className="text-center w-full">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <p className="text-gray-600 mb-2">📍 {businessInfo.address}</p>
+                      <p className="text-sm text-gray-500 mb-3">
+                        Latitude: {businessInfo.coordinates.lat}<br />
+                        Longitude: {businessInfo.coordinates.lng}
+                      </p>
+                      <button
+                        onClick={() => window.open(`https://maps.google.com/?q=${businessInfo.coordinates.lat},${businessInfo.coordinates.lng}`, '_blank')}
+                        className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                      >
+                        Open in Google Maps
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <button
-                    onClick={() => setShowMap(true)}
+                    onClick={loadMap}
                     className="bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors"
                   >
                     Show Map
@@ -348,17 +455,34 @@ const LocalSEO = () => {
 
             {/* Quick Actions */}
             <div className="space-y-3">
-              <button className="w-full bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2">
+              <button
+                onClick={() => handleContactAction('call')}
+                className="w-full bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+              >
                 <PhoneIcon className="w-4 h-4" />
                 Call Now
               </button>
-              
-              <button className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+
+              <button
+                onClick={() => handleContactAction('email')}
+                className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+              >
                 <EnvelopeIcon className="w-4 h-4" />
                 Send Message
               </button>
-              
-              <button className="w-full bg-purple-500 text-white py-3 px-4 rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center gap-2">
+
+              <button
+                onClick={() => handleContactAction('chat')}
+                className="w-full bg-purple-500 text-white py-3 px-4 rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center gap-2"
+              >
+                <ChatBubbleLeftIcon className="w-4 h-4" />
+                Live Chat
+              </button>
+
+              <button
+                onClick={() => handleContactAction('website')}
+                className="w-full bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
+              >
                 <GlobeAltIcon className="w-4 h-4" />
                 Visit Website
               </button>
