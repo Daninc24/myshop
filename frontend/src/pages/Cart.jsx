@@ -22,37 +22,86 @@ const Cart = () => {
   const [cartProducts, setCartProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch product details for cart items
+  // Fetch product details for cart items with improved error handling
   useEffect(() => {
     const fetchCartProducts = async () => {
-      if (cart.length === 0) {
+      if (!cart || cart.length === 0) {
         setCartProducts([]);
         setLoading(false);
         return;
       }
 
       try {
-        const productIds = cart.map(item => item.productId || item._id);
-        const response = await axios.get('/products');
-        const products = response.data.filter(product => 
-          productIds.includes(product._id)
-        );
+        setLoading(true);
+        
+        // Get unique product IDs from cart
+        const productIds = cart
+          .map(item => item.productId || item._id)
+          .filter((id, index, arr) => arr.indexOf(id) === index); // Remove duplicates
 
+        if (productIds.length === 0) {
+          setCartProducts([]);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch products with retry logic
+        let products = [];
+        try {
+          const response = await axios.get('/products');
+          products = Array.isArray(response.data) ? response.data : (response.data.products || []);
+        } catch (fetchError) {
+          console.error('Error fetching products:', fetchError);
+          // Fallback: create basic product objects from cart data
+          products = cart.map(item => ({
+            _id: item.productId || item._id,
+            title: item.title || 'Product',
+            price: item.price || 0,
+            images: item.images || ['/placeholder-image.jpg'],
+            category: item.category || 'Unknown'
+          }));
+        }
+
+        // Map cart items with product details
         const cartWithProducts = cart.map(cartItem => {
-          const product = products.find(p => p._id === (cartItem.productId || cartItem._id));
-          return {
-            ...cartItem,
-            ...product,
-            price: product?.price || 0,
-            title: product?.title || 'Unknown Product',
-            image: product?.images?.[0] || product?.image || '/placeholder-image.jpg',
-            category: product?.category || 'Unknown Category'
-          };
+          const productId = cartItem.productId || cartItem._id;
+          const product = products.find(p => p._id === productId);
+          
+          if (product) {
+            return {
+              ...cartItem,
+              ...product,
+              price: product.price || 0,
+              title: product.title || 'Unknown Product',
+              image: product.images?.[0] || product.image || '/placeholder-image.jpg',
+              category: product.category || 'Unknown Category'
+            };
+          } else {
+            // Fallback for missing products
+            return {
+              ...cartItem,
+              price: cartItem.price || 0,
+              title: cartItem.title || 'Product Not Available',
+              image: cartItem.image || '/placeholder-image.jpg',
+              category: cartItem.category || 'Unknown Category'
+            };
+          }
         });
 
         setCartProducts(cartWithProducts);
       } catch (err) {
-        error('Error loading cart items');
+        console.error('Error processing cart items:', err);
+        error('Error loading cart items. Please try refreshing the page.');
+        
+        // Fallback: use cart data as is
+        const fallbackCart = cart.map(item => ({
+          ...item,
+          price: item.price || 0,
+          title: item.title || 'Product',
+          image: item.image || '/placeholder-image.jpg',
+          category: item.category || 'Unknown'
+        }));
+        setCartProducts(fallbackCart);
       } finally {
         setLoading(false);
       }
@@ -99,37 +148,36 @@ const Cart = () => {
       navigate('/login');
       return;
     }
+    
+    if (cartProducts.length === 0) {
+      error('Your cart is empty');
+      return;
+    }
+    
     navigate('/checkout');
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (cartProducts.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-md w-full text-center">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
-              <ShoppingBagIcon className="h-8 w-8 text-gray-400" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
-            <p className="text-gray-600 mb-6">
-              Looks like you haven't added any items to your cart yet.
-            </p>
-            <div className="space-y-3">
-              <Link
-                to="/products"
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-md font-medium hover:bg-blue-700 transition-colors inline-flex items-center justify-center"
-              >
-                <ArrowLeftIcon className="h-5 w-5 mr-2" />
-                Continue Shopping
-              </Link>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <Helmet>
+          <title>Loading Cart - LuxeCart</title>
+        </Helmet>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white p-4 rounded-lg shadow">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-20 h-20 bg-gray-200 rounded"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -138,79 +186,165 @@ const Cart = () => {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-50 py-8">
       <Helmet>
         <title>Cart - LuxeCart</title>
-<meta name="description" content="View and manage your shopping cart at LuxeCart. Ready for checkout!" />
-<meta property="og:title" content="Cart - LuxeCart" />
-<meta property="og:description" content="View and manage your shopping cart at LuxeCart. Ready for checkout!" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://luxecart.com/cart" />
-<meta property="og:image" content="https://luxecart.com/logo.png" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Cart - LuxeCart" />
-<meta name="twitter:description" content="View and manage your shopping cart at LuxeCart. Ready for checkout!" />
-<meta name="twitter:image" content="https://luxecart.com/logo.png" />
-<link rel="canonical" href="https://luxecart.com/cart" />
+        <meta name="description" content="Review your shopping cart items and proceed to checkout." />
       </Helmet>
-      {/* Modernize cart container and summary */}
-      <div className="max-w-4xl mx-auto py-10 animate-fade-in">
-        <h1 className="text-3xl font-heading font-bold text-secondary mb-8">Your Cart</h1>
-        {cart.length === 0 ? (
-          <div className="card text-center py-16">
-            <p className="text-gray-500 text-lg mb-4">Your cart is empty.</p>
-            <Link to="/products" className="btn-primary">Browse Products</Link>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-4">
+            <Link 
+              to="/products" 
+              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeftIcon className="w-5 h-5 mr-2" />
+              Continue Shopping
+            </Link>
+            <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
+          </div>
+          
+          {cartProducts.length > 0 && (
+            <button
+              onClick={handleClearCart}
+              className="text-red-600 hover:text-red-700 font-medium"
+            >
+              Clear Cart
+            </button>
+          )}
+        </div>
+
+        {cartProducts.length === 0 ? (
+          <div className="text-center py-12">
+            <ShoppingBagIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your cart is empty</h2>
+            <p className="text-gray-600 mb-6">Looks like you haven't added any items to your cart yet.</p>
+            <Link
+              to="/products"
+              className="inline-flex items-center px-6 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"
+            >
+              Start Shopping
+            </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Cart Items */}
-            <div className="md:col-span-2">
-              <div className="space-y-6">
-                {cart.map(item => (
-                  <div key={item.product} className="card flex items-center gap-6 animate-slide-in">
-                    <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded-2xl shadow-soft" />
-                    <div className="flex-1">
-                      <h2 className="text-xl font-heading font-bold text-secondary mb-1">{item.name}</h2>
-                      <div className="flex justify-between items-center">
-                        <span>{item.title} x {item.quantity}</span>
-                        <span>{convertPrice(item.price * item.quantity)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-2">
-                        <button onClick={() => updateQuantity(item.product, item.quantity - 1)} className="btn-secondary px-3 py-1">-</button>
-                        <span className="font-medium text-secondary">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.product, item.quantity + 1)} className="btn-secondary px-3 py-1">+</button>
-                        <button onClick={() => removeFromCart(item.product)} className="btn-danger px-3 py-1 ml-4">Remove</button>
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow-sm">
+                <div className="p-6 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Cart Items ({cartProducts.length})
+                  </h2>
+                </div>
+                
+                <div className="divide-y divide-gray-200">
+                  {cartProducts.map((item) => (
+                    <div key={item.productId || item._id} className="p-6">
+                      <div className="flex items-center space-x-4">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-20 h-20 object-cover rounded-lg"
+                          onError={(e) => {
+                            e.target.src = '/placeholder-image.jpg';
+                          }}
+                        />
+                        
+                        <div className="flex-1">
+                          <h3 className="text-lg font-medium text-gray-900">{item.title}</h3>
+                          <p className="text-sm text-gray-500">{item.category}</p>
+                          <p className="text-lg font-semibold text-orange-600 mt-1">
+                            {getCurrencySymbol(currency)}{convertPrice ? convertPrice(item.price) : item.price}
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleQuantityChange(item.productId || item._id, (item.quantity || 1) - 1)}
+                            className="p-1 rounded-full hover:bg-gray-100"
+                          >
+                            <MinusIcon className="w-4 h-4" />
+                          </button>
+                          
+                          <span className="w-12 text-center font-medium">{item.quantity || 1}</span>
+                          
+                          <button
+                            onClick={() => handleQuantityChange(item.productId || item._id, (item.quantity || 1) + 1)}
+                            className="p-1 rounded-full hover:bg-gray-100"
+                          >
+                            <PlusIcon className="w-4 h-4" />
+                          </button>
+                        </div>
+                        
+                        <button
+                          onClick={() => handleRemoveItem(item.productId || item._id)}
+                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full"
+                        >
+                          <TrashIcon className="w-5 h-5" />
+                        </button>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-            {/* Cart Summary */}
-            <div className="card flex flex-col gap-6">
-              <h2 className="text-2xl font-heading font-bold text-secondary mb-2">Order Summary</h2>
-              <div className="flex justify-between text-lg font-medium mt-4">
-                <span>Subtotal:</span>
-                <span>{convertPrice(subtotal)}</span>
+
+            {/* Order Summary */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-medium">{getCurrencySymbol(currency)}{convertPrice ? convertPrice(subtotal) : subtotal.toFixed(2)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Shipping</span>
+                    <span className="font-medium">
+                      {shipping === 0 ? 'Free' : `${getCurrencySymbol(currency)}${convertPrice ? convertPrice(shipping) : shipping.toFixed(2)}`}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tax</span>
+                    <span className="font-medium">{getCurrencySymbol(currency)}{convertPrice ? convertPrice(tax) : tax.toFixed(2)}</span>
+                  </div>
+                  
+                  <div className="border-t border-gray-200 pt-3">
+                    <div className="flex justify-between">
+                      <span className="text-lg font-semibold">Total</span>
+                      <span className="text-lg font-semibold text-orange-600">
+                        {getCurrencySymbol(currency)}{convertPrice ? convertPrice(total) : total.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={handleCheckout}
+                  className="w-full mt-6 bg-orange-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-orange-700 transition-colors flex items-center justify-center"
+                >
+                  <CreditCardIcon className="w-5 h-5 mr-2" />
+                  Proceed to Checkout
+                </button>
+                
+                {!user && (
+                  <p className="text-sm text-gray-500 mt-3 text-center">
+                    <Link to="/login" className="text-orange-600 hover:text-orange-700">
+                      Sign in
+                    </Link> to save your cart and get personalized recommendations
+                  </p>
+                )}
               </div>
-              <div className="flex justify-between text-lg font-medium mt-1">
-                <span>Shipping:</span>
-                <span>{convertPrice(shipping)}</span>
-              </div>
-              <div className="flex justify-between text-lg font-medium mt-1">
-                <span>Tax (8%):</span>
-                <span>{convertPrice(tax)}</span>
-              </div>
-              <div className="flex justify-between text-lg font-bold mt-4">
-                <span>Total:</span>
-                <span>{convertPrice(total)}</span>
-              </div>
-              <button className="btn-primary w-full mt-4" onClick={handleCheckout}>Proceed to Checkout</button>
             </div>
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

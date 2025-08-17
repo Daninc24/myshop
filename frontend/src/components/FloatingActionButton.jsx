@@ -10,14 +10,15 @@ import {
 } from '@heroicons/react/24/outline';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const FloatingActionButton = ({ onSearchClick, onCategoriesClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { cart } = useCart();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const cartItemCount = cart.reduce((total, item) => total + (item.quantity || 1), 0);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -25,10 +26,33 @@ const FloatingActionButton = ({ onSearchClick, onCategoriesClick }) => {
 
   const handleAction = (action) => {
     setIsOpen(false);
-    if (action === 'search' && onSearchClick) {
-      onSearchClick();
-    } else if (action === 'categories' && onCategoriesClick) {
-      onCategoriesClick();
+    
+    switch (action) {
+      case 'search':
+        if (onSearchClick) {
+          onSearchClick();
+        } else {
+          navigate('/products');
+        }
+        break;
+      case 'categories':
+        if (onCategoriesClick) {
+          onCategoriesClick();
+        } else {
+          navigate('/products');
+        }
+        break;
+      case 'wishlist':
+        navigate('/wishlist');
+        break;
+      case 'profile':
+        navigate(user ? '/profile' : '/login');
+        break;
+      case 'cart':
+        navigate('/cart');
+        break;
+      default:
+        break;
     }
   };
 
@@ -48,7 +72,8 @@ const FloatingActionButton = ({ onSearchClick, onCategoriesClick }) => {
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
               onClick={() => handleAction('search')}
-              className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-colors"
+              className="flex items-center justify-center w-14 h-14 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-colors touch-manipulation"
+              style={{ minHeight: '56px', minWidth: '56px' }}
             >
               <MagnifyingGlassIcon className="w-6 h-6" />
             </motion.button>
@@ -59,7 +84,8 @@ const FloatingActionButton = ({ onSearchClick, onCategoriesClick }) => {
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
               onClick={() => handleAction('categories')}
-              className="flex items-center justify-center w-12 h-12 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition-colors"
+              className="flex items-center justify-center w-14 h-14 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition-colors touch-manipulation"
+              style={{ minHeight: '56px', minWidth: '56px' }}
             >
               <PlusIcon className="w-6 h-6" />
             </motion.button>
@@ -69,9 +95,9 @@ const FloatingActionButton = ({ onSearchClick, onCategoriesClick }) => {
               initial={{ x: 20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              as={Link}
-              to="/wishlist"
-              className="flex items-center justify-center w-12 h-12 bg-pink-500 text-white rounded-full shadow-lg hover:bg-pink-600 transition-colors"
+              onClick={() => handleAction('wishlist')}
+              className="flex items-center justify-center w-14 h-14 bg-pink-500 text-white rounded-full shadow-lg hover:bg-pink-600 transition-colors touch-manipulation"
+              style={{ minHeight: '56px', minWidth: '56px' }}
             >
               <HeartIcon className="w-6 h-6" />
             </motion.button>
@@ -81,9 +107,9 @@ const FloatingActionButton = ({ onSearchClick, onCategoriesClick }) => {
               initial={{ x: 20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
-              as={Link}
-              to={user ? "/profile" : "/login"}
-              className="flex items-center justify-center w-12 h-12 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 transition-colors"
+              onClick={() => handleAction('profile')}
+              className="flex items-center justify-center w-14 h-14 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 transition-colors touch-manipulation"
+              style={{ minHeight: '56px', minWidth: '56px' }}
             >
               <UserIcon className="w-6 h-6" />
             </motion.button>
@@ -95,8 +121,9 @@ const FloatingActionButton = ({ onSearchClick, onCategoriesClick }) => {
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        onClick={toggleMenu}
-        className="relative flex items-center justify-center w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
+        onClick={isOpen ? toggleMenu : () => handleAction('cart')}
+        className="relative flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 touch-manipulation"
+        style={{ minHeight: '64px', minWidth: '64px' }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -107,7 +134,7 @@ const FloatingActionButton = ({ onSearchClick, onCategoriesClick }) => {
               exit={{ rotate: 90, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <XMarkIcon className="w-7 h-7" />
+              <XMarkIcon className="w-8 h-8" />
             </motion.div>
           ) : (
             <motion.div
@@ -118,12 +145,13 @@ const FloatingActionButton = ({ onSearchClick, onCategoriesClick }) => {
               transition={{ duration: 0.2 }}
               className="relative"
             >
-              <ShoppingCartIcon className="w-7 h-7" />
+              <ShoppingCartIcon className="w-8 h-8" />
               {cartItemCount > 0 && (
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+                  className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold"
+                  style={{ minHeight: '24px', minWidth: '24px' }}
                 >
                   {cartItemCount > 99 ? '99+' : cartItemCount}
                 </motion.div>
@@ -132,6 +160,18 @@ const FloatingActionButton = ({ onSearchClick, onCategoriesClick }) => {
           )}
         </AnimatePresence>
       </motion.button>
+
+      {/* Backdrop for closing menu */}
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={toggleMenu}
+          className="fixed inset-0 bg-black bg-opacity-25 z-40"
+          style={{ pointerEvents: 'auto' }}
+        />
+      )}
     </div>
   );
 };
