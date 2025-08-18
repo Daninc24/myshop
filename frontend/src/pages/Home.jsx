@@ -61,6 +61,9 @@ const Home = () => {
   const { user } = useAuth();
   const { error: showError } = useToast();
   
+  // Add error state
+  const [hasError, setHasError] = useState(false);
+  
   // State management - Initialize with empty arrays to prevent undefined errors
   const [products, setProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
@@ -228,9 +231,10 @@ const Home = () => {
   const fetchAssurances = useCallback(async () => {
     try {
       const response = await axios.get('/site/assurances');
-      setAssurances(response.data.assurances || []);
+      setAssurances(response.data?.assurances || []);
     } catch (error) {
       console.error('Error fetching assurances:', error);
+      setAssurances([]); // Ensure we always have an array
     }
   }, []);
 
@@ -281,10 +285,11 @@ const Home = () => {
       const fetchSuggestions = async () => {
         try {
           const response = await axios.get(`/products/search/suggestions?q=${encodeURIComponent(search)}`);
-          setSearchSuggestions(response.data.suggestions || []);
+          setSearchSuggestions(response.data?.suggestions || []);
           setShowSuggestions(true);
         } catch (error) {
           console.error('Error fetching search suggestions:', error);
+          setSearchSuggestions([]);
         }
       };
       fetchSuggestions();
@@ -293,6 +298,22 @@ const Home = () => {
       setShowSuggestions(false);
     }
   }, [search]);
+
+  // Global error handler
+  useEffect(() => {
+    const handleError = (error) => {
+      console.error('Global error caught:', error);
+      setHasError(true);
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleError);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleError);
+    };
+  }, []);
 
   // SEO structured data
   const structuredData = useMemo(() => ({
@@ -322,12 +343,32 @@ const Home = () => {
     );
   }
 
+  // Error fallback
+  if (hasError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">😔</div>
+          <h2 className="text-2xl font-bold text-text-primary mb-2">Something went wrong</h2>
+          <p className="text-text-secondary mb-4">We're having trouble loading the page. Please try refreshing.</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Safety check for all arrays to prevent undefined errors
-  const safeProducts = products || [];
-  const safeNewArrivals = newArrivals || [];
-  const safeBestSelling = bestSelling || [];
-  const safeCategoriesList = categoriesList || [];
-  const safeTrendingProducts = trendingProducts || [];
+  const safeProducts = Array.isArray(products) ? products : [];
+  const safeNewArrivals = Array.isArray(newArrivals) ? newArrivals : [];
+  const safeBestSelling = Array.isArray(bestSelling) ? bestSelling : [];
+  const safeCategoriesList = Array.isArray(categoriesList) ? categoriesList : [];
+  const safeTrendingProducts = Array.isArray(trendingProducts) ? trendingProducts : [];
+  const safeAssurances = Array.isArray(assurances) ? assurances : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
