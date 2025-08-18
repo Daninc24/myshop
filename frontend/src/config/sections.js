@@ -179,9 +179,9 @@ export const SECTIONS_CONFIG = {
     enabled: true,
     title: 'Shop by Category',
     subtitle: 'Browse our wide range of categories',
-    maxDisplay: 6,
+    maxDisplay: 4, // Reduced from 6 for better mobile experience
     showViewAll: true,
-    viewAllLink: '/categories'
+    viewAllLink: '/products' // Fixed link to go to products page
   },
 
   // Featured Products Section (Main product showcase)

@@ -384,43 +384,43 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="max-w-7xl mx-auto mb-16 px-4">
-        <div className="bg-gradient-to-br from-secondary/5 to-accent/5 rounded-3xl p-4 md:p-8 border border-secondary/20">
-          <div className="flex flex-col sm:flex-row sm:items-center mb-6 gap-4 sm:gap-0">
-            <div className="flex items-center gap-3">
-              <GlobeAltIcon className="h-6 w-6 text-secondary" />
-              <h2 className="text-xl md:text-2xl font-bold text-text-primary">{getSectionTitle('categories')}</h2>
+      {/* Categories Section - Compact Mobile Design */}
+      <section className="max-w-7xl mx-auto mb-8 md:mb-16 px-4">
+        <div className="bg-gradient-to-br from-secondary/5 to-accent/5 rounded-2xl md:rounded-3xl p-3 md:p-6 lg:p-8 border border-secondary/20">
+          <div className="flex flex-col sm:flex-row sm:items-center mb-4 md:mb-6 gap-2 md:gap-4 sm:gap-0">
+            <div className="flex items-center gap-2 md:gap-3">
+              <GlobeAltIcon className="h-5 w-5 md:h-6 md:w-6 text-secondary" />
+              <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-text-primary">{getSectionTitle('categories')}</h2>
             </div>
             {shouldShowViewAll('categories') && (
-              <Link to={getViewAllLink('categories')} className="sm:ml-auto text-secondary hover:text-secondary-dark font-semibold text-sm md:text-base">
+              <Link to={getViewAllLink('categories')} className="sm:ml-auto text-secondary hover:text-secondary-dark font-semibold text-xs md:text-sm lg:text-base">
                 View all
               </Link>
             )}
           </div>
           {loadingCategories ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4">
-              {[...Array(6)].map((_, i) => (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4">
+              {[...Array(4)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="bg-surface-hover rounded-lg h-16 md:h-24 mb-2"></div>
-                  <div className="bg-surface-hover rounded h-3 md:h-4"></div>
+                  <div className="bg-surface-hover rounded-lg h-12 md:h-16 lg:h-20 mb-1 md:mb-2"></div>
+                  <div className="bg-surface-hover rounded h-2 md:h-3 lg:h-4"></div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4">
               {categoriesList.slice(0, getSectionMaxDisplay('categories')).map((category, index) => (
                 <Link
                   key={category.id || category._id || index}
-                  to={`/products?category=${encodeURIComponent(category.name)}`}
-                  className="group bg-surface/80 backdrop-blur-sm rounded-2xl p-3 md:p-4 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                  to={`/products?category=${encodeURIComponent(category.id || category.name)}`}
+                  className="group bg-surface/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-2 md:p-3 lg:p-4 text-center hover:shadow-lg md:hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 md:hover:-translate-y-2"
                 >
-                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform">
-                    <span className="text-white font-bold text-sm md:text-lg">
+                  <div className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-1 md:mb-2 lg:mb-3 group-hover:scale-110 transition-transform">
+                    <span className="text-white font-bold text-xs md:text-sm lg:text-lg">
                       {(category.name || 'C')[0].toUpperCase()}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-text-primary group-hover:text-primary transition-colors text-xs md:text-sm">
+                  <h3 className="font-semibold text-text-primary group-hover:text-primary transition-colors text-xs md:text-sm lg:text-base leading-tight">
                     {category.name}
                   </h3>
                 </Link>
