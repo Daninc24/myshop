@@ -1,4 +1,4 @@
-// Image utility functions for LuxeCart
+// Image utility functions for MyShop
 
 // Default placeholder images by category
 const CATEGORY_PLACEHOLDERS = {

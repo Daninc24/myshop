@@ -1,4 +1,4 @@
-// Comprehensive SEO Configuration for LuxeCart
+// Comprehensive SEO Configuration for MyShop
 import { getBrandName, getBrandDescription, getBrandWebsite } from './branding';
 
 // Base SEO configuration
@@ -7,13 +7,13 @@ export const SEO_CONFIG = {
   default: {
     title: `${getBrandName()} - Your Premium Shopping Destination`,
     description: getBrandDescription(),
-    keywords: 'luxury shopping, premium products, exclusive deals, fast delivery, secure payments, online store, ecommerce, luxecart',
+    keywords: 'online shopping, premium products, exclusive deals, fast delivery, secure payments, online store, ecommerce, myshop',
     image: `${getBrandWebsite()}/logo.png`,
     url: getBrandWebsite(),
     type: 'website',
     locale: 'en_US',
     siteName: getBrandName(),
-    twitterHandle: '@luxecart',
+    twitterHandle: '@myshop',
     author: getBrandName(),
     robots: 'index, follow',
     themeColor: '#ff6600',

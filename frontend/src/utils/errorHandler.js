@@ -1,4 +1,4 @@
-// Comprehensive Error Handler for LuxeCart
+// Comprehensive Error Handler for MyShop
 // This utility handles expected errors silently and provides better error management
 
 // Expected error patterns that should be silenced

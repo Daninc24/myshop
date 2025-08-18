@@ -101,7 +101,109 @@ const Home = () => {
     { number: '99%', label: 'Satisfaction Rate', icon: StarIcon, enabled: true }
   ], []);
 
-  // Event handlers
+  // Safe data getters with fallbacks
+  const safeProducts = useMemo(() => products.slice(0, 8), [products]);
+  const safeNewArrivals = useMemo(() => newArrivals.slice(0, 4), [newArrivals]);
+  const safeBestSelling = useMemo(() => bestSelling.slice(0, 4), [bestSelling]);
+  const safeCategoriesList = useMemo(() => categoriesList.slice(0, 8), [categoriesList]);
+
+  // Fetch products
+  const fetchProducts = useCallback(async () => {
+    try {
+      setLoadingProducts(true);
+      const response = await axios.get('/api/products?limit=20&featured=true');
+      setProducts(response.data.products || response.data || []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      showError('Failed to load products');
+    } finally {
+      setLoadingProducts(false);
+    }
+  }, [showError]);
+
+  // Fetch new arrivals
+  const fetchNewArrivals = useCallback(async () => {
+    try {
+      setLoadingNewArrivals(true);
+      const response = await axios.get('/api/products?sort=newest&limit=8');
+      setNewArrivals(response.data.products || response.data || []);
+    } catch (error) {
+      console.error('Error fetching new arrivals:', error);
+    } finally {
+      setLoadingNewArrivals(false);
+    }
+  }, []);
+
+  // Fetch best selling
+  const fetchBestSelling = useCallback(async () => {
+    try {
+      setLoadingBestSelling(true);
+      const response = await axios.get('/api/products/best-selling?limit=8');
+      setBestSelling(response.data.products || response.data || []);
+    } catch (error) {
+      console.error('Error fetching best selling:', error);
+    } finally {
+      setLoadingBestSelling(false);
+    }
+  }, []);
+
+  // Fetch categories
+  const fetchCategories = useCallback(async () => {
+    try {
+      setLoadingCategories(true);
+      const response = await axios.get('/api/categories');
+      setCategoriesList(response.data.categories || response.data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    } finally {
+      setLoadingCategories(false);
+    }
+  }, []);
+
+  // Search functionality
+  const handleSearch = useCallback((searchTerm) => {
+    if (searchTerm.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+      setSearch('');
+      setShowSuggestions(false);
+    }
+  }, [navigate]);
+
+  const handleSearchSubmit = useCallback((e) => {
+    e.preventDefault();
+    handleSearch(search);
+  }, [handleSearch, search]);
+
+  // Search suggestions
+  const fetchSearchSuggestions = useCallback(async (query) => {
+    if (query.length < 2) {
+      setSearchSuggestions([]);
+      return;
+    }
+
+    try {
+      const response = await axios.get(`/api/products/search-suggestions?q=${encodeURIComponent(query)}`);
+      setSearchSuggestions(response.data.suggestions || []);
+    } catch (error) {
+      console.error('Error fetching search suggestions:', error);
+      setSearchSuggestions([]);
+    }
+  }, []);
+
+  // Debounced search suggestions
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (search) {
+        fetchSearchSuggestions(search);
+      } else {
+        setSearchSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [search, fetchSearchSuggestions]);
+
+  // Navigation handlers
   const handleShopNow = useCallback(() => {
     navigate('/products');
   }, [navigate]);
@@ -110,195 +212,60 @@ const Home = () => {
     navigate('/products?sort=discount');
   }, [navigate]);
 
-  const handleSearch = useCallback((searchTerm) => {
-    setSearch(searchTerm);
-    if (searchTerm.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchTerm)}`);
-    }
-  }, [navigate]);
-
-  // Data fetching functions
-  const fetchProducts = useCallback(async () => {
-    try {
-      setLoadingProducts(true);
-      const response = await axios.get('/products?limit=8');
-      setProducts(response.data?.products || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setProducts([]);
-    } finally {
-      setLoadingProducts(false);
-    }
-  }, []);
-
-  const fetchNewArrivals = useCallback(async () => {
-    try {
-      setLoadingNewArrivals(true);
-      const response = await axios.get('/products?sort=newest&limit=4');
-      setNewArrivals(response.data?.products || []);
-    } catch (error) {
-      console.error('Error fetching new arrivals:', error);
-      setNewArrivals([]);
-    } finally {
-      setLoadingNewArrivals(false);
-    }
-  }, []);
-
-  const fetchBestSelling = useCallback(async () => {
-    try {
-      setLoadingBestSelling(true);
-      const response = await axios.get('/products/best-selling?limit=4');
-      setBestSelling(response.data?.products || []);
-    } catch (error) {
-      console.error('Error fetching best selling:', error);
-      setBestSelling([]);
-    } finally {
-      setLoadingBestSelling(false);
-    }
-  }, []);
-
-  const fetchCategories = useCallback(async () => {
-    try {
-      setLoadingCategories(true);
-      const response = await axios.get('/categories');
-      setCategoriesList(response.data?.categories || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      setCategoriesList([]);
-    } finally {
-      setLoadingCategories(false);
-    }
-  }, []);
-
-  const fetchTrendingProducts = useCallback(async () => {
-    try {
-      const response = await axios.get('/products?sort=trending&limit=6');
-      setTrendingProducts(response.data?.products || []);
-    } catch (error) {
-      console.error('Error fetching trending products:', error);
-      setTrendingProducts([]);
-    }
-  }, []);
-
-  // Initialize data
+  // Load data on mount
   useEffect(() => {
-    const initializeData = async () => {
+    const loadData = async () => {
       setLoading(true);
-      
-      try {
-        await Promise.allSettled([
-          fetchProducts(),
-          fetchCategories()
-        ]);
-        
-        setLoading(false);
-        
-        // Fetch secondary data in background
-        setTimeout(() => {
-          Promise.allSettled([
-            fetchNewArrivals(),
-            fetchBestSelling(),
-            fetchTrendingProducts()
-          ]);
-        }, 100);
-      } catch (error) {
-        console.error('Error initializing data:', error);
-        setLoading(false);
-      }
+      await Promise.allSettled([
+        fetchProducts(),
+        fetchNewArrivals(),
+        fetchBestSelling(),
+        fetchCategories()
+      ]);
+      setLoading(false);
     };
 
-    initializeData();
-  }, [fetchProducts, fetchCategories, fetchNewArrivals, fetchBestSelling, fetchTrendingProducts]);
+    loadData();
+  }, [fetchProducts, fetchNewArrivals, fetchBestSelling, fetchCategories]);
 
-  // Search suggestions
-  useEffect(() => {
-    if (search.trim()) {
-      const fetchSuggestions = async () => {
-        try {
-          const response = await axios.get(`/products/search/suggestions?q=${encodeURIComponent(search)}`);
-          setSearchSuggestions(response.data?.suggestions || []);
-          setShowSuggestions(true);
-        } catch (error) {
-          console.error('Error fetching search suggestions:', error);
-          setSearchSuggestions([]);
-        }
-      };
-      fetchSuggestions();
-    } else {
-      setSearchSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, [search]);
-
-  // SEO structured data
-  const structuredData = useMemo(() => ({
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": getBrandName(),
-    "description": getSEODescription(),
-    "url": getSEOUrl('/'),
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": getSEOUrl('/products?search={search_term_string}')
-      },
-      "query-input": "required name=search_term_string"
-    }
-  }), []);
-
+  // Loading state
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
-        <div className="text-center">
-          <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-600">Loading amazing products...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
-  // Safety check for all arrays
-  const safeProducts = Array.isArray(products) ? products : [];
-  const safeNewArrivals = Array.isArray(newArrivals) ? newArrivals : [];
-  const safeBestSelling = Array.isArray(bestSelling) ? bestSelling : [];
-  const safeCategoriesList = Array.isArray(categoriesList) ? categoriesList : [];
-  const safeTrendingProducts = Array.isArray(trendingProducts) ? trendingProducts : [];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      {/* SEO */}
+    <div className="min-h-screen">
       <Helmet>
-        <title>{getSEOTitle('Home')}</title>
-        <meta name="description" content={getSEODescription()} />
-        <meta name="keywords" content={getSEOKeywords()} />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content={getBrandName()} />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        
-        {/* Open Graph */}
-        <meta property="og:title" content={getSEOTitle('Home')} />
-        <meta property="og:description" content={getSEODescription()} />
+        <title>{getSEOTitle('home')}</title>
+        <meta name="description" content={getSEODescription('home')} />
+        <meta name="keywords" content={getSEOKeywords('home')} />
+        <meta property="og:title" content={getSEOTitle('home')} />
+        <meta property="og:description" content={getSEODescription('home')} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={getSEOUrl('/')} />
-        <meta property="og:image" content={getSEOImage()} />
-        <meta property="og:site_name" content={getBrandName()} />
-        <meta property="og:locale" content="en_US" />
-        
-        {/* Twitter Card */}
+        <meta property="og:url" content={getSEOUrl('home')} />
+        <meta property="og:image" content={getSEOImage('home')} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={getSEOTitle('Home')} />
-        <meta name="twitter:description" content={getSEODescription()} />
-        <meta name="twitter:image" content={getSEOImage()} />
-        
-        {/* Additional SEO */}
-        <link rel="canonical" href={getSEOUrl('/')} />
-        <meta name="theme-color" content="#ff6600" />
-        
-        {/* Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </script>
+        <meta name="twitter:title" content={getSEOTitle('home')} />
+        <meta name="twitter:description" content={getSEODescription('home')} />
+        <meta name="twitter:image" content={getSEOImage('home')} />
+        <link rel="canonical" href={getSEOUrl('home')} />
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "${getBrandName()}",
+            "description": "${getSEODescription('home')}",
+            "url": "${getSEOUrl('home')}",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "${getSEOUrl('products')}?search={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          }
+        `}</script>
       </Helmet>
 
       {/* Hero Section */}
@@ -314,21 +281,23 @@ const Home = () => {
             
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto mb-8">
-              <div className="relative">
+              <form onSubmit={handleSearchSubmit} className="relative">
                 <input
                   type="text"
                   placeholder="Search for products..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
+                  onFocus={() => setShowSuggestions(true)}
+                  ref={searchInputRef}
                   className="w-full px-6 py-4 text-gray-900 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-white"
                 />
                 <button
-                  onClick={() => handleSearch(search)}
+                  type="submit"
                   className="absolute right-2 top-2 bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 transition-colors"
                 >
                   <MagnifyingGlassIcon className="w-6 h-6" />
                 </button>
-              </div>
+              </form>
               
               {/* Search Suggestions */}
               {showSuggestions && searchSuggestions.length > 0 && (

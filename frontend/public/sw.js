@@ -274,7 +274,7 @@ async function doBackgroundSync() {
 // Push notifications
 self.addEventListener('push', (event) => {
   const options = {
-    body: event.data ? event.data.text() : 'New notification from LuxeCart',
+    body: event.data ? event.data.text() : 'New notification from MyShop',
     icon: '/favicon.ico',
     badge: '/favicon.ico',
     vibrate: [100, 50, 100],
@@ -297,7 +297,7 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification('LuxeCart', options)
+    self.registration.showNotification('MyShop', options)
   );
 });
 

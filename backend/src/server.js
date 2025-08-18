@@ -61,7 +61,6 @@ const wishlistRoutes = require('./routes/wishlist');
 const { credentialCache, loadCredentials } = require('./utils/credentialCache');
 const { createIndexes } = require('./utils/databaseIndexes');
 const compressionMiddleware = require('./middleware/compression');
-const { addSampleCategories } = require('./utils/sampleCategories');
 
 const app = express();
 const server = http.createServer(app);
@@ -306,8 +305,8 @@ const allowedOrigins = [
   'https://myshop-hhfv.vercel.app',
   'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app',
   // Production URLs - Add your actual production domains here
-  'https://luxecart.com',
-  'https://www.luxecart.com',
+        'https://myshop.com',
+      'https://www.myshop.com',
   'https://your-frontend-domain.com',
   'https://your-production-domain.com'
 ];
@@ -529,13 +528,6 @@ passport.deserializeUser(async (id, done) => {
       console.log('✅ Database indexes created successfully');
     }).catch(error => {
       console.error('❌ Error creating database indexes:', error);
-    });
-     
-     // Add sample categories (non-blocking)
-    addSampleCategories().then(() => {
-      console.log('✅ Sample categories process completed!');
-    }).catch(error => {
-      console.error('❌ Error adding sample categories:', error);
     });
 
     // Only initialize Google OAuth if credentials are available
