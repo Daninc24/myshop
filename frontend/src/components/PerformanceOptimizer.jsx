@@ -89,18 +89,17 @@ const PerformanceOptimizer = () => {
 
     // Preload critical resources
     const preloadCriticalResources = () => {
+      // Only preload resources that actually exist
       const criticalResources = [
-        '/fonts/inter-var.woff2',
-        '/logo.png',
-        '/hero-image.jpg'
+        // Only preload essential resources that we know exist
+        '/favicon.ico'
       ];
 
       criticalResources.forEach(resource => {
         const link = document.createElement('link');
         link.rel = 'preload';
-        link.as = resource.includes('.woff2') ? 'font' : 'image';
+        link.as = resource.includes('.ico') ? 'image' : 'image';
         link.href = resource;
-        link.crossOrigin = resource.includes('.woff2') ? 'anonymous' : '';
         document.head.appendChild(link);
       });
     };

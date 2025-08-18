@@ -88,13 +88,18 @@ class AdvertisementService {
         });
       }
       
-      // You can also send to your backend
-      await axios.post('/analytics/ad-impression', {
-        adId,
-        position,
-        type,
-        timestamp: new Date().toISOString()
-      });
+      // Only send to backend if analytics endpoint exists
+      try {
+        await axios.post('/analytics/ad-impression', {
+          adId,
+          position,
+          type,
+          timestamp: new Date().toISOString()
+        });
+      } catch (analyticsError) {
+        // Silently fail if analytics endpoint doesn't exist
+        console.debug('Analytics endpoint not available:', analyticsError.message);
+      }
     } catch (error) {
       console.error('Error tracking ad impression:', error);
     }

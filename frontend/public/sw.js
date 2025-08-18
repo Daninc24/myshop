@@ -1,19 +1,15 @@
-const CACHE_NAME = 'myshop-v1.0.0';
-const STATIC_CACHE = 'static-v1.0.0';
-const DYNAMIC_CACHE = 'dynamic-v1.0.0';
-const API_CACHE = 'api-v1.0.0';
+const CACHE_NAME = 'myshop-v1.0.1';
+const STATIC_CACHE = 'static-v1.0.1';
+const DYNAMIC_CACHE = 'dynamic-v1.0.1';
+const API_CACHE = 'api-v1.0.1';
 
-// Files to cache immediately
+// Files to cache immediately - only essential files
 const STATIC_FILES = [
   '/',
   '/index.html',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
-  '/favicon.ico',
-  '/manifest.json',
   '/offline.html',
-  '/images/logo.png',
-  '/images/placeholder-image.svg'
+  '/favicon.ico',
+  '/manifest.json'
 ];
 
 // API endpoints to cache
@@ -31,14 +27,24 @@ self.addEventListener('install', (event) => {
     caches.open(STATIC_CACHE)
       .then((cache) => {
         console.log('Service Worker: Caching static files');
-        return cache.addAll(STATIC_FILES);
+        // Cache files individually to handle failures gracefully
+        return Promise.allSettled(
+          STATIC_FILES.map(url => 
+            cache.add(url).catch(error => {
+              console.warn(`Failed to cache ${url}:`, error);
+              return null;
+            })
+          )
+        );
       })
       .then(() => {
         console.log('Service Worker: Static files cached');
         return self.skipWaiting();
       })
       .catch((error) => {
-        console.error('Service Worker: Error caching static files', error);
+        console.error('Service Worker: Error during installation', error);
+        // Continue installation even if caching fails
+        return self.skipWaiting();
       })
   );
 });
@@ -65,6 +71,10 @@ self.addEventListener('activate', (event) => {
         console.log('Service Worker: Activated');
         return self.clients.claim();
       })
+      .catch((error) => {
+        console.error('Service Worker: Error during activation', error);
+        return self.clients.claim();
+      })
   );
 });
 
@@ -78,12 +88,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip external resources that might cause issues
+  if (url.hostname !== location.hostname && 
+      !url.hostname.includes('cloudinary.com') &&
+      !url.hostname.includes('googleapis.com')) {
+    return;
+  }
+
   // Handle different types of requests
   if (url.pathname.startsWith('/api/')) {
     // API requests - Network first with cache fallback
     event.respondWith(handleApiRequest(request));
-  } else if (url.pathname.startsWith('/images/') || url.pathname.startsWith('/static/')) {
-    // Static assets - Cache first with network fallback
+  } else if (url.pathname.startsWith('/images/') || 
+             url.pathname.startsWith('/static/') ||
+             url.hostname.includes('cloudinary.com')) {
+    // Static assets and images - Cache first with network fallback
     event.respondWith(handleStaticRequest(request));
   } else {
     // HTML pages - Network first with cache fallback
@@ -99,24 +118,35 @@ async function handleApiRequest(request) {
     
     if (networkResponse.ok) {
       // Cache successful responses
-      const cache = await caches.open(API_CACHE);
-      cache.put(request, networkResponse.clone());
+      try {
+        const cache = await caches.open(API_CACHE);
+        cache.put(request, networkResponse.clone());
+      } catch (cacheError) {
+        console.warn('Failed to cache API response:', cacheError);
+      }
       return networkResponse;
     }
     
-    throw new Error('Network response not ok');
+    throw new Error(`Network response not ok: ${networkResponse.status}`);
   } catch (error) {
+    console.log('API request failed, trying cache:', error.message);
+    
     // Fallback to cache
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
+    try {
+      const cachedResponse = await caches.match(request);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+    } catch (cacheError) {
+      console.warn('Cache lookup failed:', cacheError);
     }
     
     // Return offline response for API requests
     return new Response(
       JSON.stringify({ 
         error: 'You are offline. Please check your connection.',
-        offline: true 
+        offline: true,
+        message: 'Service temporarily unavailable'
       }),
       {
         status: 503,
@@ -129,11 +159,16 @@ async function handleApiRequest(request) {
 
 // Handle static asset requests
 async function handleStaticRequest(request) {
-  const cachedResponse = await caches.match(request);
-  
-  if (cachedResponse) {
-    // Return cached version immediately
-    return cachedResponse;
+  try {
+    // Try cache first
+    const cachedResponse = await caches.match(request);
+    
+    if (cachedResponse) {
+      // Return cached version immediately
+      return cachedResponse;
+    }
+  } catch (cacheError) {
+    console.warn('Cache lookup failed:', cacheError);
   }
   
   try {
@@ -142,15 +177,26 @@ async function handleStaticRequest(request) {
     
     if (networkResponse.ok) {
       // Cache for future use
-      const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      try {
+        const cache = await caches.open(DYNAMIC_CACHE);
+        cache.put(request, networkResponse.clone());
+      } catch (cacheError) {
+        console.warn('Failed to cache static asset:', cacheError);
+      }
     }
     
     return networkResponse;
   } catch (error) {
+    console.log('Static asset request failed:', error.message);
+    
     // Return placeholder for images
-    if (request.url.includes('/images/')) {
-      return caches.match('/images/placeholder-image.svg');
+    if (request.url.includes('/images/') || request.url.includes('cloudinary.com')) {
+      try {
+        return await caches.match('/images/placeholder-image.svg') || 
+               new Response('', { status: 404 });
+      } catch (placeholderError) {
+        return new Response('', { status: 404 });
+      }
     }
     
     throw error;
@@ -165,21 +211,36 @@ async function handlePageRequest(request) {
     
     if (networkResponse.ok) {
       // Cache successful responses
-      const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      try {
+        const cache = await caches.open(DYNAMIC_CACHE);
+        cache.put(request, networkResponse.clone());
+      } catch (cacheError) {
+        console.warn('Failed to cache page:', cacheError);
+      }
       return networkResponse;
     }
     
-    throw new Error('Network response not ok');
+    throw new Error(`Network response not ok: ${networkResponse.status}`);
   } catch (error) {
+    console.log('Page request failed, trying cache:', error.message);
+    
     // Fallback to cache
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
+    try {
+      const cachedResponse = await caches.match(request);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+    } catch (cacheError) {
+      console.warn('Cache lookup failed:', cacheError);
     }
     
     // Return offline page
-    return caches.match('/offline.html');
+    try {
+      return await caches.match('/offline.html') || 
+             new Response('Offline - Please check your connection', { status: 503 });
+    } catch (offlineError) {
+      return new Response('Offline - Please check your connection', { status: 503 });
+    }
   }
 }
 
@@ -211,9 +272,9 @@ async function doBackgroundSync() {
 // Push notifications
 self.addEventListener('push', (event) => {
   const options = {
-    body: event.data ? event.data.text() : 'New notification from MyShopping Center',
-    icon: '/images/logo.png',
-    badge: '/images/badge.png',
+    body: event.data ? event.data.text() : 'New notification from LuxeCart',
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -223,18 +284,18 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'View',
-        icon: '/images/checkmark.png'
+        icon: '/favicon.ico'
       },
       {
         action: 'close',
         title: 'Close',
-        icon: '/images/xmark.png'
+        icon: '/favicon.ico'
       }
     ]
   };
 
   event.waitUntil(
-    self.registration.showNotification('MyShopping Center', options)
+    self.registration.showNotification('LuxeCart', options)
   );
 });
 
@@ -268,19 +329,25 @@ async function removePendingAction(actionId) {
 
 // Cache size management
 async function cleanOldCaches() {
-  const cacheNames = await caches.keys();
-  
-  for (const cacheName of cacheNames) {
-    if (cacheName.startsWith('dynamic-') || cacheName.startsWith('api-')) {
-      const cache = await caches.open(cacheName);
-      const keys = await cache.keys();
-      
-      // Keep only the 50 most recent items
-      if (keys.length > 50) {
-        const keysToDelete = keys.slice(0, keys.length - 50);
-        await Promise.all(keysToDelete.map(key => cache.delete(key)));
+  try {
+    const cacheNames = await caches.keys();
+    
+    for (const cacheName of cacheNames) {
+      if (cacheName.startsWith('dynamic-') || cacheName.startsWith('api-')) {
+        const cache = await caches.open(cacheName);
+        const keys = await cache.keys();
+        
+        // Keep only the 50 most recent items
+        if (keys.length > 50) {
+          const keysToDelete = keys.slice(0, keys.length - 50);
+          await Promise.allSettled(
+            keysToDelete.map(key => cache.delete(key))
+          );
+        }
       }
     }
+  } catch (error) {
+    console.warn('Cache cleanup failed:', error);
   }
 }
 
