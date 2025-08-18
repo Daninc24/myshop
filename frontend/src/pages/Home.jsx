@@ -128,19 +128,19 @@ const Home = () => {
   // Hero content
   const heroContent = useMemo(() => ({
     title: getBrandName(),
-    subtitle: getSectionConfig('hero').subtitle || `Discover ${safeProducts.length > 0 ? safeProducts.length : 'thousands of'} premium products with confidence. Shop the latest trends and enjoy lightning-fast delivery!`,
+    subtitle: getSectionConfig('hero').subtitle || `Discover ${products.length > 0 ? products.length : 'thousands of'} premium products with confidence. Shop the latest trends and enjoy lightning-fast delivery!`,
     highlights: [
       "🎯 Premium Quality Products",
       "⚡ Same Day Delivery",
       "🛡️ 100% Secure Shopping",
-      `💎 ${safeProducts.length > 0 ? safeProducts.length : '15,000'}+ Premium Products`,
+      `💎 ${products.length > 0 ? products.length : '15,000'}+ Premium Products`,
       "🌟 World-Class Service"
     ],
     cta: {
       primary: "Shop Now",
       secondary: "View Deals"
     }
-  }), [safeProducts.length]);
+  }), [products.length]);
 
   // Event handlers
   const handleShopNow = useCallback(() => {

@@ -45,12 +45,9 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
     } catch (error) {
       setUser(null);
-      // Silent handling for 401 errors - this is expected for non-authenticated users
-      if (error.response && error.response.status === 401) {
-        // Don't log 401 errors - they're expected for public pages
-        return;
-      } else if (error.response && error.response.status === 503) {
-        // Don't log 503 errors - server might be temporarily unavailable
+      // Silent handling for expected errors
+      if (error.response && (error.response.status === 401 || error.response.status === 503)) {
+        // Don't log 401 or 503 errors - they're expected
         return;
       } else {
         // Only log unexpected errors
