@@ -14,6 +14,13 @@ import {
 } from '../config/sections';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import PremiumFeatures from '../components/PremiumFeatures';
+import PremiumHero from '../components/PremiumHero';
+import AdvertisementSection from '../components/AdvertisementSection';
+import AIRecommendationEngine from '../components/AIRecommendationEngine';
+import WishlistWithPriceAlerts from '../components/WishlistWithPriceAlerts';
+import SocialMediaSharing from '../components/SocialMediaSharing';
+import ReferralSystem from '../components/ReferralSystem';
 
 // Icons
 import {
@@ -44,6 +51,7 @@ const Home = () => {
   const [bestSelling, setBestSelling] = useState([]);
   const [categoriesList, setCategoriesList] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
+  const [heroContent, setHeroContent] = useState(null);
 
   // Loading states
   const [loading, setLoading] = useState(true);
@@ -160,6 +168,16 @@ const Home = () => {
     }
   }, []);
 
+  // Fetch trending products
+  const fetchTrendingProducts = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/products/trending?limit=6');
+      setTrendingProducts(response.data.products || response.data || []);
+    } catch (error) {
+      console.error('Error fetching trending products:', error);
+    }
+  }, []);
+
   // Search functionality
   const handleSearch = useCallback((searchTerm) => {
     if (searchTerm.trim()) {
@@ -220,13 +238,14 @@ const Home = () => {
         fetchProducts(),
         fetchNewArrivals(),
         fetchBestSelling(),
-        fetchCategories()
+        fetchCategories(),
+        fetchTrendingProducts()
       ]);
       setLoading(false);
     };
 
     loadData();
-  }, [fetchProducts, fetchNewArrivals, fetchBestSelling, fetchCategories]);
+  }, [fetchProducts, fetchNewArrivals, fetchBestSelling, fetchCategories, fetchTrendingProducts]);
 
   // Loading state
   if (loading) {
@@ -268,89 +287,28 @@ const Home = () => {
         `}</script>
       </Helmet>
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-orange-500 to-red-500 text-white py-20 lg:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Welcome to {getBrandName()}
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-              Discover premium products with confidence. Shop the latest trends and enjoy fast delivery!
-            </p>
-            
-            {/* Search Bar */}
-            <div className="max-w-2xl mx-auto mb-8">
-              <form onSubmit={handleSearchSubmit} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search for products..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onFocus={() => setShowSuggestions(true)}
-                  ref={searchInputRef}
-                  className="w-full px-6 py-4 text-gray-900 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-white"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-2 bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 transition-colors"
-                >
-                  <MagnifyingGlassIcon className="w-6 h-6" />
-                </button>
-              </form>
-              
-              {/* Search Suggestions */}
-              {showSuggestions && searchSuggestions.length > 0 && (
-                <div className="absolute z-10 w-full bg-white rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto">
-                  {searchSuggestions.map((suggestion, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleSearch(suggestion)}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-100 text-gray-900 border-b border-gray-200 last:border-b-0"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+      {/* Premium Hero Section */}
+      <PremiumHero
+        heroContent={heroContent}
+        trendingProducts={trendingProducts}
+        onShopNow={handleShopNow}
+        onViewDeals={handleViewDeals}
+      />
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={handleShopNow}
-                className="bg-white text-orange-500 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
-              >
-                Shop Now
-                <ArrowRightIcon className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleViewDeals}
-                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-orange-500 transition-colors"
-              >
-                View Deals
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Advertisement Section - Top */}
+      <AdvertisementSection 
+        sectionName="hero-bottom"
+        className="my-8"
+      />
 
-      {/* Features Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="text-center">
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${feature.gradient} text-white mb-4`}>
-                  <feature.icon className="w-8 h-8" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Premium Features Section */}
+      <PremiumFeatures />
+
+      {/* Advertisement Section - Features */}
+      <AdvertisementSection 
+        sectionName="features-bottom"
+        className="my-8"
+      />
 
       {/* Categories Section */}
       {safeCategoriesList.length > 0 && (
@@ -394,6 +352,12 @@ const Home = () => {
         </section>
       )}
 
+      {/* Advertisement Section - Categories */}
+      <AdvertisementSection 
+        sectionName="categories-bottom"
+        className="my-8"
+      />
+
       {/* Featured Products */}
       {safeProducts.length > 0 && (
         <section className="py-16 bg-white">
@@ -422,9 +386,23 @@ const Home = () => {
         </section>
       )}
 
+      {/* AI Recommendation Engine */}
+      {user && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <AIRecommendationEngine
+              userId={user._id}
+              limit={8}
+              title="Recommended for You"
+              subtitle="AI-powered suggestions based on your preferences"
+            />
+          </div>
+        </section>
+      )}
+
       {/* New Arrivals */}
       {safeNewArrivals.length > 0 && (
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">New Arrivals</h2>
@@ -440,9 +418,15 @@ const Home = () => {
         </section>
       )}
 
+      {/* Advertisement Section - New Arrivals */}
+      <AdvertisementSection 
+        sectionName="new-arrivals-bottom"
+        className="my-8"
+      />
+
       {/* Best Selling */}
       {safeBestSelling.length > 0 && (
-        <section className="py-16 bg-white">
+        <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Best Selling</h2>
@@ -454,6 +438,24 @@ const Home = () => {
                 <ProductCard key={product._id} product={product} />
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Wishlist with Price Alerts (for authenticated users) */}
+      {user && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <WishlistWithPriceAlerts />
+          </div>
+        </section>
+      )}
+
+      {/* Referral System */}
+      {user && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <ReferralSystem userId={user._id} />
           </div>
         </section>
       )}
@@ -471,6 +473,18 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Advertisement Section - Bottom */}
+      <AdvertisementSection 
+        sectionName="bottom"
+        className="my-8"
+      />
+
+      {/* Social Media Sharing */}
+      <SocialMediaSharing 
+        showFloating={true}
+        position="bottom-right"
+      />
     </div>
   );
 };
