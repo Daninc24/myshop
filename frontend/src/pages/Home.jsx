@@ -409,7 +409,7 @@ const Home = () => {
             </div>
           ) : (
             <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4">
-              {categoriesList.slice(0, getSectionMaxDisplay('categories')).map((category, index) => (
+              {(categoriesList || []).slice(0, getSectionMaxDisplay('categories')).map((category, index) => (
                 <Link
                   key={category.id || category._id || index}
                   to={`/products?category=${encodeURIComponent(category.id || category.name)}`}
@@ -464,7 +464,7 @@ const Home = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {products.slice(0, 3).map(product => (
+                {(products || []).slice(0, 3).map(product => (
                   <ProductCard key={product._id} product={product} compact={true} />
                 ))}
               </div>
@@ -496,7 +496,7 @@ const Home = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {newArrivals.slice(0, 3).map(product => (
+                {(newArrivals || []).slice(0, 3).map(product => (
                   <ProductCard key={product._id} product={product} compact={true} />
                 ))}
               </div>
@@ -528,7 +528,7 @@ const Home = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {bestSelling.slice(0, 3).map(product => (
+                {(bestSelling || []).slice(0, 3).map(product => (
                   <ProductCard key={product._id} product={product} compact={true} />
                 ))}
               </div>

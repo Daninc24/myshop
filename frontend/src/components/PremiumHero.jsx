@@ -275,7 +275,7 @@ const PremiumHero = ({
                 >
                                      <p className="text-white/80 mb-4 text-xs md:text-sm">🔥 Trending Now</p>
                   <div className="flex justify-center gap-2 md:gap-4">
-                    {trendingProducts.slice(0, 3).map((product, index) => (
+                    {(trendingProducts || []).slice(0, 3).map((product, index) => (
                       <motion.div
                         key={product._id}
                         initial={{ opacity: 0, scale: 0.8 }}
