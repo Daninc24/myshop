@@ -311,6 +311,7 @@ const Home = () => {
       // Only set error state for truly unexpected errors
       const errorString = error.toString();
       const errorMessage = error.message || errorString;
+      const errorStack = error.stack || '';
       
       // Check if this is an expected error that should be ignored
       const expectedErrors = [
@@ -326,11 +327,16 @@ const Home = () => {
       ];
       
       const isExpectedError = expectedErrors.some(pattern => 
-        pattern.test(errorString) || pattern.test(errorMessage)
+        pattern.test(errorString) || pattern.test(errorMessage) || pattern.test(errorStack)
       );
       
       if (!isExpectedError) {
         console.error('Unexpected error caught:', error);
+        console.error('Error details:', {
+          message: errorMessage,
+          stack: errorStack,
+          type: error.constructor.name
+        });
         setHasError(true);
       }
     };

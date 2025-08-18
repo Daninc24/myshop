@@ -81,7 +81,8 @@ const AIRecommendationEngine = ({
 
       // Fetch all products from database
       const response = await axios.get('/products?limit=100');
-      const allProducts = response.data.products || response.data || [];
+      const allProducts = Array.isArray(response.data?.products) ? response.data.products : 
+                         Array.isArray(response.data) ? response.data : [];
       
       if (!allProducts.length) {
         setRecommendations([]);
@@ -152,6 +153,8 @@ const AIRecommendationEngine = ({
 
   // AI Logic Functions
   const getPersonalizedRecommendations = (products, userId, currentProduct, limit) => {
+    if (!Array.isArray(products)) return [];
+    
     let scoredProducts = products.map(product => {
       let score = 0;
 
@@ -189,6 +192,8 @@ const AIRecommendationEngine = ({
   };
 
   const getTrendingRecommendations = (products, limit) => {
+    if (!Array.isArray(products)) return [];
+    
     return products
       .filter(product => product.rating >= 4.0 || product.reviewCount >= 10)
       .sort((a, b) => {
@@ -201,6 +206,8 @@ const AIRecommendationEngine = ({
   };
 
   const getSimilarRecommendations = (products, currentProduct, limit) => {
+    if (!Array.isArray(products)) return [];
+    
     if (!currentProduct) {
       return getTrendingRecommendations(products, limit);
     }
@@ -236,6 +243,8 @@ const AIRecommendationEngine = ({
   };
 
   const getFrequentlyBoughtRecommendations = (products, limit) => {
+    if (!Array.isArray(products)) return [];
+    
     // Simulate frequently bought together logic
     // In a real implementation, this would use order history
     return products
