@@ -221,7 +221,10 @@ async function handlePageRequest(request) {
     
     throw new Error(`Network response not ok: ${networkResponse.status}`);
   } catch (error) {
-    console.log('Page request failed, trying cache:', error.message);
+    // Only log network errors, not cache fallbacks
+    if (error.message.includes('Network response not ok')) {
+      console.debug('Network request failed, using cache fallback');
+    }
     
     // Fallback to cache
     try {
@@ -230,7 +233,7 @@ async function handlePageRequest(request) {
         return cachedResponse;
       }
     } catch (cacheError) {
-      console.warn('Cache lookup failed:', cacheError);
+      // Silent cache lookup failures
     }
     
     // Return offline page

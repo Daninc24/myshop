@@ -42,25 +42,19 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const response = await axios.get('/auth/profile');
-
       setUser(response.data.user);
     } catch (error) {
       setUser(null);
-      // Don't show error for 401 on public pages - this is expected behavior
+      // Silent handling for 401 errors - this is expected for non-authenticated users
       if (error.response && error.response.status === 401) {
-        const currentPath = window.location.pathname;
-        const publicPaths = ['/login', '/register', '/', '/products', '/product', '/faq', '/contact', '/about', '/events'];
-        const isPublicPath = publicPaths.some(path => 
-          currentPath === path || currentPath.startsWith(path + '/')
-        );
-        
-        // Only show error for protected routes
-        if (!isPublicPath) {
-          // User not authenticated - redirecting to login
-        }
+        // Don't log 401 errors - they're expected for public pages
+        return;
+      } else if (error.response && error.response.status === 503) {
+        // Don't log 503 errors - server might be temporarily unavailable
+        return;
       } else {
-        // Show error for other types of errors
-        console.error('Auth check failed:', error.message);
+        // Only log unexpected errors
+        console.debug('Auth check failed:', error.message);
       }
     } finally {
       setLoading(false);

@@ -399,21 +399,21 @@ const Home = () => {
             )}
           </div>
           {loadingCategories ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4">
+            <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="bg-surface-hover rounded-lg h-12 md:h-16 lg:h-20 mb-1 md:mb-2"></div>
-                  <div className="bg-surface-hover rounded h-2 md:h-3 lg:h-4"></div>
+                <div key={i} className="animate-pulse flex-shrink-0">
+                  <div className="bg-surface-hover rounded-lg h-12 md:h-16 lg:h-20 mb-1 md:mb-2 w-20 md:w-24 lg:w-32"></div>
+                  <div className="bg-surface-hover rounded h-2 md:h-3 lg:h-4 w-16 md:w-20 lg:w-24"></div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4">
+            <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4">
               {categoriesList.slice(0, getSectionMaxDisplay('categories')).map((category, index) => (
                 <Link
                   key={category.id || category._id || index}
                   to={`/products?category=${encodeURIComponent(category.id || category.name)}`}
-                  className="group bg-surface/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-2 md:p-3 lg:p-4 text-center hover:shadow-lg md:hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 md:hover:-translate-y-2"
+                  className="group bg-surface/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-2 md:p-3 lg:p-4 text-center hover:shadow-lg md:hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 md:hover:-translate-y-2 flex-shrink-0 w-20 md:w-24 lg:w-32"
                 >
                   <div className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-1 md:mb-2 lg:mb-3 group-hover:scale-110 transition-transform">
                     <span className="text-white font-bold text-xs md:text-sm lg:text-lg">
