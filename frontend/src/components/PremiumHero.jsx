@@ -245,30 +245,30 @@ const PremiumHero = ({
                 transition={{ delay: 0.6, duration: 0.8 }}
                 className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4"
               >
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onShopNow}
-                  className="group relative px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-full text-base md:text-lg shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 w-full sm:w-auto"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    {heroContent.cta.primary}
-                    <ArrowRightIcon className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
-                </motion.button>
+                                 <motion.button
+                   whileHover={{ scale: 1.05 }}
+                   whileTap={{ scale: 0.95 }}
+                   onClick={onShopNow}
+                   className="group relative px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-full text-base md:text-lg shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 w-full sm:w-auto"
+                 >
+                   <span className="flex items-center justify-center gap-2">
+                     {heroContent?.cta?.primary || 'Shop Now'}
+                     <ArrowRightIcon className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+                   </span>
+                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                 </motion.button>
 
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onViewDeals}
-                  className="px-6 md:px-8 py-3 md:py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-bold rounded-full text-base md:text-lg hover:bg-white/20 transition-all duration-300 w-full sm:w-auto"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <FireIcon className="h-4 w-4 md:h-5 md:w-5" />
-                    {heroContent.cta.secondary}
-                  </span>
-                </motion.button>
+                 <motion.button
+                   whileHover={{ scale: 1.05 }}
+                   whileTap={{ scale: 0.95 }}
+                   onClick={onViewDeals}
+                   className="px-6 md:px-8 py-3 md:py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-bold rounded-full text-base md:text-lg hover:bg-white/20 transition-all duration-300 w-full sm:w-auto"
+                 >
+                   <span className="flex items-center justify-center gap-2">
+                     <FireIcon className="h-4 w-4 md:h-5 md:w-5" />
+                     {heroContent?.cta?.secondary || 'View Deals'}
+                   </span>
+                 </motion.button>
               </motion.div>
 
               {/* Trending products preview */}

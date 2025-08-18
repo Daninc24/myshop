@@ -24,7 +24,7 @@ import { ConfigProvider, theme as antdTheme } from 'antd';
     axios.defaults.baseURL = '';
   } else {
     // Production: use the full API URL as provided by environment variable
-    const raw = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
+    const raw = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com/api';
     const trimmed = raw.replace(/\/+$/, ''); // remove trailing slashes
     axios.defaults.baseURL = trimmed;
   }
