@@ -55,6 +55,7 @@ const pageViewRoutes = require('./routes/pageViews');
 const categoryRoutes = require('./routes/categoryRoutes');
 const siteRoutes = require('./routes/site');
 const recommendationsRoutes = require('./routes/recommendations');
+const wishlistRoutes = require('./routes/wishlist');
 
 
 const { credentialCache, loadCredentials } = require('./utils/credentialCache');
@@ -344,6 +345,7 @@ app.use('/api/pageviews', pageViewRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/site', siteRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // Handle OPTIONS requests for image uploads
 app.options('/uploads/:filename', (req, res) => {

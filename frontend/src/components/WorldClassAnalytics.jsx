@@ -15,8 +15,8 @@ import {
 } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import {
-  TrendingUpIcon,
-  TrendingDownIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   CurrencyDollarIcon,
   ShoppingBagIcon,
   UsersIcon,
@@ -251,7 +251,7 @@ const WorldClassAnalytics = () => {
           title="Conversion Rate"
           value={metrics.conversion.current}
           change={metrics.conversion.change}
-          icon={TrendingUpIcon}
+          icon={ArrowTrendingUpIcon}
           color="bg-orange-500"
         />
       </div>

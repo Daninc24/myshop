@@ -27,7 +27,7 @@ const faqs = [
   {
     section: "Delivery",
     question: "How long does delivery take?",
-    answer: "Delivery within Nairobi takes 1-2 days. Other regions may take 2-5 days depending on location.",
+    answer: "We offer lightning-fast 24-hour delivery across Kenya! Orders placed before 2 PM are delivered the next day. Express delivery available for urgent orders.",
   },
   {
     section: "Delivery",
@@ -51,17 +51,17 @@ export default function FAQ() {
   // Group FAQs by section
   const sections = ["Ordering", "Payments", "Delivery", "Support"];
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 py-12 bg-white dark:bg-gray-900 transition-colors duration-300">
-      <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-blue-900 dark:text-yellow-400">Frequently Asked Questions</h1>
+    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 py-12 bg-background transition-colors duration-300">
+      <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-text-primary">Frequently Asked Questions</h1>
       <div className="max-w-2xl w-full flex flex-col gap-8">
         {sections.map(section => (
           <div key={section}>
-            <h2 className="text-2xl font-semibold mb-4 text-blue-800 dark:text-yellow-300">{section}</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-text-primary">{section}</h2>
             <div className="flex flex-col gap-4">
               {faqs.filter(faq => faq.section === section).map((faq, i) => (
-                <div key={faq.question} className="bg-blue-50 dark:bg-gray-800 rounded-xl p-4 shadow">
-                  <h3 className="font-semibold text-lg text-blue-900 dark:text-yellow-300 mb-2">{faq.question}</h3>
-                  <p className="text-gray-700 dark:text-gray-200">{faq.answer}</p>
+                <div key={faq.question} className="bg-surface rounded-xl p-4 shadow">
+                  <h3 className="font-semibold text-lg text-text-primary mb-2">{faq.question}</h3>
+                  <p className="text-text-primary">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -69,7 +69,7 @@ export default function FAQ() {
         ))}
       </div>
       <div className="max-w-2xl w-full mt-8 text-center">
-        <p className="text-md text-gray-600 dark:text-gray-300">Still have questions? <a href="/contact" className="text-primary underline">Contact our support team</a> and we'll be happy to help!</p>
+        <p className="text-md text-text-secondary">Still have questions? <a href="/contact" className="text-primary underline">Contact our support team</a> and we'll be happy to help!</p>
       </div>
     </div>
   );

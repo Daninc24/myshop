@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   BellIcon, 
   BellSlashIcon,
-  TrendingDownIcon,
+  ArrowTrendingDownIcon,
   CurrencyDollarIcon,
   CheckIcon,
   XMarkIcon

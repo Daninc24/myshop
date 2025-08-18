@@ -11,6 +11,7 @@ import AdminRoute from './components/AdminRoute';
 import POSRoute from './components/POSRoute';
 import SuperAdminRoute from './components/SuperAdminRoute';
 import GoogleAnalytics from './components/GoogleAnalytics';
+import PerformanceOptimizer from './components/PerformanceOptimizer';
 
 // Lazy-loaded components
 import {
@@ -65,6 +66,9 @@ const App = () => {
     <ErrorBoundary>
       {/* Google Analytics */}
       <GoogleAnalytics />
+      
+      {/* Performance Optimizer */}
+      <PerformanceOptimizer />
       
       <AppLayout>
         <Suspense fallback={<LoadingSpinner />}>

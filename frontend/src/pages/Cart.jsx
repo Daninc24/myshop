@@ -218,9 +218,9 @@ const Cart = () => {
 
         {cartProducts.length === 0 ? (
           <div className="text-center py-12">
-            <ShoppingBagIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your cart is empty</h2>
-            <p className="text-gray-600 mb-6">Looks like you haven't added any items to your cart yet.</p>
+            <ShoppingBagIcon className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                          <h2 className="text-2xl font-semibold text-text-primary mb-2">Your cart is empty</h2>
+              <p className="text-text-secondary mb-6">Looks like you haven't added any items to your cart yet.</p>
             <Link
               to="/products"
               className="inline-flex items-center px-6 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"

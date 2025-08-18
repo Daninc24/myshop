@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
-import { useTheme } from '../contexts/ThemeContext';
+
 import CategoryDropdown from './CategoryDropdown';
 import MobileMenu from './MobileMenu';
 import SmartNotificationSystem from './SmartNotificationSystem';
@@ -15,8 +15,7 @@ import {
   BellIcon,
   Bars3Icon,
   XMarkIcon,
-  SunIcon,
-  MoonIcon,
+
   SparklesIcon,
   ShoppingBagIcon,
   Cog6ToothIcon,
@@ -64,7 +63,7 @@ const Navbar = () => {
 
   const { user, logout } = useAuth();
   const { cart, currency, setCurrency } = useCart();
-  const { isDarkMode, toggleDarkMode } = useTheme();
+
   
   // Get wishlist count from localStorage
   const getWishlistCount = () => {
@@ -282,57 +281,7 @@ const Navbar = () => {
               </Link>
             )}
 
-            {/* Search Bar */}
-            <div className="relative">
-              <form onSubmit={handleSearchSubmit} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    handleSearch(e.target.value);
-                  }}
-                  className="w-80 px-4 py-2 pl-10 pr-4 bg-surface border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary placeholder-text-muted transition-all duration-300"
-                />
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-text-muted hover:text-primary transition-colors duration-200"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </form>
 
-              {/* Search Results Dropdown */}
-              {showSearchResults && searchResults.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-border rounded-xl shadow-large z-50">
-                  {searchResults.map((product) => (
-                    <Link
-                      key={product._id}
-                      to={`/product/${product._id}`}
-                      className="flex items-center space-x-3 p-3 hover:bg-surface-hover transition-colors duration-200"
-                      onClick={() => {
-                        setShowSearchResults(false);
-                        setSearchTerm('');
-                      }}
-                    >
-                      <img
-                        src={product.images?.[0] || '/placeholder-image.svg'}
-                        alt={product.title}
-                        className="w-12 h-12 object-cover rounded-lg"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-text-primary truncate">{product.title}</p>
-                        <p className="text-xs text-text-muted">${product.price}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Right Side Actions */}
@@ -362,18 +311,7 @@ const Navbar = () => {
               </select>
             </div>
 
-            {/* Dark Mode Toggle */}
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300 group"
-              aria-label="Toggle dark mode"
-            >
-              {isDarkMode ? (
-                <SunIcon className="w-5 h-5 text-warning group-hover:scale-110 transition-transform duration-200" />
-              ) : (
-                <MoonIcon className="w-5 h-5 text-text-secondary group-hover:scale-110 transition-transform duration-200" />
-              )}
-            </button>
+
 
             {/* Notifications */}
             <div className="relative">
@@ -437,9 +375,6 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
-
-            {/* Notification System */}
-            <SmartNotificationSystem />
 
             {/* User Menu */}
             {user ? (
@@ -505,9 +440,10 @@ const Navbar = () => {
             ) : (
               <Link
                 to="/login"
-                className="btn-primary"
+                className="flex items-center space-x-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors duration-200 font-medium"
               >
-                Sign In
+                <UserIcon className="w-5 h-5" />
+                <span>Login</span>
               </Link>
             )}
 
@@ -538,8 +474,7 @@ const Navbar = () => {
           currencies={currencies}
           handleCurrencyChange={(newCurrency) => setCurrency(newCurrency)}
           categories={categoriesList}
-          isDarkMode={isDarkMode}
-          toggleDarkMode={toggleDarkMode}
+          
           onSearchClick={() => setShowSearch(true)}
           onNotificationsClick={() => setShowNotifications(true)}
           wishlistCount={getWishlistCount()}

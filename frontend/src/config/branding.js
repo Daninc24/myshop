@@ -51,7 +51,7 @@ export const BRAND_CONFIG = {
     securePayments: true,
     easyReturns: true,
     flexiblePayment: true,
-    sameDayDelivery: false,
+    sameDayDelivery: true,
     customerSupport: '24/7'
   },
   

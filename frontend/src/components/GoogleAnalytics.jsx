@@ -36,7 +36,6 @@ const initializeGA = () => {
   });
 };
 
-// Enhanced Google Analytics Component
 const GoogleAnalytics = () => {
   const location = useLocation();
 
@@ -51,10 +50,190 @@ const GoogleAnalytics = () => {
       window.gtag('config', GA_TRACKING_ID, {
         page_title: document.title,
         page_location: window.location.href,
-        page_path: location.pathname + location.search
+        page_path: location.pathname + location.search,
+        custom_map: {
+          'custom_parameter_1': 'user_type',
+          'custom_parameter_2': 'product_category',
+          'custom_parameter_3': 'search_term'
+        }
       });
+
+      // Enhanced ecommerce tracking
+      window.gtag('config', GA_TRACKING_ID, {
+        send_page_view: false,
+        custom_map: {
+          'custom_parameter_1': 'user_type',
+          'custom_parameter_2': 'product_category',
+          'custom_parameter_3': 'search_term'
+        }
+      });
+
+      // Track user engagement
+      const trackUserEngagement = () => {
+        window.gtag('event', 'user_engagement', {
+          engagement_time_msec: 1000,
+          session_id: Date.now()
+        });
+      };
+
+      // Track scroll depth
+      let maxScroll = 0;
+      const trackScrollDepth = () => {
+        const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+        if (scrollPercent > maxScroll) {
+          maxScroll = scrollPercent;
+          if (maxScroll >= 25 && maxScroll % 25 === 0) {
+            window.gtag('event', 'scroll_depth', {
+              scroll_percentage: maxScroll,
+              page_location: window.location.href
+            });
+          }
+        }
+      };
+
+      // Track time on page
+      let startTime = Date.now();
+      const trackTimeOnPage = () => {
+        const timeOnPage = Date.now() - startTime;
+        if (timeOnPage >= 30000) { // Track after 30 seconds
+          window.gtag('event', 'time_on_page', {
+            time_on_page: timeOnPage,
+            page_location: window.location.href
+          });
+        }
+      };
+
+      // Add event listeners
+      window.addEventListener('scroll', trackScrollDepth);
+      window.addEventListener('beforeunload', trackTimeOnPage);
+      window.addEventListener('visibilitychange', trackUserEngagement);
+
+      // Track search queries
+      const urlParams = new URLSearchParams(location.search);
+      const searchQuery = urlParams.get('search');
+      if (searchQuery) {
+        window.gtag('event', 'search', {
+          search_term: searchQuery,
+          page_location: window.location.href
+        });
+      }
+
+      // Track product views
+      if (location.pathname.includes('/product/')) {
+        const productId = location.pathname.split('/').pop();
+        window.gtag('event', 'view_item', {
+          currency: 'KES',
+          value: 0, // Will be updated with actual product price
+          items: [{
+            item_id: productId,
+            item_name: document.title,
+            currency: 'KES',
+            quantity: 1
+          }]
+        });
+      }
+
+      // Track category views
+      if (location.pathname === '/products') {
+        const category = urlParams.get('category');
+        if (category) {
+          window.gtag('event', 'view_item_list', {
+            item_list_name: category,
+            items: [{
+              item_list_name: category,
+              currency: 'KES'
+            }]
+          });
+        }
+      }
+
+      // Cleanup
+      return () => {
+        window.removeEventListener('scroll', trackScrollDepth);
+        window.removeEventListener('beforeunload', trackTimeOnPage);
+        window.removeEventListener('visibilitychange', trackUserEngagement);
+      };
     }
   }, [location]);
+
+  // Enhanced conversion tracking
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      // Track add to cart events
+      const trackAddToCart = (event) => {
+        const productData = event.detail;
+        window.gtag('event', 'add_to_cart', {
+          currency: 'KES',
+          value: productData.price,
+          items: [{
+            item_id: productData.id,
+            item_name: productData.name,
+            currency: 'KES',
+            price: productData.price,
+            quantity: productData.quantity || 1
+          }]
+        });
+      };
+
+      // Track purchase events
+      const trackPurchase = (event) => {
+        const orderData = event.detail;
+        window.gtag('event', 'purchase', {
+          transaction_id: orderData.id,
+          value: orderData.total,
+          currency: 'KES',
+          tax: orderData.tax || 0,
+          shipping: orderData.shipping || 0,
+          items: orderData.items.map(item => ({
+            item_id: item.id,
+            item_name: item.name,
+            currency: 'KES',
+            price: item.price,
+            quantity: item.quantity
+          }))
+        });
+      };
+
+      // Track wishlist events
+      const trackWishlist = (event) => {
+        const productData = event.detail;
+        window.gtag('event', 'add_to_wishlist', {
+          currency: 'KES',
+          value: productData.price,
+          items: [{
+            item_id: productData.id,
+            item_name: productData.name,
+            currency: 'KES',
+            price: productData.price,
+            quantity: 1
+          }]
+        });
+      };
+
+      // Track search events
+      const trackSearch = (event) => {
+        const searchData = event.detail;
+        window.gtag('event', 'search', {
+          search_term: searchData.query,
+          page_location: window.location.href
+        });
+      };
+
+      // Add custom event listeners
+      window.addEventListener('luxecart:add_to_cart', trackAddToCart);
+      window.addEventListener('luxecart:purchase', trackPurchase);
+      window.addEventListener('luxecart:add_to_wishlist', trackWishlist);
+      window.addEventListener('luxecart:search', trackSearch);
+
+      // Cleanup
+      return () => {
+        window.removeEventListener('luxecart:add_to_cart', trackAddToCart);
+        window.removeEventListener('luxecart:purchase', trackPurchase);
+        window.removeEventListener('luxecart:add_to_wishlist', trackWishlist);
+        window.removeEventListener('luxecart:search', trackSearch);
+      };
+    }
+  }, []);
 
   return null; // This component doesn't render anything
 };

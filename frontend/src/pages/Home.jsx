@@ -4,6 +4,32 @@ import axios from 'axios';
 import { Helmet } from 'react-helmet';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
+import { getSEOTitle, getSEODescription, getSEOKeywords, getSEOImage, getSEOUrl, getBrandName } from '../config/branding';
+import {
+  getSectionConfig,
+  getSectionTitle,
+  getSectionMaxDisplay,
+  shouldShowViewAll,
+  getViewAllLink
+} from '../config/sections';
+import PremiumFeatures from '../components/PremiumFeatures';
+import PremiumHero from '../components/PremiumHero';
+import ProductCard from '../components/ProductCard';
+import LoadingSpinner from '../components/LoadingSpinner';
+
+// Advertisement Components
+import {
+  TopBannerAd,
+  HeroAd,
+  CategoryAd,
+  FeaturedAd,
+  NewArrivalsAd,
+  BestSellingAd,
+  BottomBannerAd,
+  SidebarAd
+} from '../components/AdvertisementSection';
+
+// Icons
 import {
   ArrowRightIcon,
   StarIcon,
@@ -21,77 +47,14 @@ import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 
-// Components
-import ProductCard from '../components/ProductCard';
-import PremiumHero from '../components/PremiumHero';
-import PremiumFeatures from '../components/PremiumFeatures';
-import RecommendationEngine from '../components/RecommendationEngine';
-import FloatingActionButton from '../components/FloatingActionButton';
-import MobileSearchModal from '../components/MobileSearchModal';
-import LoadingSpinner from '../components/LoadingSpinner';
-import BlogSection from '../components/BlogSection';
-import LocalSEO from '../components/LocalSEO';
-import SocialMediaIntegration from '../components/SocialMediaIntegration';
-
-// Advertisement Components
-import {
-  TopBannerAd,
-  HeroAd,
-  CategoryAd,
-  FeaturedAd,
-  NewArrivalsAd,
-  BestSellingAd,
-  BottomBannerAd,
-  SidebarAd
-} from '../components/AdvertisementSection';
-
-// Configuration
-import { 
-  getSEOTitle, 
-  getSEODescription, 
-  getSEOKeywords, 
-  getSEOImage, 
-  getSEOUrl, 
-  getBrandName 
-} from '../config/branding';
-import { 
-  getSectionConfig, 
-  getSectionTitle, 
-  getSectionMaxDisplay, 
-  shouldShowViewAll, 
-  getViewAllLink 
-} from '../config/sections';
-
 // Assets
 import gambiaMarket from '../assets/gambia-market.jpg';
 
-// Custom hooks
-const useDebounce = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  
-  return debouncedValue;
-};
-
-// API utility with retry logic
-const fetchWithRetry = async (url, options = {}) => {
-  const maxRetries = 3;
-  let lastError;
-
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await axios.get(url, { timeout: 10000, ...options });
-    } catch (error) {
-      lastError = error;
-      if (i === maxRetries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-    }
-  }
-};
+// Advanced Components
+import AIRecommendationEngine from '../components/AIRecommendationEngine';
+import WishlistWithPriceAlerts from '../components/WishlistWithPriceAlerts';
+import SocialMediaSharing from '../components/SocialMediaSharing';
+import ReferralSystem from '../components/ReferralSystem';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -105,23 +68,20 @@ const Home = () => {
   const [categoriesList, setCategoriesList] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
   const [assurances, setAssurances] = useState([]);
-  
+
   // Loading states
   const [loading, setLoading] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [loadingNewArrivals, setLoadingNewArrivals] = useState(true);
   const [loadingBestSelling, setLoadingBestSelling] = useState(true);
   const [loadingCategories, setLoadingCategories] = useState(true);
-  
+
   // UI states
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [search, setSearch] = useState('');
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  
-  // Debounced search
-  const debouncedSearch = useDebounce(search, 350);
-  
+
   // Refs
   const searchInputRef = useRef();
 
@@ -202,7 +162,7 @@ const Home = () => {
   const fetchProducts = useCallback(async () => {
     try {
       setLoadingProducts(true);
-      const response = await fetchWithRetry('/products?limit=8');
+      const response = await axios.get('/products?limit=8');
       setProducts(response.data.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -215,7 +175,7 @@ const Home = () => {
   const fetchNewArrivals = useCallback(async () => {
     try {
       setLoadingNewArrivals(true);
-      const response = await fetchWithRetry('/products?sort=newest&limit=4');
+      const response = await axios.get('/products?sort=newest&limit=4');
       setNewArrivals(response.data.products || []);
     } catch (error) {
       console.error('Error fetching new arrivals:', error);
@@ -227,7 +187,7 @@ const Home = () => {
   const fetchBestSelling = useCallback(async () => {
     try {
       setLoadingBestSelling(true);
-      const response = await fetchWithRetry('/products/best-selling?limit=4');
+      const response = await axios.get('/products/best-selling?limit=4');
       setBestSelling(response.data.products || []);
     } catch (error) {
       console.error('Error fetching best selling:', error);
@@ -239,7 +199,7 @@ const Home = () => {
   const fetchCategories = useCallback(async () => {
     try {
       setLoadingCategories(true);
-      const response = await fetchWithRetry('/categories');
+      const response = await axios.get('/categories');
       if (Array.isArray(response.data)) {
         setCategoriesList(response.data);
       }
@@ -252,7 +212,7 @@ const Home = () => {
 
   const fetchTrendingProducts = useCallback(async () => {
     try {
-      const response = await fetchWithRetry('/products?sort=trending&limit=3');
+      const response = await axios.get('/products?sort=trending&limit=3');
       setTrendingProducts(response.data.products || []);
     } catch (error) {
       console.error('Error fetching trending products:', error);
@@ -261,7 +221,7 @@ const Home = () => {
 
   const fetchAssurances = useCallback(async () => {
     try {
-      const response = await fetchWithRetry('/site/assurances');
+      const response = await axios.get('/site/assurances');
       setAssurances(response.data.assurances || []);
     } catch (error) {
       console.error('Error fetching assurances:', error);
@@ -272,21 +232,21 @@ const Home = () => {
   useEffect(() => {
     const initializeData = async () => {
       setLoading(true);
-      
+
       // Fetch critical data first
       await Promise.allSettled([
         fetchProducts(),
         fetchCategories(),
         fetchAssurances()
       ]);
-      
+
       // Fetch secondary data
       Promise.allSettled([
         fetchNewArrivals(),
         fetchBestSelling(),
         fetchTrendingProducts()
       ]);
-      
+
       setLoading(false);
     };
 
@@ -295,10 +255,10 @@ const Home = () => {
 
   // Search suggestions
   useEffect(() => {
-    if (debouncedSearch.trim()) {
+    if (search.trim()) {
       const fetchSuggestions = async () => {
         try {
-          const response = await axios.get(`/products/search/suggestions?q=${encodeURIComponent(debouncedSearch)}`);
+          const response = await axios.get(`/products/search/suggestions?q=${encodeURIComponent(search)}`);
           setSearchSuggestions(response.data.suggestions || []);
           setShowSuggestions(true);
         } catch (error) {
@@ -310,7 +270,7 @@ const Home = () => {
       setSearchSuggestions([]);
       setShowSuggestions(false);
     }
-  }, [debouncedSearch]);
+  }, [search]);
 
   // SEO structured data
   const structuredData = useMemo(() => ({
@@ -373,9 +333,6 @@ const Home = () => {
         </script>
       </Helmet>
 
-      {/* Top Banner Advertisement */}
-      <TopBannerAd />
-
       {/* Premium Hero Section */}
       <PremiumHero
         heroContent={heroContent}
@@ -385,26 +342,42 @@ const Home = () => {
         backgroundImage={gambiaMarket}
       />
 
-      {/* Premium Features Section */}
+      {/* Premium Features - What Makes Us Different */}
       <PremiumFeatures />
+
+      {/* AI Recommendation Engine */}
+      <section className="max-w-7xl mx-auto mb-16 px-4">
+        <AIRecommendationEngine 
+          userId={user?._id}
+          limit={4}
+          showTitle={true}
+          title="AI-Powered Recommendations"
+          subtitle="Discover products tailored just for you with 95% accuracy"
+        />
+      </section>
+
+
+
+      {/* Top Banner Advertisement */}
+      <TopBannerAd />
 
       {/* Hero Advertisement */}
       <HeroAd />
 
       {/* Enhanced Assurance Strip */}
       <section className="max-w-7xl mx-auto -mt-8 mb-16 px-4 relative z-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {features.filter(f => f.enabled).slice(0, 4).map((feature, idx) => (
-            <div 
-              key={idx} 
-              className="flex items-center gap-3 md:gap-4 bg-white/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+            <div
+              key={idx}
+              className="flex items-center gap-3 md:gap-4 bg-surface/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-xl border border-border/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
             >
               <div className="flex-shrink-0">
-                <feature.icon className="h-10 w-10 text-gray-700" />
+                <feature.icon className="h-10 w-10 text-text-primary" />
               </div>
               <div>
-                <div className="text-sm font-bold text-gray-900">{feature.title}</div>
-                <div className="text-xs text-gray-600 hidden sm:block">{feature.description}</div>
+                <div className="text-sm font-bold text-text-primary">{feature.title}</div>
+                <div className="text-xs text-text-secondary hidden sm:block">{feature.description}</div>
               </div>
             </div>
           ))}
@@ -413,41 +386,41 @@ const Home = () => {
 
       {/* Categories Section */}
       <section className="max-w-7xl mx-auto mb-16 px-4">
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-4 md:p-8">
+        <div className="bg-gradient-to-br from-secondary/5 to-accent/5 rounded-3xl p-4 md:p-8 border border-secondary/20">
           <div className="flex flex-col sm:flex-row sm:items-center mb-6 gap-4 sm:gap-0">
             <div className="flex items-center gap-3">
-              <GlobeAltIcon className="h-6 w-6 text-blue-500" />
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900">{getSectionTitle('categories')}</h2>
+              <GlobeAltIcon className="h-6 w-6 text-secondary" />
+              <h2 className="text-xl md:text-2xl font-bold text-text-primary">{getSectionTitle('categories')}</h2>
             </div>
             {shouldShowViewAll('categories') && (
-              <Link to={getViewAllLink('categories')} className="sm:ml-auto text-blue-600 hover:text-blue-700 font-semibold text-sm md:text-base">
+              <Link to={getViewAllLink('categories')} className="sm:ml-auto text-secondary hover:text-secondary-dark font-semibold text-sm md:text-base">
                 View all
               </Link>
             )}
           </div>
           {loadingCategories ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="bg-gray-200 rounded-lg h-16 md:h-24 mb-2"></div>
-                  <div className="bg-gray-200 rounded h-3 md:h-4"></div>
+                  <div className="bg-surface-hover rounded-lg h-16 md:h-24 mb-2"></div>
+                  <div className="bg-surface-hover rounded h-3 md:h-4"></div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4">
               {categoriesList.slice(0, getSectionMaxDisplay('categories')).map((category, index) => (
                 <Link
                   key={category.id || category._id || index}
                   to={`/products?category=${encodeURIComponent(category.name)}`}
-                  className="group bg-white/80 backdrop-blur-sm rounded-2xl p-3 md:p-4 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                  className="group bg-surface/80 backdrop-blur-sm rounded-2xl p-3 md:p-4 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
                 >
-                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform">
                     <span className="text-white font-bold text-sm md:text-lg">
                       {(category.name || 'C')[0].toUpperCase()}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-xs md:text-sm">
+                  <h3 className="font-semibold text-text-primary group-hover:text-primary transition-colors text-xs md:text-sm">
                     {category.name}
                   </h3>
                 </Link>
@@ -463,148 +436,153 @@ const Home = () => {
       {/* Featured Products Advertisement */}
       <FeaturedAd />
 
-      {/* Featured Products Section */}
+      {/* Product Sections - Alibaba Style Layout */}
       <section className="max-w-7xl mx-auto mb-16 px-4">
-        <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-4 md:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center mb-6 gap-4 sm:gap-0">
-            <div className="flex items-center gap-3">
-              <FireIcon className="h-6 w-6 text-orange-500" />
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900">{getSectionTitle('featuredProducts')}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Featured Products */}
+          <div className="bg-gradient-to-br from-primary/5 to-error/5 rounded-2xl p-6 border border-primary/20">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FireIcon className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-bold text-text-primary">{getSectionTitle('featuredProducts')}</h3>
+              </div>
+              {shouldShowViewAll('featuredProducts') && (
+                <Link to={getViewAllLink('featuredProducts')} className="text-primary hover:text-primary-dark font-semibold text-sm">
+                  View all
+                </Link>
+              )}
             </div>
-            {shouldShowViewAll('featuredProducts') && (
-              <Link to={getViewAllLink('featuredProducts')} className="sm:ml-auto text-orange-600 hover:text-orange-700 font-semibold text-sm md:text-base">
-                View all
-              </Link>
+            {loadingProducts ? (
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="bg-surface-hover rounded-lg h-32 mb-2"></div>
+                    <div className="bg-surface-hover rounded h-3 mb-1"></div>
+                    <div className="bg-surface-hover rounded h-3 w-2/3"></div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {products.slice(0, 3).map(product => (
+                  <ProductCard key={product._id} product={product} compact={true} />
+                ))}
+              </div>
             )}
           </div>
-          {loadingProducts ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="bg-gray-200 rounded-lg h-48 mb-3"></div>
-                  <div className="bg-gray-200 rounded h-4 mb-2"></div>
-                  <div className="bg-gray-200 rounded h-4 w-3/4"></div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              {products.slice(0, getSectionMaxDisplay('featuredProducts')).map(product => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
 
-      {/* New Arrivals Advertisement */}
-      <NewArrivalsAd />
-
-      {/* New Arrivals Section */}
-      <section className="max-w-7xl mx-auto mb-16 px-4">
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl p-4 md:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center mb-6 gap-4 sm:gap-0">
-            <div className="flex items-center gap-3">
-              <ClockIcon className="h-6 w-6 text-green-500" />
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900">{getSectionTitle('newArrivals')}</h2>
+          {/* New Arrivals */}
+          <div className="bg-gradient-to-br from-success/5 to-accent/5 rounded-2xl p-6 border border-success/20">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <ClockIcon className="h-5 w-5 text-success" />
+                <h3 className="text-lg font-bold text-text-primary">{getSectionTitle('newArrivals')}</h3>
+              </div>
+              {shouldShowViewAll('newArrivals') && (
+                <Link to={getViewAllLink('newArrivals')} className="text-success hover:text-success-dark font-semibold text-sm">
+                  View all
+                </Link>
+              )}
             </div>
-            {shouldShowViewAll('newArrivals') && (
-              <Link to={getViewAllLink('newArrivals')} className="sm:ml-auto text-green-600 hover:text-green-700 font-semibold text-sm md:text-base">
-                View all
-              </Link>
+            {loadingNewArrivals ? (
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="bg-surface-hover rounded-lg h-32 mb-2"></div>
+                    <div className="bg-surface-hover rounded h-3 mb-1"></div>
+                    <div className="bg-surface-hover rounded h-3 w-2/3"></div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {newArrivals.slice(0, 3).map(product => (
+                  <ProductCard key={product._id} product={product} compact={true} />
+                ))}
+              </div>
             )}
           </div>
-          {loadingNewArrivals ? (
-            <div className="overflow-x-auto flex gap-4 md:gap-6 pb-4 scrollbar-hide">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="min-w-[180px] sm:min-w-[220px] max-w-[240px] flex-shrink-0 animate-pulse">
-                  <div className="bg-gray-200 rounded-lg h-36 md:h-48 mb-3 md:mb-4"></div>
-                  <div className="bg-gray-200 rounded h-3 md:h-4 mb-2"></div>
-                  <div className="bg-gray-200 rounded h-3 md:h-4 w-3/4"></div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="overflow-x-auto flex gap-4 md:gap-6 pb-4 scrollbar-hide">
-              {newArrivals.slice(0, getSectionMaxDisplay('newArrivals')).map(product => (
-                <div key={product._id} className="min-w-[180px] sm:min-w-[220px] max-w-[240px] flex-shrink-0">
-                  <ProductCard product={product} small />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
 
-      {/* Best Selling Advertisement */}
-      <BestSellingAd />
-
-      {/* Best Selling Section */}
-      <section className="max-w-7xl mx-auto mb-16 px-4">
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-4 md:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center mb-6 gap-4 sm:gap-0">
-            <div className="flex items-center gap-3">
-              <StarIcon className="h-6 w-6 text-yellow-500 fill-current" />
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900">{getSectionTitle('bestSelling')}</h2>
+          {/* Best Selling */}
+          <div className="bg-gradient-to-br from-accent/5 to-secondary/5 rounded-2xl p-6 border border-accent/20">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <StarIcon className="h-5 w-5 text-accent" />
+                <h3 className="text-lg font-bold text-text-primary">{getSectionTitle('bestSelling')}</h3>
+              </div>
+              {shouldShowViewAll('bestSelling') && (
+                <Link to={getViewAllLink('bestSelling')} className="text-accent hover:text-accent-dark font-semibold text-sm">
+                  View all
+                </Link>
+              )}
             </div>
-            {shouldShowViewAll('bestSelling') && (
-              <Link to={getViewAllLink('bestSelling')} className="sm:ml-auto text-purple-600 hover:text-purple-700 font-semibold text-sm md:text-base">
-                View all
-              </Link>
+            {loadingBestSelling ? (
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="bg-surface-hover rounded-lg h-32 mb-2"></div>
+                    <div className="bg-surface-hover rounded h-3 mb-1"></div>
+                    <div className="bg-surface-hover rounded h-3 w-2/3"></div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {bestSelling.slice(0, 3).map(product => (
+                  <ProductCard key={product._id} product={product} compact={true} />
+                ))}
+              </div>
             )}
           </div>
-          {loadingBestSelling ? (
-            <div className="overflow-x-auto flex gap-4 md:gap-6 pb-4 scrollbar-hide">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="min-w-[180px] sm:min-w-[220px] max-w-[240px] flex-shrink-0 animate-pulse">
-                  <div className="bg-gray-200 rounded-lg h-36 md:h-48 mb-3 md:mb-4"></div>
-                  <div className="bg-gray-200 rounded h-3 md:h-4 mb-2"></div>
-                  <div className="bg-gray-200 rounded h-3 md:h-4 w-3/4"></div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="overflow-x-auto flex gap-4 md:gap-6 pb-4 scrollbar-hide">
-              {bestSelling.slice(0, getSectionMaxDisplay('bestSelling')).map(product => (
-                <div key={product._id} className="min-w-[180px] sm:min-w-[220px] max-w-[240px] flex-shrink-0">
-                  <ProductCard product={product} small />
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </section>
-
-      {/* AI Recommendations Section */}
-      <section className="max-w-7xl mx-auto mb-16 px-4">
-        <RecommendationEngine
-          userId={user?.id || null}
-          type="personalized"
-        />
-      </section>
-
-      {/* Blog Section - Content Marketing */}
-      <BlogSection />
-
-      {/* Local SEO Section */}
-      <LocalSEO />
-
-      {/* Social Media Integration */}
-      <SocialMediaIntegration />
 
       {/* Bottom Banner Advertisement */}
       <BottomBannerAd />
-      
-      {/* Floating Action Button for Mobile */}
-      <FloatingActionButton 
-        onSearchClick={() => setShowMobileSearch(true)}
-        onCategoriesClick={() => navigate('/products')}
-      />
 
-      {/* Mobile Search Modal */}
-      <MobileSearchModal 
-        isOpen={showMobileSearch}
-        onClose={() => setShowMobileSearch(false)}
+      {/* Social Proof Section */}
+      <section className="max-w-7xl mx-auto mb-16 px-4">
+        <div className="bg-gradient-to-br from-surface to-surface-hover rounded-3xl p-4 md:p-8 border border-border">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-4">
+              Trusted by Thousands of Customers
+            </h2>
+            <p className="text-text-secondary max-w-2xl mx-auto">
+              Join our growing community of satisfied customers who trust LuxeCart for their shopping needs.
+            </p>
+          </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {stats.filter(s => s.enabled).map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="flex justify-center mb-3">
+                  <stat.icon className="h-8 w-8 text-primary" />
+                </div>
+                <div className="text-2xl md:text-3xl font-bold text-text-primary mb-1">
+                  {stat.number}
+                </div>
+                <div className="text-sm text-text-secondary">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Referral System Section */}
+      {user && (
+        <section className="max-w-7xl mx-auto mb-16 px-4">
+          <ReferralSystem user={user} />
+        </section>
+      )}
+
+      {/* Social Media Sharing */}
+      <SocialMediaSharing 
+        title="Discover Amazing Products on LuxeCart!"
+        description="Premium shopping experience with lightning-fast delivery and exceptional customer service."
+        hashtags={["LuxeCart", "PremiumShopping", "FastDelivery", "Kenya", "OnlineShopping"]}
+        showFloating={true}
+        position="bottom-right"
       />
     </div>
   );

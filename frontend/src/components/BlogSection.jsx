@@ -295,7 +295,7 @@ const BlogSection = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <Link
-                    to={`/blog/${featuredArticle.slug}`}
+                    to={`/products?category=featured&article=${featuredArticle.slug}`}
                     className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors"
                   >
                     Read Full Article
@@ -392,7 +392,7 @@ const BlogSection = () => {
                   <span className="text-sm text-gray-600">{article.author}</span>
                 </div>
                 <Link
-                  to={`/blog/${article.slug}`}
+                  to={`/products?category=${article.category}&article=${article.slug}`}
                   className="text-orange-500 hover:text-orange-600 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all"
                 >
                   Read More
@@ -407,7 +407,7 @@ const BlogSection = () => {
       {/* View All Articles Button */}
       <div className="text-center mt-12">
         <Link
-          to="/blog"
+          to="/products?view=blog"
           className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-800 transition-colors"
         >
           View All Articles

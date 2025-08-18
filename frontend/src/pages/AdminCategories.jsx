@@ -123,18 +123,18 @@ export default function AdminCategories() {
             <div key={idx} className="flex gap-2 mb-1 items-center">
               <input name="name" placeholder="Subcategory Name" value={sub.name || ''} onChange={e => handleSubInput(idx, e)} className="border rounded px-2 py-1 flex-1" required />
               <input name="id" placeholder="Subcategory ID" value={sub.id || ''} onChange={e => handleSubInput(idx, e)} className="border rounded px-2 py-1 w-36" required />
-              <button type="button" onClick={() => removeSubcategory(idx)} className="ml-1 px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200" title="Remove Subcategory">&times;</button>
+              <button type="button" onClick={() => removeSubcategory(idx)} className="ml-1 px-2 py-1 bg-error/10 text-error rounded hover:bg-error/20" title="Remove Subcategory">&times;</button>
             </div>
           ))}
-          <button type="button" onClick={addSubcategory} className="mt-2 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 font-semibold" title="Add Subcategory">+ Add Subcategory</button>
+          <button type="button" onClick={addSubcategory} className="mt-2 px-3 py-1 bg-secondary/10 text-secondary rounded hover:bg-secondary/20 font-semibold" title="Add Subcategory">+ Add Subcategory</button>
         </div>
-        {error && <div className="text-red-600 mb-2">{error}</div>}
+        {error && <div className="text-error mb-2">{error}</div>}
         <div className="flex gap-2 mt-4">
-          <button type="submit" className="bg-blue-700 text-white px-4 py-2 rounded-xl" disabled={loading}>{editingId ? 'Update' : 'Add'} Category</button>
-          <button type="button" onClick={resetForm} className="bg-gray-200 px-4 py-2 rounded-xl">Cancel</button>
+          <button type="submit" className="bg-secondary text-white px-4 py-2 rounded-xl" disabled={loading}>{editingId ? 'Update' : 'Add'} Category</button>
+          <button type="button" onClick={resetForm} className="bg-surface px-4 py-2 rounded-xl">Cancel</button>
         </div>
       </form>
-      <div className="bg-white p-4 rounded-xl shadow">
+      <div className="bg-surface p-4 rounded-xl shadow">
         <h2 className="font-semibold mb-2">All Categories</h2>
         {loading && <div>Loading...</div>}
         <ul>
@@ -143,14 +143,14 @@ export default function AdminCategories() {
               <div className="flex items-center justify-between">
                 <span className="font-bold">{cat.name}</span>
                 <div className="flex gap-2">
-                  <button onClick={() => handleEdit(cat)} className="text-blue-600 underline">Edit</button>
-                  <button onClick={() => handleDelete(cat.id)} className="text-red-600 underline">Delete</button>
+                  <button onClick={() => handleEdit(cat)} className="text-secondary underline">Edit</button>
+                  <button onClick={() => handleDelete(cat.id)} className="text-error underline">Delete</button>
                 </div>
               </div>
               {cat.subcategories && cat.subcategories.length > 0 && (
-                <ul className="ml-4 mt-1 text-sm text-gray-700">
+                <ul className="ml-4 mt-1 text-sm text-text-primary">
                   {cat.subcategories.map(sub => (
-                    <li key={sub.id}>- {sub.name} <span className="text-gray-400">({sub.id})</span></li>
+                    <li key={sub.id}>- {sub.name} <span className="text-text-muted">({sub.id})</span></li>
                   ))}
                 </ul>
               )}

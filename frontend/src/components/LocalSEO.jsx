@@ -38,10 +38,10 @@ const LocalSEO = () => {
       lng: 36.8219
     },
     socialMedia: {
-      facebook: 'https://facebook.com/luxecart',
-      instagram: 'https://instagram.com/luxecart',
+      facebook: 'https://www.facebook.com/luxecart',
+      instagram: 'https://www.instagram.com/luxecart',
       twitter: 'https://twitter.com/luxecart',
-      linkedin: 'https://linkedin.com/company/luxecart'
+      linkedin: 'https://www.linkedin.com/company/luxecart'
     },
     services: [
       'Online Shopping',

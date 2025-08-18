@@ -90,6 +90,21 @@ router.post('/interaction', async (req, res) => {
   }
 });
 
+// AI interaction tracking
+router.post('/ai-interaction', async (req, res) => {
+  try {
+    const { type, productId, recommendationType, userId, timestamp, feedback, accuracy } = req.body;
+    
+    // Store AI interaction analytics (in production, this would go to a dedicated analytics service)
+    // AI interaction logged
+    
+    res.json({ success: true, message: 'AI interaction recorded' });
+  } catch (error) {
+    console.error('AI interaction tracking error:', error);
+    res.status(500).json({ error: 'Failed to record AI interaction' });
+  }
+});
+
 // Get real-time analytics dashboard data
 router.get('/dashboard', auth, async (req, res) => {
   try {

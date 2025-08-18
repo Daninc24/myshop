@@ -17,7 +17,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { getLazyImageProps, getOptimizedImageUrl } from '../utils/imageUtils';
 
-const ProductCard = ({ product, showQuickView = true, showWishlist = true }) => {
+const ProductCard = ({ product, showQuickView = true, showWishlist = true, compact = false }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -164,13 +164,58 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true }) => 
         );
       } else {
         stars.push(
-          <StarIcon key={i} className="w-4 h-4 text-gray-300" />
+          <StarIcon key={i} className="w-4 h-4 text-text-muted" />
         );
       }
     }
     return stars;
   };
 
+  // Compact mode render
+  if (compact) {
+    return (
+      <div className="group relative bg-surface rounded-xl border border-border overflow-hidden hover:shadow-medium transition-all duration-300">
+        <Link to={`/product/${_id}`} className="block">
+          <div className="flex gap-3 p-3">
+            {/* Compact Image */}
+            <div className="w-20 h-20 bg-surface-hover rounded-lg overflow-hidden flex-shrink-0">
+              <img
+                src={getOptimizedImageUrl(images[0]) || '/placeholder-image.svg'}
+                alt={title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = '/placeholder-image.svg';
+                }}
+              />
+            </div>
+            
+            {/* Compact Content */}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-text-primary text-sm line-clamp-2 mb-1">
+                {title}
+              </h3>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-primary font-bold text-sm">
+                  {displayPrice}
+                </span>
+                {displayOriginalPrice && (
+                  <span className="text-text-muted line-through text-xs">
+                    {displayOriginalPrice}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                {renderRatingStars(rating)}
+                <span className="text-text-muted text-xs">({reviewCount})</span>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </div>
+    );
+  }
+
+  // Full mode render
   return (
     <div
       className="group relative bg-surface rounded-2xl border border-border overflow-hidden hover:shadow-large transition-all duration-300 transform hover:-translate-y-1"
@@ -207,7 +252,7 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true }) => 
       {showWishlist && (
         <button
           onClick={handleWishlistToggle}
-          className={`absolute top-3 right-3 z-10 p-2 rounded-full transition-all duration-300 ${
+          className={`absolute top-3 right-3 z-10 p-2 sm:p-2.5 rounded-full transition-all duration-300 min-h-[44px] min-w-[44px] sm:min-h-[48px] sm:min-w-[48px] ${
             isInWishlist 
               ? 'bg-error text-white shadow-glow' 
               : 'bg-surface/80 backdrop-blur-sm text-text-secondary hover:text-error hover:bg-surface'
@@ -224,7 +269,7 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true }) => 
       {/* Image Container */}
       <div className="block relative overflow-hidden">
         <Link to={`/product/${_id}`} className="block">
-          <div className="aspect-square bg-surface-hover relative w-full h-64">
+          <div className="aspect-square bg-surface-hover relative w-full h-48 sm:h-56 md:h-64">
             {/* Main Image */}
             <img
               src={getOptimizedImageUrl(images[selectedImageIndex] || images[0]) || '/placeholder-image.svg'}
@@ -280,7 +325,7 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true }) => 
             disabled={isAddingToCart || stock <= 0}
             className={`p-3 rounded-full transition-all duration-300 transform hover:scale-110 ${
               stock <= 0 
-                ? 'bg-gray-500 text-white cursor-not-allowed' 
+                ? 'bg-text-muted text-surface cursor-not-allowed' 
                 : 'bg-primary text-white hover:bg-primary-dark shadow-glow'
             }`}
           >
@@ -303,7 +348,7 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true }) => 
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         {/* Category */}
         {category && (
           <p className="text-xs text-text-muted mb-2 font-medium uppercase tracking-wide">
@@ -313,7 +358,7 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true }) => 
 
         {/* Title */}
         <Link to={`/product/${_id}`}>
-          <h3 className="font-semibold text-text-primary mb-2 line-clamp-2 hover:text-primary transition-colors duration-200">
+          <h3 className="font-semibold text-text-primary mb-2 line-clamp-2 hover:text-primary transition-colors duration-200 text-sm sm:text-base">
             {title}
           </h3>
         </Link>
@@ -332,11 +377,11 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true }) => 
 
         {/* Price */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-primary">
+          <span className="text-base sm:text-lg font-bold text-primary">
             {getCurrencySymbol(currency)}{displayPrice}
           </span>
           {displayOriginalPrice && displayOriginalPrice > displayPrice && (
-            <span className="text-sm text-text-muted line-through">
+            <span className="text-xs sm:text-sm text-text-muted line-through">
               {getCurrencySymbol(currency)}{displayOriginalPrice}
             </span>
           )}
@@ -359,9 +404,9 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true }) => 
           <button
             onClick={handleAddToCart}
             disabled={isAddingToCart || stock <= 0}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+            className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 min-h-[44px] ${
               stock <= 0 
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                ? 'bg-surface-hover text-text-muted cursor-not-allowed' 
                 : 'bg-primary text-white hover:bg-primary-dark hover:shadow-glow transform hover:-translate-y-0.5'
             }`}
           >

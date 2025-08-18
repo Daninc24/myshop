@@ -134,6 +134,79 @@ const productSchema = new mongoose.Schema({
     type: String,
     enum: ['draft', 'active', 'archived', 'out_of_stock'],
     default: 'draft'
+  },
+  // Delivery and shipping information
+  delivery: {
+    freeShipping: {
+      type: Boolean,
+      default: false
+    },
+    deliveryTime: {
+      type: String,
+      enum: ['same_day', 'next_day', '2_3_days', '3_5_days', '5_7_days'],
+      default: 'next_day'
+    },
+    expressDelivery: {
+      type: Boolean,
+      default: false
+    },
+    expressDeliveryFee: {
+      type: Number,
+      min: 0,
+      default: 0
+    },
+    weight: {
+      value: Number,
+      unit: {
+        type: String,
+        enum: ['g', 'kg', 'oz', 'lb'],
+        default: 'g'
+      }
+    },
+    dimensions: {
+      length: Number,
+      width: Number,
+      height: Number,
+      unit: {
+        type: String,
+        enum: ['mm', 'cm', 'm', 'in', 'ft'],
+        default: 'cm'
+      }
+    }
+  },
+  // Product specifications
+  specifications: {
+    brand: String,
+    model: String,
+    material: String,
+    color: String,
+    size: String,
+    warranty: String,
+    countryOfOrigin: String
+  },
+  // SEO and marketing
+  seo: {
+    title: String,
+    description: String,
+    keywords: [String],
+    canonicalUrl: String
+  },
+  // Product tags for better search and categorization
+  tags: [String],
+  // Featured and promotional flags
+  isFeatured: {
+    type: Boolean,
+    default: false
+  },
+  isOnSale: {
+    type: Boolean,
+    default: false
+  },
+  salePercentage: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: 0
   }
 }, {
   timestamps: true,

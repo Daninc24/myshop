@@ -19,7 +19,7 @@ const SocialMediaIntegration = () => {
       followers: 15420,
       posts: 156,
       engagement: 8.5,
-      url: 'https://facebook.com/luxecart',
+      url: 'https://www.facebook.com/luxecart',
       growth: '+12%',
       verified: true
     },
@@ -27,7 +27,7 @@ const SocialMediaIntegration = () => {
       followers: 23450,
       posts: 289,
       engagement: 12.3,
-      url: 'https://instagram.com/luxecart',
+      url: 'https://www.instagram.com/luxecart',
       growth: '+18%',
       verified: true
     },
@@ -43,7 +43,7 @@ const SocialMediaIntegration = () => {
       followers: 5670,
       posts: 89,
       engagement: 4.2,
-      url: 'https://linkedin.com/company/luxecart',
+      url: 'https://www.linkedin.com/company/luxecart',
       growth: '+15%',
       verified: true
     }

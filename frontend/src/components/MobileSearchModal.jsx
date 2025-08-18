@@ -47,7 +47,7 @@ const MobileSearchModal = ({ isOpen, onClose }) => {
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className="bg-white rounded-2xl w-full max-w-md shadow-2xl"
+            className="bg-surface rounded-2xl w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4">
@@ -60,13 +60,13 @@ const MobileSearchModal = ({ isOpen, onClose }) => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-text-primary"
                   />
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-muted" />
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 text-gray-500 hover:text-gray-700"
+                  className="p-2 text-text-muted hover:text-text-secondary"
                 >
                   <XMarkIcon className="w-6 h-6" />
                 </button>
@@ -74,7 +74,7 @@ const MobileSearchModal = ({ isOpen, onClose }) => {
               
               {isLoading && (
                 <div className="mt-4 text-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500 mx-auto"></div>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
                 </div>
               )}
             </div>

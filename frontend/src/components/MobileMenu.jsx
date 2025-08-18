@@ -17,8 +17,7 @@ import {
   HeartIcon,
   MagnifyingGlassIcon,
   BellIcon,
-  SunIcon,
-  MoonIcon,
+
   ShoppingBagIcon
 } from '@heroicons/react/24/outline';
 
@@ -33,8 +32,7 @@ const MobileMenu = ({
   handleCurrencyChange,
   posRoles,
   categories = [],
-  isDarkMode,
-  toggleDarkMode,
+
   onSearchClick,
   onNotificationsClick,
   wishlistCount = 0
@@ -70,7 +68,7 @@ const MobileMenu = ({
 
   return (
     <div
-      className={`fixed top-0 left-0 w-80 h-full bg-gradient-to-b from-blue-900 to-blue-800 shadow-2xl z-50 transform transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      className={`fixed top-0 left-0 w-[280px] sm:w-80 h-full bg-gradient-to-b from-blue-900 to-blue-800 shadow-2xl z-50 transform transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
       <div className="flex justify-between items-center p-6 border-b border-blue-700">
         <h2 className="text-2xl font-bold text-yellow-400">Menu</h2>
@@ -100,6 +98,22 @@ const MobileMenu = ({
               </svg>
             </button>
           </form>
+        </div>
+
+        {/* Currency Selector */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-blue-200 mb-2">Currency</label>
+          <select
+            value={currency}
+            onChange={(e) => handleCurrencyChange(e.target.value)}
+            className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white transition-all duration-300"
+          >
+            {currencies.map((curr) => (
+              <option key={curr.code} value={curr.code} className="bg-blue-800 text-white">
+                {curr.symbol} {curr.code} - {curr.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Quick Actions Grid */}
@@ -162,26 +176,7 @@ const MobileMenu = ({
           </button>
         </div>
 
-        {/* Theme Toggle */}
-        <div className="flex justify-center mb-4">
-          <button
-            onClick={toggleDarkMode}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-white hover:bg-blue-700/50 transition-all duration-200"
-            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          >
-            {isDarkMode ? (
-              <>
-                <SunIcon className="h-5 w-5" />
-                <span className="text-sm">Light Mode</span>
-              </>
-            ) : (
-              <>
-                <MoonIcon className="h-5 w-5" />
-                <span className="text-sm">Dark Mode</span>
-              </>
-            )}
-          </button>
-        </div>
+
 
         {/* Categories Section */}
         <div className="border-t border-blue-700 pt-4">

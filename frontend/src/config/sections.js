@@ -4,7 +4,7 @@ export const SECTIONS_CONFIG = {
   hero: {
     enabled: true,
     title: 'LuxeCart',
-    subtitle: 'Discover thousands of premium products with confidence. Shop the latest trends and enjoy lightning-fast delivery!',
+    subtitle: 'Discover thousands of premium products with confidence. Shop the latest trends and enjoy 24-hour delivery!',
     highlights: [
       'Premium Quality Products',
       'Fast & Secure Delivery',
@@ -34,8 +34,8 @@ export const SECTIONS_CONFIG = {
     subtitle: 'Experience the difference with our premium services',
     items: [
       {
-        title: 'Free Shipping',
-        description: 'Free shipping on orders over $50',
+        title: '24-Hour Delivery',
+        description: 'Lightning-fast delivery across Kenya',
         icon: 'TruckIcon',
         gradient: 'from-blue-500 to-cyan-500',
         enabled: true

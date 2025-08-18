@@ -255,7 +255,7 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
     <div className="relative w-full max-w-2xl" ref={searchRef}>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+          <MagnifyingGlassIcon className="h-5 w-5 text-text-muted" />
         </div>
         
         <input
@@ -265,7 +265,7 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
           onFocus={() => setShowSuggestions(true)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           placeholder={placeholder}
-          className="w-full pl-12 pr-20 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="w-full pl-12 pr-20 py-3 border border-border rounded-full focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text-primary placeholder-text-muted"
         />
         
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 gap-1">
@@ -277,7 +277,7 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
           
           <button
             onClick={handleVoiceSearch}
-            className="p-2 text-gray-400 hover:text-orange-500 transition-colors"
+            className="p-2 text-text-muted hover:text-primary transition-colors"
             title="Voice Search"
           >
             <MicrophoneIcon className="h-5 w-5" />
@@ -285,7 +285,7 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
           
           <button
             onClick={handleImageSearch}
-            className="p-2 text-gray-400 hover:text-orange-500 transition-colors"
+            className="p-2 text-text-muted hover:text-primary transition-colors"
             title="Image Search"
           >
             <CameraIcon className="h-5 w-5" />
@@ -293,7 +293,7 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
           
           <button
             onClick={() => handleSearch()}
-            className="px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors"
+            className="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors"
           >
             Search
           </button>
@@ -302,19 +302,19 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
 
       {/* Smart Suggestions Panel */}
       {showSuggestions && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-surface rounded-2xl shadow-2xl border border-border z-50 max-h-96 overflow-y-auto">
           {/* Search Suggestions */}
           {suggestions.length > 0 && (
-            <div className="p-4 border-b border-gray-100">
+            <div className="p-4 border-b border-border">
               <div className="flex items-center gap-2 mb-3">
-                <SparklesIcon className="h-4 w-4 text-orange-500" />
-                <span className="text-sm font-semibold text-gray-700">Smart Suggestions</span>
+                <SparklesIcon className="h-4 w-4 text-primary" />
+                <span className="text-sm font-semibold text-text-primary">Smart Suggestions</span>
               </div>
               {suggestions.map((suggestion, index) => (
                 <div
                   key={index}
                   onClick={() => handleSearch(suggestion.title)}
-                  className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                  className="flex items-center gap-3 p-2 hover:bg-surface-hover rounded-lg cursor-pointer"
                 >
                   {suggestion.image && (
                     <img 
@@ -325,10 +325,10 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
                     />
                   )}
                   <div className="flex-1">
-                    <div className="font-medium text-gray-900">{suggestion.title}</div>
-                    <div className="text-sm text-gray-500">{suggestion.category}</div>
+                    <div className="font-medium text-text-primary">{suggestion.title}</div>
+                    <div className="text-sm text-text-secondary">{suggestion.category}</div>
                   </div>
-                  <div className="text-sm text-gray-400">
+                  <div className="text-sm text-text-muted">
                     {suggestion.price && `$${suggestion.price}`}
                   </div>
                 </div>
@@ -338,22 +338,22 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
 
           {/* Recent Searches */}
           {recentSearches.length > 0 && (
-            <div className="p-4 border-b border-gray-100">
+            <div className="p-4 border-b border-border">
               <div className="flex items-center gap-2 mb-3">
-                <ClockIcon className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-semibold text-gray-700">Recent Searches</span>
+                <ClockIcon className="h-4 w-4 text-text-muted" />
+                <span className="text-sm font-semibold text-text-primary">Recent Searches</span>
               </div>
               {recentSearches.map((search, index) => (
-                <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-2 hover:bg-surface-hover rounded-lg">
                   <button
                     onClick={() => handleSearch(search)}
-                    className="flex-1 text-left text-gray-700 hover:text-orange-500"
+                    className="flex-1 text-left text-text-primary hover:text-primary"
                   >
                     {search}
                   </button>
                   <button
                     onClick={() => removeRecentSearch(search)}
-                    className="p-1 text-gray-400 hover:text-red-500"
+                    className="p-1 text-text-muted hover:text-error"
                   >
                     <XMarkIcon className="h-4 w-4" />
                   </button>
@@ -366,10 +366,10 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
           <div className="p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <FireIcon className="h-4 w-4 text-red-500" />
-                <span className="text-sm font-semibold text-gray-700">Trending Now</span>
+                <FireIcon className="h-4 w-4 text-error" />
+                <span className="text-sm font-semibold text-text-primary">Trending Now</span>
               </div>
-                             <div className="flex items-center gap-2 text-xs text-gray-500">
+                             <div className="flex items-center gap-2 text-xs text-text-muted">
                  <ChartBarIcon className="h-3 w-3" />
                  <span>Live</span>
                </div>
@@ -381,7 +381,7 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
                   <button
                     key={index}
                     onClick={() => handleSearch(term)}
-                    className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm hover:bg-orange-200 transition-colors flex items-center gap-1"
+                    className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm hover:bg-primary/20 transition-colors flex items-center gap-1"
                   >
                     {term}
                     {liveTrend && (
@@ -397,18 +397,18 @@ const SmartSearch = ({ onSearch, placeholder = "Search products, brands, or cate
             </div>
             
             {/* Search Analytics */}
-            <div className="mt-4 pt-3 border-t border-gray-100">
-              <div className="grid grid-cols-3 gap-4 text-xs text-gray-600">
+            <div className="mt-4 pt-3 border-t border-border">
+              <div className="grid grid-cols-3 gap-4 text-xs text-text-secondary">
                 <div className="text-center">
-                  <div className="font-semibold text-gray-800">{searchAnalytics.averageResults}</div>
+                  <div className="font-semibold text-text-primary">{searchAnalytics.averageResults}</div>
                   <div>Avg Results</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-gray-800">{searchAnalytics.searchTime.toFixed(1)}s</div>
+                  <div className="font-semibold text-text-primary">{searchAnalytics.searchTime.toFixed(1)}s</div>
                   <div>Search Time</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-gray-800">{searchAnalytics.successRate}%</div>
+                  <div className="font-semibold text-text-primary">{searchAnalytics.successRate}%</div>
                   <div>Success Rate</div>
                 </div>
               </div>

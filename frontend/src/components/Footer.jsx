@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { getBrandName, getBrandEmail, getBrandPhone, getSocialLinks } from '../config/branding';
+import { 
+  StarIcon,
+  MapPinIcon, 
+  PhoneIcon, 
+  EnvelopeIcon,
+  GlobeAltIcon
+} from '@heroicons/react/24/outline';
 
 const EventsPreview = () => {
   const [events, setEvents] = useState([]);
@@ -25,9 +32,9 @@ const EventsPreview = () => {
     fetchEvents();
   }, []);
 
-  if (loading) return <div className="text-gray-400 dark:text-gray-500 text-xs">Loading events…</div>;
+  if (loading) return <div className="text-gray-400 text-xs">Loading events…</div>;
   if (error) return <div className="text-red-500 text-xs">{error}</div>;
-  if (!events.length) return <div className="text-gray-400 dark:text-gray-500 text-xs">No upcoming events.</div>;
+  if (!events.length) return <div className="text-gray-400 text-xs">No upcoming events.</div>;
 
   return (
     <ul className="space-y-1 text-sm">
@@ -35,7 +42,7 @@ const EventsPreview = () => {
         <li key={event._id || event.title}>
           <span className="font-medium text-primary">{event.title}</span>
           {event.date && (
-            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">{new Date(event.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            <span className="ml-2 text-xs text-gray-500">{new Date(event.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
           )}
           {event.link ? (
             <a href={event.link} target="_blank" rel="noopener noreferrer" className="ml-2 underline hover:text-primary">More Info</a>
@@ -56,10 +63,7 @@ const email = getBrandEmail();
 const socialLinks = getSocialLinks();
 const eventsLink = '/events';
 
-// Dark mode utility
-const toggleDarkMode = () => {
-  document.documentElement.classList.toggle('dark');
-};
+
 
 const mapEmbedUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.16228411687!2d36.821946!3d-1.292066!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d2d5555555%3A0x5b7f5e5e5e5e5e5e!2sNairobi!5e0!3m2!1sen!2ske!4v1620000000000!5m2!1sen!2ske';
 
@@ -104,9 +108,9 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-r from-blue-700 via-purple-700 to-yellow-400 border-t border-yellow-300 dark:from-gray-900 dark:via-blue-900 dark:to-yellow-600 dark:text-gray-100 mt-12 py-4 sm:py-6 px-2 sm:px-4 text-white transition-colors duration-300">
+    <footer className="bg-gradient-to-r from-primary to-secondary border-t border-primary mt-12 py-4 sm:py-6 px-2 sm:px-4 text-white transition-colors duration-300">
   {/* Responsive grid: 1col xs, 2col sm, 3col md, 5col lg */}
-  <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
         {/* Brand & Newsletter */}
         {/* Latest Events & Promotions */}
         <div className="flex flex-col gap-2 md:col-span-1 items-center sm:items-start">
@@ -116,7 +120,7 @@ const Footer = () => {
       <button
         key={star}
         onClick={() => handleRate(star)}
-        className={`text-2xl ${userRating >= star ? 'text-primary' : 'text-gray-300'} focus:outline-none transition-colors`}
+                        className={`text-2xl ${userRating >= star ? 'text-primary' : 'text-text-muted'} focus:outline-none transition-colors`}
         aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
       >
         ★
@@ -144,7 +148,7 @@ const Footer = () => {
         {/* Store Location Map */}
         <div className="flex flex-col gap-3 md:col-span-1">
           <h3 className="text-lg font-heading font-bold mb-2">Our Location</h3>
-          <div className="rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700">
+          <div className="rounded-xl overflow-hidden shadow-lg border border-gray-200">
             <iframe
               src={mapEmbedUrl}
               width="100%"
@@ -157,14 +161,16 @@ const Footer = () => {
               className="w-full h-40 md:h-32"
             ></iframe>
           </div>
-          <span className="text-xs text-gray-500 dark:text-gray-400">Nairobi, Kenya</span>
+          <span className="text-xs text-gray-500">Nairobi, Kenya</span>
         </div>
         <div className="flex flex-col gap-2 col-span-1 items-center sm:items-start">
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-2 w-full">
-  <img src="/images/logo-footer.svg" alt="Logo" className="w-10 h-10 rounded-xl shadow-lg bg-white p-1 mx-auto sm:mx-0" aria-label="LuxeCart Logo" />
-<span className="font-heading text-xl sm:text-2xl font-bold text-yellow-400 drop-shadow text-center sm:text-left">{getBrandName()}</span>
-</div>
-          <p className="text-gray-500 dark:text-gray-400 mb-2">Your one-stop shop for everything awesome. Enjoy seamless shopping, fast delivery, and great deals!</p>
+            <div className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center mx-auto sm:mx-0">
+              <span className="font-heading text-lg font-bold text-primary">LC</span>
+            </div>
+            <span className="font-heading text-xl sm:text-2xl font-bold text-white drop-shadow text-center sm:text-left">{getBrandName()}</span>
+          </div>
+          <p className="text-text-secondary mb-2">Your one-stop shop for everything awesome. Enjoy seamless shopping, fast delivery, and great deals!</p>
           <form className="flex flex-col gap-2 w-full" onSubmit={e => { e.preventDefault(); alert('Subscribed!'); }}>
   <label htmlFor="newsletter" className="font-medium">Subscribe to our newsletter</label>
   <div className="flex flex-col xs:flex-row gap-2 w-full">
@@ -173,9 +179,15 @@ const Footer = () => {
   </div>
 </form>
           <div className="flex gap-3 mt-4 justify-center sm:justify-start">
-            <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/facebook.svg" alt="Facebook" className="w-6 h-6" /></a>
-            <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/twitter.svg" alt="Twitter" className="w-6 h-6" /></a>
-            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-yellow-400/20 rounded-full p-1"><img src="/icons/whatsapp.svg" alt="WhatsApp" className="w-6 h-6" /></a>
+            <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-white/20 rounded-full p-2">
+              <GlobeAltIcon className="w-6 h-6 text-white" />
+            </a>
+            <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-white/20 rounded-full p-2">
+              <GlobeAltIcon className="w-6 h-6 text-white" />
+            </a>
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-white/20 rounded-full p-2">
+              <GlobeAltIcon className="w-6 h-6 text-white" />
+            </a>
           </div>
           
         </div>
@@ -183,12 +195,12 @@ const Footer = () => {
         {/* Quick Links */}
         <div className="flex flex-col gap-2">
           <h3 className="text-lg font-heading font-bold mb-2">Quick Links</h3>
-          <a href="/" className="hover:text-yellow-400 transition-colors">Home</a>
-          <a href="/products" className="hover:text-yellow-400 transition-colors">Products</a>
-          <Link to="/about" className="hover:text-yellow-400 transition-colors">About Us</Link>
-          <Link to="/contact" className="hover:text-yellow-400 transition-colors">Contact</Link>
-          <Link to="/faq" className="hover:text-yellow-400 transition-colors">FAQ</Link>
-          <Link to="/events" className="hover:text-yellow-400 transition-colors">Events</Link>
+                   <a href="/" className="hover:text-white/80 transition-colors">Home</a>
+         <a href="/products" className="hover:text-white/80 transition-colors">Products</a>
+         <Link to="/about" className="hover:text-white/80 transition-colors">About Us</Link>
+         <Link to="/contact" className="hover:text-white/80 transition-colors">Contact</Link>
+         <Link to="/faq" className="hover:text-white/80 transition-colors">FAQ</Link>
+         <Link to="/events" className="hover:text-white/80 transition-colors">Events</Link>
         </div>
         {/* Contact Info */}
         <div className="flex flex-col gap-2">
@@ -206,15 +218,15 @@ const Footer = () => {
             <span>Nairobi, Kenya</span>
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
-  <span className="bg-white rounded shadow p-1"><img src="/icons/visa.svg" alt="Visa" className="w-8 h-6" /></span>
-  <span className="bg-white rounded shadow p-1"><img src="/icons/mastercard.svg" alt="MasterCard" className="w-8 h-6" /></span>
-  <span className="bg-white rounded shadow p-1"><img src="/icons/paypal.svg" alt="PayPal" className="w-8 h-6" /></span>
-</div>
+            <span className="bg-white rounded shadow p-1 text-xs font-bold text-gray-700 px-2 py-1">VISA</span>
+            <span className="bg-white rounded shadow p-1 text-xs font-bold text-gray-700 px-2 py-1">MC</span>
+            <span className="bg-white rounded shadow p-1 text-xs font-bold text-gray-700 px-2 py-1">PP</span>
+          </div>
         </div>
       </div>
-      <div className="border-t border-yellow-300 mt-6 pt-2 text-center text-xs text-yellow-100 flex flex-col sm:flex-row justify-between items-center gap-2">
+      <div className="border-t border-white/20 mt-6 pt-2 text-center text-xs text-white/80 flex flex-col sm:flex-row justify-between items-center gap-2">
         <span>&copy; {new Date().getFullYear()} {getBrandName()}. All rights reserved.</span>
-        <a href="#top" className="text-primary hover:underline">Back to Top ↑</a>
+        <a href="#top" className="text-white hover:underline">Back to Top ↑</a>
       </div>
     </footer>
   );

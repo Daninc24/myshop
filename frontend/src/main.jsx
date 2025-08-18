@@ -6,7 +6,7 @@ import './index.css'
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ToastProvider } from './contexts/ToastContext.jsx';
 import { CartProvider } from './contexts/CartContext.jsx';
-import { ThemeProvider } from './contexts/ThemeContext.jsx';
+
 import { AnalyticsProvider } from './contexts/AnalyticsContext.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -43,17 +43,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           algorithm: antdTheme.defaultAlgorithm,
         }}
       >
-        <ThemeProvider>
-          <ToastProvider>
-            <AuthProvider>
-              <CartProvider>
-                <AnalyticsProvider>
-                  <App />
-                </AnalyticsProvider>
-              </CartProvider>
-            </AuthProvider>
-          </ToastProvider>
-        </ThemeProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <CartProvider>
+              <AnalyticsProvider>
+                <App />
+              </AnalyticsProvider>
+            </CartProvider>
+          </AuthProvider>
+        </ToastProvider>
       </ConfigProvider>
     </HelmetProvider>
   </BrowserRouter>,

@@ -28,7 +28,34 @@ const AdminProducts = () => {
     category: '',
     subcategory: '',
     stock: '',
-    status: 'draft'
+    status: 'draft',
+    // Delivery information
+    freeShipping: false,
+    deliveryTime: 'next_day',
+    expressDelivery: false,
+    expressDeliveryFee: '',
+    weight: '',
+    weightUnit: 'g',
+    length: '',
+    width: '',
+    height: '',
+    dimensionUnit: 'cm',
+    // Specifications
+    brand: '',
+    model: '',
+    material: '',
+    color: '',
+    size: '',
+    warranty: '',
+    countryOfOrigin: '',
+    // SEO and marketing
+    seoTitle: '',
+    seoDescription: '',
+    seoKeywords: '',
+    tags: '',
+    isFeatured: false,
+    isOnSale: false,
+    salePercentage: ''
   });
 
   useEffect(() => {
@@ -116,6 +143,42 @@ const AdminProducts = () => {
       }
       submitData.append('status', formData.status);
       
+      // Delivery information
+      submitData.append('freeShipping', formData.freeShipping);
+      submitData.append('deliveryTime', formData.deliveryTime);
+      submitData.append('expressDelivery', formData.expressDelivery);
+      if (formData.expressDeliveryFee) {
+        submitData.append('expressDeliveryFee', formData.expressDeliveryFee);
+      }
+      if (formData.weight) {
+        submitData.append('weight', formData.weight);
+        submitData.append('weightUnit', formData.weightUnit);
+      }
+      if (formData.length) {
+        submitData.append('length', formData.length);
+        submitData.append('width', formData.width);
+        submitData.append('height', formData.height);
+        submitData.append('dimensionUnit', formData.dimensionUnit);
+      }
+      
+      // Specifications
+      if (formData.brand) submitData.append('brand', formData.brand);
+      if (formData.model) submitData.append('model', formData.model);
+      if (formData.material) submitData.append('material', formData.material);
+      if (formData.color) submitData.append('color', formData.color);
+      if (formData.size) submitData.append('size', formData.size);
+      if (formData.warranty) submitData.append('warranty', formData.warranty);
+      if (formData.countryOfOrigin) submitData.append('countryOfOrigin', formData.countryOfOrigin);
+      
+      // SEO and marketing
+      if (formData.seoTitle) submitData.append('seoTitle', formData.seoTitle);
+      if (formData.seoDescription) submitData.append('seoDescription', formData.seoDescription);
+      if (formData.seoKeywords) submitData.append('seoKeywords', formData.seoKeywords);
+      if (formData.tags) submitData.append('tags', formData.tags);
+      submitData.append('isFeatured', formData.isFeatured);
+      submitData.append('isOnSale', formData.isOnSale);
+      if (formData.salePercentage) submitData.append('salePercentage', formData.salePercentage);
+      
       // Append all image files
       imageFiles.forEach((file, index) => {
         submitData.append('images', file);
@@ -154,7 +217,34 @@ const AdminProducts = () => {
       category: product.category,
       subcategory: product.subcategory || '',
       stock: (product.stock ?? '').toString(),
-      status: product.status || 'draft'
+      status: product.status || 'draft',
+      // Delivery information
+      freeShipping: product.delivery?.freeShipping || false,
+      deliveryTime: product.delivery?.deliveryTime || 'next_day',
+      expressDelivery: product.delivery?.expressDelivery || false,
+      expressDeliveryFee: (product.delivery?.expressDeliveryFee ?? '').toString(),
+      weight: (product.delivery?.weight?.value ?? '').toString(),
+      weightUnit: product.delivery?.weight?.unit || 'g',
+      length: (product.delivery?.dimensions?.length ?? '').toString(),
+      width: (product.delivery?.dimensions?.width ?? '').toString(),
+      height: (product.delivery?.dimensions?.height ?? '').toString(),
+      dimensionUnit: product.delivery?.dimensions?.unit || 'cm',
+      // Specifications
+      brand: product.specifications?.brand || '',
+      model: product.specifications?.model || '',
+      material: product.specifications?.material || '',
+      color: product.specifications?.color || '',
+      size: product.specifications?.size || '',
+      warranty: product.specifications?.warranty || '',
+      countryOfOrigin: product.specifications?.countryOfOrigin || '',
+      // SEO and marketing
+      seoTitle: product.seo?.title || '',
+      seoDescription: product.seo?.description || '',
+      seoKeywords: product.seo?.keywords?.join(', ') || '',
+      tags: product.tags?.join(', ') || '',
+      isFeatured: product.isFeatured || false,
+      isOnSale: product.isOnSale || false,
+      salePercentage: (product.salePercentage ?? '').toString()
     });
     // Determine if product has variants
     const hasVar = Array.isArray(product.variants) && product.variants.length > 0;
@@ -198,7 +288,34 @@ const AdminProducts = () => {
       category: '',
       subcategory: '',
       stock: '',
-      status: 'draft'
+      status: 'draft',
+      // Delivery information
+      freeShipping: false,
+      deliveryTime: 'next_day',
+      expressDelivery: false,
+      expressDeliveryFee: '',
+      weight: '',
+      weightUnit: 'g',
+      length: '',
+      width: '',
+      height: '',
+      dimensionUnit: 'cm',
+      // Specifications
+      brand: '',
+      model: '',
+      material: '',
+      color: '',
+      size: '',
+      warranty: '',
+      countryOfOrigin: '',
+      // SEO and marketing
+      seoTitle: '',
+      seoDescription: '',
+      seoKeywords: '',
+      tags: '',
+      isFeatured: false,
+      isOnSale: false,
+      salePercentage: ''
     });
     setImageFiles([]);
     setImagePreviews([]);
@@ -473,6 +590,260 @@ const AdminProducts = () => {
                 <option value="out_of_stock">Out of stock</option>
               </select>
             </div>
+
+            {/* Delivery Information */}
+            <div className="md:col-span-2">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">Delivery & Shipping</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="freeShipping"
+                    checked={formData.freeShipping}
+                    onChange={e => setFormData(f => ({ ...f, freeShipping: e.target.checked }))}
+                  />
+                  <label htmlFor="freeShipping" className="font-medium">Free Shipping</label>
+                </div>
+                
+                <div className="flex flex-col gap-1">
+                  <label className="font-medium">Delivery Time</label>
+                  <select
+                    value={formData.deliveryTime}
+                    onChange={e => setFormData(f => ({ ...f, deliveryTime: e.target.value }))}
+                    className="input-field"
+                  >
+                    <option value="same_day">Same Day</option>
+                    <option value="next_day">Next Day (24 Hours)</option>
+                    <option value="2_3_days">2-3 Days</option>
+                    <option value="3_5_days">3-5 Days</option>
+                    <option value="5_7_days">5-7 Days</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="expressDelivery"
+                    checked={formData.expressDelivery}
+                    onChange={e => setFormData(f => ({ ...f, expressDelivery: e.target.checked }))}
+                  />
+                  <label htmlFor="expressDelivery" className="font-medium">Express Delivery Available</label>
+                </div>
+
+                {formData.expressDelivery && (
+                  <div className="flex flex-col gap-1">
+                    <label className="font-medium">Express Delivery Fee</label>
+                    <input
+                      type="number"
+                      value={formData.expressDeliveryFee}
+                      onChange={e => setFormData(f => ({ ...f, expressDeliveryFee: e.target.value }))}
+                      placeholder="Express delivery fee"
+                      className="input-field"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Weight and Dimensions */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div className="flex flex-col gap-1">
+                  <label className="font-medium">Weight</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      value={formData.weight}
+                      onChange={e => setFormData(f => ({ ...f, weight: e.target.value }))}
+                      placeholder="Weight"
+                      className="input-field flex-1"
+                    />
+                    <select
+                      value={formData.weightUnit}
+                      onChange={e => setFormData(f => ({ ...f, weightUnit: e.target.value }))}
+                      className="input-field w-20"
+                    >
+                      <option value="g">g</option>
+                      <option value="kg">kg</option>
+                      <option value="oz">oz</option>
+                      <option value="lb">lb</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="font-medium">Length</label>
+                  <input
+                    type="number"
+                    value={formData.length}
+                    onChange={e => setFormData(f => ({ ...f, length: e.target.value }))}
+                    placeholder="Length"
+                    className="input-field"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="font-medium">Width</label>
+                  <input
+                    type="number"
+                    value={formData.width}
+                    onChange={e => setFormData(f => ({ ...f, width: e.target.value }))}
+                    placeholder="Width"
+                    className="input-field"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="font-medium">Height</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      value={formData.height}
+                      onChange={e => setFormData(f => ({ ...f, height: e.target.value }))}
+                      placeholder="Height"
+                      className="input-field flex-1"
+                    />
+                    <select
+                      value={formData.dimensionUnit}
+                      onChange={e => setFormData(f => ({ ...f, dimensionUnit: e.target.value }))}
+                      className="input-field w-20"
+                    >
+                      <option value="cm">cm</option>
+                      <option value="mm">mm</option>
+                      <option value="m">m</option>
+                      <option value="in">in</option>
+                      <option value="ft">ft</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Specifications */}
+            <div className="md:col-span-2">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">Product Specifications</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  value={formData.brand}
+                  onChange={e => setFormData(f => ({ ...f, brand: e.target.value }))}
+                  placeholder="Brand"
+                  className="input-field"
+                />
+                <input
+                  type="text"
+                  value={formData.model}
+                  onChange={e => setFormData(f => ({ ...f, model: e.target.value }))}
+                  placeholder="Model"
+                  className="input-field"
+                />
+                <input
+                  type="text"
+                  value={formData.material}
+                  onChange={e => setFormData(f => ({ ...f, material: e.target.value }))}
+                  placeholder="Material"
+                  className="input-field"
+                />
+                <input
+                  type="text"
+                  value={formData.color}
+                  onChange={e => setFormData(f => ({ ...f, color: e.target.value }))}
+                  placeholder="Color"
+                  className="input-field"
+                />
+                <input
+                  type="text"
+                  value={formData.size}
+                  onChange={e => setFormData(f => ({ ...f, size: e.target.value }))}
+                  placeholder="Size"
+                  className="input-field"
+                />
+                <input
+                  type="text"
+                  value={formData.warranty}
+                  onChange={e => setFormData(f => ({ ...f, warranty: e.target.value }))}
+                  placeholder="Warranty"
+                  className="input-field"
+                />
+                <input
+                  type="text"
+                  value={formData.countryOfOrigin}
+                  onChange={e => setFormData(f => ({ ...f, countryOfOrigin: e.target.value }))}
+                  placeholder="Country of Origin"
+                  className="input-field"
+                />
+              </div>
+            </div>
+
+            {/* SEO and Marketing */}
+            <div className="md:col-span-2">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">SEO & Marketing</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  value={formData.seoTitle}
+                  onChange={e => setFormData(f => ({ ...f, seoTitle: e.target.value }))}
+                  placeholder="SEO Title"
+                  className="input-field"
+                />
+                <input
+                  type="text"
+                  value={formData.seoKeywords}
+                  onChange={e => setFormData(f => ({ ...f, seoKeywords: e.target.value }))}
+                  placeholder="SEO Keywords (comma-separated)"
+                  className="input-field"
+                />
+                <input
+                  type="text"
+                  value={formData.tags}
+                  onChange={e => setFormData(f => ({ ...f, tags: e.target.value }))}
+                  placeholder="Tags (comma-separated)"
+                  className="input-field"
+                />
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="isFeatured"
+                      checked={formData.isFeatured}
+                      onChange={e => setFormData(f => ({ ...f, isFeatured: e.target.checked }))}
+                    />
+                    <label htmlFor="isFeatured" className="font-medium">Featured Product</label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="isOnSale"
+                      checked={formData.isOnSale}
+                      onChange={e => setFormData(f => ({ ...f, isOnSale: e.target.checked }))}
+                    />
+                    <label htmlFor="isOnSale" className="font-medium">On Sale</label>
+                  </div>
+                </div>
+                {formData.isOnSale && (
+                  <div className="flex flex-col gap-1">
+                    <label className="font-medium">Sale Percentage</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={formData.salePercentage}
+                      onChange={e => setFormData(f => ({ ...f, salePercentage: e.target.value }))}
+                      placeholder="Sale percentage"
+                      className="input-field"
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="mt-4">
+                <label className="font-medium">SEO Description</label>
+                <textarea
+                  value={formData.seoDescription}
+                  onChange={e => setFormData(f => ({ ...f, seoDescription: e.target.value }))}
+                  placeholder="SEO Description"
+                  className="input-field"
+                  rows="3"
+                />
+              </div>
+            </div>
             <div className="flex flex-col gap-1 md:col-span-2">
               <label className="font-medium">Description</label>
               <textarea
@@ -518,8 +889,33 @@ const AdminProducts = () => {
                 <h2 className="text-lg font-heading font-bold text-secondary mb-1">{product.title}</h2>
                 <div className="text-gray-500 text-sm mb-1">{product.category}</div>
                 <div className="text-primary font-semibold text-xl mb-1">Ksh {product.price}</div>
-                <div className="text-xs text-gray-400">Stock: {product.stock}</div>
+                <div className="flex flex-wrap gap-2 text-xs text-gray-400 mb-1">
+                  <span>Stock: {product.stock}</span>
+                  <span>•</span>
+                  <span>Status: {product.status}</span>
+                  {product.delivery?.freeShipping && (
+                    <>
+                      <span>•</span>
+                      <span className="text-green-600">Free Shipping</span>
+                    </>
+                  )}
+                  {product.isFeatured && (
+                    <>
+                      <span>•</span>
+                      <span className="text-blue-600">Featured</span>
+                    </>
+                  )}
+                  {product.isOnSale && (
+                    <>
+                      <span>•</span>
+                      <span className="text-red-600">On Sale</span>
+                    </>
+                  )}
+                </div>
                 <div className="text-gray-700 text-sm mt-2 line-clamp-2">{product.description}</div>
+                {product.specifications?.brand && (
+                  <div className="text-xs text-gray-500 mt-1">Brand: {product.specifications.brand}</div>
+                )}
               </div>
             </div>
             <div className="flex flex-col gap-2 md:ml-4">

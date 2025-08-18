@@ -7,7 +7,7 @@ import {
   ShoppingCartIcon,
   HeartIcon,
   StarIcon,
-  TrendingUpIcon
+  ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 
 const AdvancedAnalytics = () => {
@@ -353,7 +353,7 @@ const AdvancedAnalytics = () => {
 
         <div className="bg-orange-50 p-4 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUpIcon className="w-4 h-4 text-orange-500" />
+                            <ArrowTrendingUpIcon className="w-4 h-4 text-orange-500" />
             <span className="text-sm font-medium text-orange-700">Conversion Rate</span>
           </div>
           <p className="text-2xl font-bold text-orange-900">{metrics.conversionRate.toFixed(1)}%</p>

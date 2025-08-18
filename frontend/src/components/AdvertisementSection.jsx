@@ -62,8 +62,8 @@ const AdvertisementSection = ({
   if (loading) {
     return (
       <div className={`${className} animate-pulse`}>
-                 <div className="bg-gray-200 rounded-lg h-20 flex items-center justify-center">
-          <div className="text-gray-400">Loading advertisements...</div>
+                 <div className="bg-surface-hover rounded-lg h-20 flex items-center justify-center">
+          <div className="text-text-muted">Loading advertisements...</div>
         </div>
       </div>
     );
@@ -71,9 +71,9 @@ const AdvertisementSection = ({
 
   if (error) {
     return (
-      <div className={`${className} bg-red-50 border border-red-200 rounded-lg p-4`}>
-        <div className="text-red-600 text-sm">{error}</div>
-      </div>
+             <div className={`${className} bg-error/10 border border-error/20 rounded-lg p-4`}>
+         <div className="text-error text-sm">{error}</div>
+       </div>
     );
   }
 
@@ -184,7 +184,7 @@ export const AdvertisementGrid = ({
     return (
       <div className={`${className} grid grid-cols-1 md:grid-cols-${columns} gap-4 animate-pulse`}>
                  {[...Array(columns)].map((_, i) => (
-           <div key={i} className="bg-gray-200 rounded-lg h-20"></div>
+           <div key={i} className="bg-surface-hover rounded-lg h-20"></div>
          ))}
       </div>
     );
@@ -249,7 +249,7 @@ export const AdvertisementCarousel = ({
   if (loading) {
     return (
       <div className={`${className} animate-pulse`}>
-        <div className="bg-gray-200 rounded-lg h-20"></div>
+        <div className="bg-surface-hover rounded-lg h-20"></div>
       </div>
     );
   }

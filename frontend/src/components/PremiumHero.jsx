@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import SmartSearch from './SmartSearch';
 import { 
   ArrowRightIcon, 
   StarIcon, 
@@ -20,6 +21,7 @@ const PremiumHero = ({
   onViewDeals,
   backgroundImage 
 }) => {
+  const navigate = useNavigate();
   const [currentHighlight, setCurrentHighlight] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -79,7 +81,7 @@ const PremiumHero = ({
     >
       {/* Animated background elements */}
       <div className="absolute inset-0">
-        {/* Dark overlay for better text visibility */}
+        {/* Overlay for better text visibility */}
         <div className="absolute inset-0 bg-black/40"></div>
         {!isMobile && (
           <div 
@@ -189,6 +191,25 @@ const PremiumHero = ({
                 {heroContent.subtitle}
               </motion.p>
 
+              {/* Smart Search */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.8 }}
+                className="flex justify-center px-4"
+              >
+                <div className="w-full max-w-2xl">
+                  <SmartSearch
+                    onSearch={(query) => {
+                      if (query.trim()) {
+                        navigate(`/products?search=${encodeURIComponent(query.trim())}`);
+                      }
+                    }}
+                    placeholder="Search for products, brands, or categories..."
+                  />
+                </div>
+              </motion.div>
+
               {/* Rotating highlights */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -252,7 +273,7 @@ const PremiumHero = ({
                   transition={{ delay: 0.7, duration: 0.8 }}
                   className="mt-8 md:mt-12"
                 >
-                  <p className="text-white/60 mb-4 text-xs md:text-sm">🔥 Trending Now</p>
+                                     <p className="text-white/80 mb-4 text-xs md:text-sm">🔥 Trending Now</p>
                   <div className="flex justify-center gap-2 md:gap-4">
                     {trendingProducts.slice(0, 3).map((product, index) => (
                       <motion.div

@@ -29,24 +29,31 @@
     --shadow-large: 0 8px 32px rgba(0, 0, 0, 0.2);
     --shadow-glow: 0 0 20px rgba(255, 102, 0, 0.3);
     --shadow-glow-lg: 0 0 40px rgba(255, 102, 0, 0.4);
+    
+    /* Responsive spacing */
+    --spacing-xs: 0.5rem;   /* 8px */
+    --spacing-sm: 0.75rem;  /* 12px */
+    --spacing-md: 1rem;     /* 16px */
+    --spacing-lg: 1.5rem;   /* 24px */
+    --spacing-xl: 2rem;     /* 32px */
+    --spacing-2xl: 3rem;    /* 48px */
+    
+    /* Responsive typography */
+    --text-xs: 0.75rem;     /* 12px */
+    --text-sm: 0.875rem;    /* 14px */
+    --text-base: 1rem;      /* 16px */
+    --text-lg: 1.125rem;    /* 18px */
+    --text-xl: 1.25rem;     /* 20px */
+    --text-2xl: 1.5rem;     /* 24px */
+    --text-3xl: 1.875rem;   /* 30px */
+    --text-4xl: 2.25rem;    /* 36px */
+    
+    /* Touch target sizes */
+    --touch-target-min: 44px;
+    --touch-target-ideal: 48px;
   }
 
-  .dark {
-    --color-background: 15 23 42;
-    --color-surface: 30 41 59;
-    --color-surface-hover: 51 65 85;
-    --color-text-primary: 248 250 252;
-    --color-text-secondary: 203 213 225;
-    --color-text-muted: 148 163 184;
-    --color-border: 51 65 85;
-    --color-border-hover: 71 85 105;
-    
-    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
-    --shadow-large: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --shadow-glow: 0 0 20px rgba(255, 102, 0, 0.4);
-    --shadow-glow-lg: 0 0 40px rgba(255, 102, 0, 0.5);
-  }
+
 
   body {
     @apply bg-background font-sans text-text-primary transition-colors duration-300;
@@ -114,10 +121,7 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
-  .dark .glass {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
+
 
   .gradient-text {
     background: linear-gradient(135deg, rgb(var(--color-primary)), rgb(var(--color-primary-light)));
@@ -224,6 +228,60 @@
 
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Responsive touch targets */
+  .touch-target {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+  }
+  
+  .touch-target-ideal {
+    min-height: var(--touch-target-ideal);
+    min-width: var(--touch-target-ideal);
+  }
+  
+  /* Responsive spacing utilities */
+  .space-responsive {
+    padding: var(--spacing-sm);
+  }
+  
+  @media (min-width: 640px) {
+    .space-responsive {
+      padding: var(--spacing-md);
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .space-responsive {
+      padding: var(--spacing-lg);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .space-responsive {
+      padding: var(--spacing-xl);
+    }
+  }
+  
+  /* Responsive typography utilities */
+  .text-responsive {
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+  
+  @media (min-width: 640px) {
+    .text-responsive {
+      font-size: var(--text-base);
+      line-height: 1.6;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .text-responsive {
+      font-size: var(--text-lg);
+      line-height: 1.7;
+    }
   }
 
   .scrollbar-hide {
