@@ -1,10 +1,10 @@
-// Dynamic Sections Configuration for LuxeCart
+// Dynamic Sections Configuration
 export const SECTIONS_CONFIG = {
   // Hero Section
   hero: {
     enabled: true,
-    title: 'LuxeCart',
-    subtitle: 'Discover thousands of premium products with confidence. Shop the latest trends and enjoy 24-hour delivery!',
+    title: 'MyShop',
+    subtitle: 'Discover amazing products with confidence. Shop the latest trends and enjoy fast delivery!',
     highlights: [
       'Premium Quality Products',
       'Fast & Secure Delivery',
@@ -34,8 +34,8 @@ export const SECTIONS_CONFIG = {
     subtitle: 'Experience the difference with our premium services',
     items: [
       {
-        title: '24-Hour Delivery',
-        description: 'Lightning-fast delivery across Kenya',
+        title: 'Fast Delivery',
+        description: 'Quick and reliable shipping',
         icon: 'TruckIcon',
         gradient: 'from-blue-500 to-cyan-500',
         enabled: true
@@ -49,14 +49,14 @@ export const SECTIONS_CONFIG = {
       },
       {
         title: 'Easy Returns',
-        description: '30-day return policy',
+        description: 'Hassle-free return policy',
         icon: 'ArrowPathIcon',
         gradient: 'from-purple-500 to-pink-500',
         enabled: true
       },
       {
         title: 'Flexible Payment',
-        description: 'Pay in installments',
+        description: 'Multiple payment options',
         icon: 'CreditCardIcon',
         gradient: 'from-orange-500 to-red-500',
         enabled: true
@@ -66,7 +66,7 @@ export const SECTIONS_CONFIG = {
 
   // Advertisement Sections
   advertisements: {
-    // Top Banner Advertisement - HIGHEST PRIORITY
+    // Top Banner Advertisement
     topBanner: {
       enabled: true,
       type: 'banner',
@@ -76,11 +76,11 @@ export const SECTIONS_CONFIG = {
       interval: 5000,
       showCloseButton: true,
       showNavigation: true,
-      className: 'mb-2', // Ultra-compact spacing for better visual separation
+      className: 'mb-2',
       priority: 'high'
     },
 
-    // Hero Advertisement - SECONDARY ENGAGEMENT
+    // Hero Advertisement
     heroAd: {
       enabled: true,
       type: 'inline',
@@ -89,11 +89,11 @@ export const SECTIONS_CONFIG = {
       autoPlay: false,
       showCloseButton: false,
       showNavigation: true,
-      className: 'my-2', // Ultra-compact spacing for better flow
+      className: 'my-2',
       priority: 'high'
     },
 
-    // Category Advertisement - CONTEXTUAL PLACEMENT
+    // Category Advertisement
     categoryAd: {
       enabled: true,
       type: 'banner',
@@ -103,11 +103,11 @@ export const SECTIONS_CONFIG = {
       interval: 4000,
       showCloseButton: true,
       showNavigation: true,
-      className: 'my-2', // Ultra-compact spacing after categories
+      className: 'my-2',
       priority: 'medium'
     },
 
-    // Featured Products Advertisement - PRE-SHOPPING
+    // Featured Products Advertisement
     featuredAd: {
       enabled: true,
       type: 'inline',
@@ -116,11 +116,11 @@ export const SECTIONS_CONFIG = {
       autoPlay: false,
       showCloseButton: false,
       showNavigation: false,
-      className: 'mb-2', // Ultra-compact spacing before featured products
+      className: 'mb-2',
       priority: 'medium'
     },
 
-    // New Arrivals Advertisement - DISCOVERY
+    // New Arrivals Advertisement
     newArrivalsAd: {
       enabled: true,
       type: 'banner',
@@ -129,11 +129,11 @@ export const SECTIONS_CONFIG = {
       autoPlay: false,
       showCloseButton: true,
       showNavigation: false,
-      className: 'mb-2', // Ultra-compact spacing before new arrivals
+      className: 'mb-2',
       priority: 'medium'
     },
 
-    // Best Selling Advertisement - SOCIAL PROOF
+    // Best Selling Advertisement
     bestSellingAd: {
       enabled: true,
       type: 'inline',
@@ -142,11 +142,11 @@ export const SECTIONS_CONFIG = {
       autoPlay: false,
       showCloseButton: true,
       showNavigation: false,
-      className: 'mb-2', // Ultra-compact spacing before best selling
+      className: 'mb-2',
       priority: 'medium'
     },
 
-    // Bottom Banner Advertisement - EXIT INTENT
+    // Bottom Banner Advertisement
     bottomBanner: {
       enabled: true,
       type: 'banner',
@@ -156,11 +156,11 @@ export const SECTIONS_CONFIG = {
       interval: 6000,
       showCloseButton: true,
       showNavigation: true,
-      className: 'mt-4 mb-2', // Ultra-compact spacing for exit intent
+      className: 'mt-4 mb-2',
       priority: 'high'
     },
 
-    // Sidebar Advertisement - DESKTOP ONLY
+    // Sidebar Advertisement
     sidebarAd: {
       enabled: true,
       type: 'sidebar',
@@ -179,12 +179,12 @@ export const SECTIONS_CONFIG = {
     enabled: true,
     title: 'Shop by Category',
     subtitle: 'Browse our wide range of categories',
-    maxDisplay: 4, // Reduced from 6 for better mobile experience
+    maxDisplay: 4,
     showViewAll: true,
-    viewAllLink: '/products' // Fixed link to go to products page
+    viewAllLink: '/products'
   },
 
-  // Featured Products Section (Main product showcase)
+  // Featured Products Section
   featuredProducts: {
     enabled: true,
     title: 'Featured Products',
@@ -194,27 +194,27 @@ export const SECTIONS_CONFIG = {
     viewAllLink: '/products'
   },
 
-  // New Arrivals Section (Streamlined)
+  // New Arrivals Section
   newArrivals: {
     enabled: true,
     title: 'New Arrivals',
     subtitle: 'Latest products added to our collection',
-    maxDisplay: 3, // Reduced from 4
+    maxDisplay: 3,
     showViewAll: true,
     viewAllLink: '/products?sort=newest'
   },
 
-  // Best Selling Section (Streamlined)
+  // Best Selling Section
   bestSelling: {
     enabled: true,
     title: 'Best Selling',
     subtitle: 'Most popular products our customers love',
-    maxDisplay: 3, // Reduced from 4
+    maxDisplay: 3,
     showViewAll: true,
     viewAllLink: '/products?sort=popular'
   },
 
-  // AI Recommendations Section (Non-critical, loads after main content)
+  // AI Recommendations Section
   aiRecommendations: {
     enabled: true,
     title: 'Recommended for You',
@@ -224,7 +224,7 @@ export const SECTIONS_CONFIG = {
     viewAllLink: '/products?recommended=true'
   },
 
-  // Stats Section (Social proof)
+  // Stats Section
   stats: {
     enabled: true,
     title: 'Why Customers Choose Us',

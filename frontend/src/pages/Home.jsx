@@ -12,22 +12,8 @@ import {
   shouldShowViewAll,
   getViewAllLink
 } from '../config/sections';
-import PremiumFeatures from '../components/PremiumFeatures';
-import PremiumHero from '../components/PremiumHero';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
-
-// Advertisement Components
-import {
-  TopBannerAd,
-  HeroAd,
-  CategoryAd,
-  FeaturedAd,
-  NewArrivalsAd,
-  BestSellingAd,
-  BottomBannerAd,
-  SidebarAd
-} from '../components/AdvertisementSection';
 
 // Icons
 import {
@@ -47,35 +33,17 @@ import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 
-// Assets
-import gambiaMarket from '../assets/gambia-market.jpg';
-
-// Advanced Components
-import AIRecommendationEngine from '../components/AIRecommendationEngine';
-import WishlistWithPriceAlerts from '../components/WishlistWithPriceAlerts';
-import SocialMediaSharing from '../components/SocialMediaSharing';
-import ReferralSystem from '../components/ReferralSystem';
-
 const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { error: showError } = useToast();
   
-  // Add error state
-  const [hasError, setHasError] = useState(false);
-  
-  // Reset error state when component mounts
-  useEffect(() => {
-    setHasError(false);
-  }, []);
-  
-  // State management - Initialize with empty arrays to prevent undefined errors
+  // State management
   const [products, setProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
   const [bestSelling, setBestSelling] = useState([]);
   const [categoriesList, setCategoriesList] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
-  const [assurances, setAssurances] = useState([]);
 
   // Loading states
   const [loading, setLoading] = useState(true);
@@ -97,8 +65,8 @@ const Home = () => {
   const features = useMemo(() => [
     {
       icon: TruckIcon,
-      title: 'Free Shipping',
-      description: 'Free shipping on orders over $50',
+      title: 'Fast Delivery',
+      description: 'Quick and reliable shipping',
       gradient: 'from-blue-500 to-cyan-500',
       enabled: true
     },
@@ -112,43 +80,26 @@ const Home = () => {
     {
       icon: ArrowPathIcon,
       title: 'Easy Returns',
-      description: '30-day return policy',
+      description: 'Hassle-free return policy',
       gradient: 'from-purple-500 to-pink-500',
       enabled: true
     },
     {
       icon: CreditCardIcon,
       title: 'Flexible Payment',
-      description: 'Pay in installments',
+      description: 'Multiple payment options',
       gradient: 'from-orange-500 to-red-500',
       enabled: true
     }
   ], []);
 
-  // Enhanced stats for social proof
+  // Stats for social proof
   const stats = useMemo(() => [
-    { number: '50K+', label: 'Happy Customers', icon: UserGroupIcon, enabled: true },
-    { number: '100K+', label: 'Products Sold', icon: ShoppingBagIcon, enabled: true },
+    { number: '10K+', label: 'Happy Customers', icon: UserGroupIcon, enabled: true },
+    { number: '50K+', label: 'Products Available', icon: ShoppingBagIcon, enabled: true },
     { number: '24/7', label: 'Customer Support', icon: HeartIcon, enabled: true },
-    { number: '150+', label: 'Countries Served', icon: GlobeAltIcon, enabled: true }
+    { number: '99%', label: 'Satisfaction Rate', icon: StarIcon, enabled: true }
   ], []);
-
-  // Hero content
-  const heroContent = useMemo(() => ({
-    title: getBrandName(),
-    subtitle: getSectionConfig('hero').subtitle || `Discover ${products.length > 0 ? products.length : 'thousands of'} premium products with confidence. Shop the latest trends and enjoy lightning-fast delivery!`,
-    highlights: [
-      "🎯 Premium Quality Products",
-      "⚡ Same Day Delivery",
-      "🛡️ 100% Secure Shopping",
-      `💎 ${products.length > 0 ? products.length : '15,000'}+ Premium Products`,
-      "🌟 World-Class Service"
-    ],
-    cta: {
-      primary: "Shop Now",
-      secondary: "View Deals"
-    }
-  }), [products.length]);
 
   // Event handlers
   const handleShopNow = useCallback(() => {
@@ -174,7 +125,7 @@ const Home = () => {
       setProducts(response.data?.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);
-      setProducts([]); // Ensure we always have an array
+      setProducts([]);
     } finally {
       setLoadingProducts(false);
     }
@@ -187,7 +138,7 @@ const Home = () => {
       setNewArrivals(response.data?.products || []);
     } catch (error) {
       console.error('Error fetching new arrivals:', error);
-      setNewArrivals([]); // Ensure we always have an array
+      setNewArrivals([]);
     } finally {
       setLoadingNewArrivals(false);
     }
@@ -200,7 +151,7 @@ const Home = () => {
       setBestSelling(response.data?.products || []);
     } catch (error) {
       console.error('Error fetching best selling:', error);
-      setBestSelling([]); // Ensure we always have an array
+      setBestSelling([]);
     } finally {
       setLoadingBestSelling(false);
     }
@@ -210,14 +161,10 @@ const Home = () => {
     try {
       setLoadingCategories(true);
       const response = await axios.get('/categories');
-      if (Array.isArray(response.data)) {
-        setCategoriesList(response.data);
-      } else {
-        setCategoriesList([]); // Ensure we always have an array
-      }
+      setCategoriesList(response.data?.categories || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      setCategoriesList([]); // Ensure we always have an array
+      setCategoriesList([]);
     } finally {
       setLoadingCategories(false);
     }
@@ -225,65 +172,43 @@ const Home = () => {
 
   const fetchTrendingProducts = useCallback(async () => {
     try {
-      const response = await axios.get('/products?sort=trending&limit=3');
+      const response = await axios.get('/products?sort=trending&limit=6');
       setTrendingProducts(response.data?.products || []);
     } catch (error) {
       console.error('Error fetching trending products:', error);
-      setTrendingProducts([]); // Ensure we always have an array
+      setTrendingProducts([]);
     }
   }, []);
 
-  const fetchAssurances = useCallback(async () => {
-    try {
-      const response = await axios.get('/site/assurances');
-      setAssurances(response.data?.assurances || []);
-    } catch (error) {
-      console.error('Error fetching assurances:', error);
-      setAssurances([]); // Ensure we always have an array
-    }
-  }, []);
-
-  // Initialize data with optimized loading
+  // Initialize data
   useEffect(() => {
     const initializeData = async () => {
       setLoading(true);
-      setHasError(false); // Reset error state on data initialization
-
-      // Add timeout to prevent infinite loading
-      const timeoutId = setTimeout(() => {
-        setLoading(false);
-      }, 10000); // 10 second timeout
-
+      
       try {
-        // Fetch critical data first (products and categories)
         await Promise.allSettled([
           fetchProducts(),
           fetchCategories()
         ]);
-
-        // Clear timeout and set loading to false
-        clearTimeout(timeoutId);
+        
         setLoading(false);
-
+        
         // Fetch secondary data in background
         setTimeout(() => {
           Promise.allSettled([
             fetchNewArrivals(),
             fetchBestSelling(),
-            fetchTrendingProducts(),
-            fetchAssurances()
+            fetchTrendingProducts()
           ]);
         }, 100);
-
       } catch (error) {
         console.error('Error initializing data:', error);
-        clearTimeout(timeoutId);
         setLoading(false);
       }
     };
 
     initializeData();
-  }, [fetchProducts, fetchCategories, fetchAssurances, fetchNewArrivals, fetchBestSelling, fetchTrendingProducts]);
+  }, [fetchProducts, fetchCategories, fetchNewArrivals, fetchBestSelling, fetchTrendingProducts]);
 
   // Search suggestions
   useEffect(() => {
@@ -304,51 +229,6 @@ const Home = () => {
       setShowSuggestions(false);
     }
   }, [search]);
-
-  // Global error handler - only for unexpected errors
-  useEffect(() => {
-    const handleError = (error) => {
-      // Only set error state for truly unexpected errors
-      const errorString = error.toString();
-      const errorMessage = error.message || errorString;
-      const errorStack = error.stack || '';
-      
-      // Check if this is an expected error that should be ignored
-      const expectedErrors = [
-        /401/, // Auth errors
-        /503/, // Service unavailable
-        /analytics\/ad-impression.*404/, // Analytics errors
-        /analytics\/ad-click.*404/, // Analytics errors
-        /maps\.googleapis\.com.*ERR_BLOCKED_BY_CLIENT/, // Google Maps blocked
-        /maps\.gstatic\.com.*ERR_BLOCKED_BY_CLIENT/, // Google Maps blocked
-        /Node cannot be found in the current page/, // React DevTools
-        /Service Worker.*Loaded/, // Service Worker
-        /Service Worker.*registered/ // Service Worker
-      ];
-      
-      const isExpectedError = expectedErrors.some(pattern => 
-        pattern.test(errorString) || pattern.test(errorMessage) || pattern.test(errorStack)
-      );
-      
-      if (!isExpectedError) {
-        console.error('Unexpected error caught:', error);
-        console.error('Error details:', {
-          message: errorMessage,
-          stack: errorStack,
-          type: error.constructor.name
-        });
-        setHasError(true);
-      }
-    };
-
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleError);
-
-    return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleError);
-    };
-  }, []);
 
   // SEO structured data
   const structuredData = useMemo(() => ({
@@ -372,42 +252,22 @@ const Home = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
         <div className="text-center">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-text-secondary">Loading amazing products...</p>
+          <p className="mt-4 text-gray-600">Loading amazing products...</p>
         </div>
       </div>
     );
   }
 
-  // Error fallback
-  if (hasError) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">😔</div>
-          <h2 className="text-2xl font-bold text-text-primary mb-2">Something went wrong</h2>
-          <p className="text-text-secondary mb-4">We're having trouble loading the page. Please try refreshing.</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-          >
-            Refresh Page
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Safety check for all arrays to prevent undefined errors
+  // Safety check for all arrays
   const safeProducts = Array.isArray(products) ? products : [];
   const safeNewArrivals = Array.isArray(newArrivals) ? newArrivals : [];
   const safeBestSelling = Array.isArray(bestSelling) ? bestSelling : [];
   const safeCategoriesList = Array.isArray(categoriesList) ? categoriesList : [];
   const safeTrendingProducts = Array.isArray(trendingProducts) ? trendingProducts : [];
-  const safeAssurances = Array.isArray(assurances) ? assurances : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      {/* Enhanced SEO */}
+      {/* SEO */}
       <Helmet>
         <title>{getSEOTitle('Home')}</title>
         <meta name="description" content={getSEODescription()} />
@@ -441,257 +301,207 @@ const Home = () => {
         </script>
       </Helmet>
 
-      {/* Premium Hero Section */}
-      <PremiumHero
-        heroContent={heroContent}
-        trendingProducts={safeTrendingProducts}
-        onShopNow={handleShopNow}
-        onViewDeals={handleViewDeals}
-        backgroundImage={gambiaMarket}
-      />
-
-      {/* Premium Features - What Makes Us Different */}
-      <PremiumFeatures />
-
-      {/* AI Recommendation Engine */}
-      <section className="max-w-7xl mx-auto mb-16 px-4">
-        <AIRecommendationEngine 
-          userId={user?._id}
-          limit={4}
-          showTitle={true}
-          title="AI-Powered Recommendations"
-          subtitle="Discover products tailored just for you with 95% accuracy"
-        />
-      </section>
-
-
-
-      {/* Top Banner Advertisement */}
-      <TopBannerAd />
-
-      {/* Hero Advertisement */}
-      <HeroAd />
-
-      {/* Enhanced Assurance Strip */}
-      <section className="max-w-7xl mx-auto -mt-8 mb-16 px-4 relative z-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-          {features.filter(f => f.enabled).slice(0, 4).map((feature, idx) => (
-            <div
-              key={idx}
-              className="flex items-center gap-3 md:gap-4 bg-surface/95 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-xl border border-border/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
-            >
-              <div className="flex-shrink-0">
-                <feature.icon className="h-10 w-10 text-text-primary" />
-              </div>
-              <div>
-                <div className="text-sm font-bold text-text-primary">{feature.title}</div>
-                <div className="text-xs text-text-secondary hidden sm:block">{feature.description}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Categories Section - Compact Mobile Design */}
-      <section className="max-w-7xl mx-auto mb-8 md:mb-16 px-4">
-        <div className="bg-gradient-to-br from-secondary/5 to-accent/5 rounded-2xl md:rounded-3xl p-3 md:p-6 lg:p-8 border border-secondary/20">
-          <div className="flex flex-col sm:flex-row sm:items-center mb-4 md:mb-6 gap-2 md:gap-4 sm:gap-0">
-            <div className="flex items-center gap-2 md:gap-3">
-              <GlobeAltIcon className="h-5 w-5 md:h-6 md:w-6 text-secondary" />
-              <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-text-primary">{getSectionTitle('categories')}</h2>
-            </div>
-            {shouldShowViewAll('categories') && (
-              <Link to={getViewAllLink('categories')} className="sm:ml-auto text-secondary hover:text-secondary-dark font-semibold text-xs md:text-sm lg:text-base">
-                View all
-              </Link>
-            )}
-          </div>
-          {loadingCategories ? (
-            <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="animate-pulse flex-shrink-0">
-                  <div className="bg-surface-hover rounded-lg h-12 md:h-16 lg:h-20 mb-1 md:mb-2 w-20 md:w-24 lg:w-32"></div>
-                  <div className="bg-surface-hover rounded h-2 md:h-3 lg:h-4 w-16 md:w-20 lg:w-24"></div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4">
-              {safeCategoriesList.slice(0, getSectionMaxDisplay('categories') || 4).map((category, index) => (
-                <Link
-                  key={category.id || category._id || index}
-                  to={`/products?category=${encodeURIComponent(category.id || category.name)}`}
-                  className="group bg-surface/80 backdrop-blur-sm rounded-xl md:rounded-2xl p-2 md:p-3 lg:p-4 text-center hover:shadow-lg md:hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 md:hover:-translate-y-2 flex-shrink-0 w-20 md:w-24 lg:w-32"
-                >
-                  <div className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-1 md:mb-2 lg:mb-3 group-hover:scale-110 transition-transform">
-                    <span className="text-white font-bold text-xs md:text-sm lg:text-lg">
-                      {(category.name || 'C')[0].toUpperCase()}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-text-primary group-hover:text-primary transition-colors text-xs md:text-sm lg:text-base leading-tight">
-                    {category.name}
-                  </h3>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Category Advertisement */}
-      <CategoryAd />
-
-      {/* Featured Products Advertisement */}
-      <FeaturedAd />
-
-      {/* Product Sections - Alibaba Style Layout */}
-      <section className="max-w-7xl mx-auto mb-16 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* Featured Products */}
-          <div className="bg-gradient-to-br from-primary/5 to-error/5 rounded-2xl p-6 border border-primary/20">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <FireIcon className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-bold text-text-primary">{getSectionTitle('featuredProducts')}</h3>
-              </div>
-              {shouldShowViewAll('featuredProducts') && (
-                <Link to={getViewAllLink('featuredProducts')} className="text-primary hover:text-primary-dark font-semibold text-sm">
-                  View all
-                </Link>
-              )}
-            </div>
-            {loadingProducts ? (
-              <div className="space-y-3">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="bg-surface-hover rounded-lg h-32 mb-2"></div>
-                    <div className="bg-surface-hover rounded h-3 mb-1"></div>
-                    <div className="bg-surface-hover rounded h-3 w-2/3"></div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {safeProducts.slice(0, 3).map(product => (
-                  <ProductCard key={product._id} product={product} compact={true} />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* New Arrivals */}
-          <div className="bg-gradient-to-br from-success/5 to-accent/5 rounded-2xl p-6 border border-success/20">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <ClockIcon className="h-5 w-5 text-success" />
-                <h3 className="text-lg font-bold text-text-primary">{getSectionTitle('newArrivals')}</h3>
-              </div>
-              {shouldShowViewAll('newArrivals') && (
-                <Link to={getViewAllLink('newArrivals')} className="text-success hover:text-success-dark font-semibold text-sm">
-                  View all
-                </Link>
-              )}
-            </div>
-            {loadingNewArrivals ? (
-              <div className="space-y-3">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="bg-surface-hover rounded-lg h-32 mb-2"></div>
-                    <div className="bg-surface-hover rounded h-3 mb-1"></div>
-                    <div className="bg-surface-hover rounded h-3 w-2/3"></div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {safeNewArrivals.slice(0, 3).map(product => (
-                  <ProductCard key={product._id} product={product} compact={true} />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Best Selling */}
-          <div className="bg-gradient-to-br from-accent/5 to-secondary/5 rounded-2xl p-6 border border-accent/20">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <StarIcon className="h-5 w-5 text-accent" />
-                <h3 className="text-lg font-bold text-text-primary">{getSectionTitle('bestSelling')}</h3>
-              </div>
-              {shouldShowViewAll('bestSelling') && (
-                <Link to={getViewAllLink('bestSelling')} className="text-accent hover:text-accent-dark font-semibold text-sm">
-                  View all
-                </Link>
-              )}
-            </div>
-            {loadingBestSelling ? (
-              <div className="space-y-3">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="bg-surface-hover rounded-lg h-32 mb-2"></div>
-                    <div className="bg-surface-hover rounded h-3 mb-1"></div>
-                    <div className="bg-surface-hover rounded h-3 w-2/3"></div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {safeBestSelling.slice(0, 3).map(product => (
-                  <ProductCard key={product._id} product={product} compact={true} />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Bottom Banner Advertisement */}
-      <BottomBannerAd />
-
-      {/* Social Proof Section */}
-      <section className="max-w-7xl mx-auto mb-16 px-4">
-        <div className="bg-gradient-to-br from-surface to-surface-hover rounded-3xl p-4 md:p-8 border border-border">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-4">
-              Trusted by Thousands of Customers
-            </h2>
-            <p className="text-text-secondary max-w-2xl mx-auto">
-              Join our growing community of satisfied customers who trust LuxeCart for their shopping needs.
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-r from-orange-500 to-red-500 text-white py-20 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Welcome to {getBrandName()}
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+              Discover premium products with confidence. Shop the latest trends and enjoy fast delivery!
             </p>
+            
+            {/* Search Bar */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search for products..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full px-6 py-4 text-gray-900 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-white"
+                />
+                <button
+                  onClick={() => handleSearch(search)}
+                  className="absolute right-2 top-2 bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 transition-colors"
+                >
+                  <MagnifyingGlassIcon className="w-6 h-6" />
+                </button>
+              </div>
+              
+              {/* Search Suggestions */}
+              {showSuggestions && searchSuggestions.length > 0 && (
+                <div className="absolute z-10 w-full bg-white rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto">
+                  {searchSuggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSearch(suggestion)}
+                      className="w-full text-left px-4 py-3 hover:bg-gray-100 text-gray-900 border-b border-gray-200 last:border-b-0"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={handleShopNow}
+                className="bg-white text-orange-500 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+              >
+                Shop Now
+                <ArrowRightIcon className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleViewDeals}
+                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-orange-500 transition-colors"
+              >
+                View Deals
+              </button>
+            </div>
           </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {stats.filter(s => s.enabled).map((stat, index) => (
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
               <div key={index} className="text-center">
-                <div className="flex justify-center mb-3">
-                  <stat.icon className="h-8 w-8 text-primary" />
+                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${feature.gradient} text-white mb-4`}>
+                  <feature.icon className="w-8 h-8" />
                 </div>
-                <div className="text-2xl md:text-3xl font-bold text-text-primary mb-1">
-                  {stat.number}
-                </div>
-                <div className="text-sm text-text-secondary">
-                  {stat.label}
-                </div>
+                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Referral System Section */}
-      {user && (
-        <section className="max-w-7xl mx-auto mb-16 px-4">
-          <ReferralSystem user={user} />
+      {/* Categories Section */}
+      {safeCategoriesList.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Shop by Category</h2>
+              <p className="text-gray-600">Browse our wide range of categories</p>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {safeCategoriesList.slice(0, 8).map((category) => (
+                <Link
+                  key={category._id}
+                  to={`/products?category=${category._id}`}
+                  className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow"
+                >
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                    <ShoppingBagIcon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                  {category.productCount && (
+                    <p className="text-sm text-gray-500 mt-1">{category.productCount} products</p>
+                  )}
+                </Link>
+              ))}
+            </div>
+            
+            {safeCategoriesList.length > 8 && (
+              <div className="text-center mt-8">
+                <Link
+                  to="/products"
+                  className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  View All Categories
+                  <ArrowRightIcon className="w-5 h-5" />
+                </Link>
+              </div>
+            )}
+          </div>
         </section>
       )}
 
-      {/* Social Media Sharing */}
-      <SocialMediaSharing 
-        title="Discover Amazing Products on LuxeCart!"
-        description="Premium shopping experience with lightning-fast delivery and exceptional customer service."
-        hashtags={["LuxeCart", "PremiumShopping", "FastDelivery", "Kenya", "OnlineShopping"]}
-        showFloating={true}
-        position="bottom-right"
-      />
+      {/* Featured Products */}
+      {safeProducts.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Products</h2>
+              <p className="text-gray-600">Handpicked products just for you</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {safeProducts.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+            
+            <div className="text-center mt-8">
+              <Link
+                to="/products"
+                className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors"
+              >
+                View All Products
+                <ArrowRightIcon className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* New Arrivals */}
+      {safeNewArrivals.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">New Arrivals</h2>
+              <p className="text-gray-600">Latest products added to our collection</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {safeNewArrivals.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Best Selling */}
+      {safeBestSelling.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Best Selling</h2>
+              <p className="text-gray-600">Most popular products our customers love</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {safeBestSelling.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Stats Section */}
+      <section className="py-16 bg-gradient-to-r from-orange-500 to-red-500 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {stats.map((stat, index) => (
+              <div key={index}>
+                <div className="text-3xl md:text-4xl font-bold mb-2">{stat.number}</div>
+                <div className="text-sm md:text-base opacity-90">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

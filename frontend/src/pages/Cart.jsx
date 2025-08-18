@@ -161,7 +161,7 @@ const Cart = () => {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <Helmet>
-          <title>Loading Cart - LuxeCart</title>
+          <title>Loading Cart - MyShop</title>
         </Helmet>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse">
@@ -188,7 +188,7 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <Helmet>
-        <title>Cart - LuxeCart</title>
+        <title>Cart - MyShop</title>
         <meta name="description" content="Review your shopping cart items and proceed to checkout." />
       </Helmet>
       

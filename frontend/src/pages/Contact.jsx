@@ -11,7 +11,7 @@ export default function Contact() {
         </div>
         <div className="flex items-center gap-2">
           <span className="font-bold">Email:</span>
-          <a href="mailto:info@luxecart.com" className="text-primary hover:underline">info@luxecart.com</a>
+                      <a href="mailto:info@myshop.com" className="text-primary hover:underline">info@myshop.com</a>
         </div>
         <div className="flex items-center gap-2">
           <span className="font-bold">Location:</span>

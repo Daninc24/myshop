@@ -124,7 +124,7 @@ class EnhancedErrorBoundary extends React.Component {
         // Fallback: open email
         const subject = encodeURIComponent(`Error Report - ${errorId}`);
         const body = encodeURIComponent(JSON.stringify(errorReport, null, 2));
-        window.open(`mailto:support@luxecart.com?subject=${subject}&body=${body}`);
+        window.open(`mailto:support@myshop.com?subject=${subject}&body=${body}`);
       });
   };
 

@@ -15,11 +15,11 @@ import {
 
 const LocalSEO = () => {
   const [businessInfo, setBusinessInfo] = useState({
-    name: 'LuxeCart Kenya',
-    address: 'Westlands, Nairobi, Kenya',
-    phone: '+254 791 991 154',
-    email: 'info@luxecart.com',
-    website: 'https://luxecart.com',
+    name: 'MyShop',
+    address: 'Your Address',
+    phone: '+1234567890',
+    email: 'info@myshop.com',
+    website: 'https://myshop.com',
     hours: {
       monday: '9:00 AM - 6:00 PM',
       tuesday: '9:00 AM - 6:00 PM',
@@ -38,10 +38,10 @@ const LocalSEO = () => {
       lng: 36.8219
     },
     socialMedia: {
-      facebook: 'https://www.facebook.com/luxecart',
-      instagram: 'https://www.instagram.com/luxecart',
-      twitter: 'https://twitter.com/luxecart',
-      linkedin: 'https://www.linkedin.com/company/luxecart'
+          facebook: 'https://www.facebook.com/myshop',
+    instagram: 'https://www.instagram.com/myshop',
+    twitter: 'https://twitter.com/myshop',
+    linkedin: 'https://www.linkedin.com/company/myshop'
     },
     services: [
       'Online Shopping',

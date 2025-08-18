@@ -1,187 +1,237 @@
-# MyShopping Center
+# MyShop - E-commerce Platform
 
-A full-stack e-commerce platform for shopping, events, and more.  
-Built with a React frontend and a Node.js/Express backend.
-
----
-
-to access the shop click this link https://myshop-git-main-daniel-mailus-projects.vercel.app/pos
-the project is hosted on vercel for frontend and render for the backendgit
-
-to login as a admin use danmailur8@gmail.com
-12345678
-for user account create one
-
-
+A modern, production-ready e-commerce platform built with React, Node.js, and MongoDB.
 
 ## Features
 
-
-- **User Authentication** (register, login, protected/admin routes)
-- **Product Catalog** with detailed product pages
-- **Shopping Cart** and **Checkout** with Stripe payment integration
-- **Order Management** for users and admins
-- **Event Listings** and live event features
-- **Testimonials** and service rating system
-- **Admin Dashboard** for managing products, orders, users, events, and analytics
-- **Social & Contact Links** (WhatsApp, Facebook, Twitter, Email, Phone)
-- **Responsive UI** with Tailwind CSS
-- **Image Uploads** for products, events, and user profiles
-
-
----
+- 🛍️ **Product Management** - Complete product catalog with categories, images, and inventory
+- 🛒 **Shopping Cart** - Persistent cart with real-time updates
+- 💳 **Payment Integration** - Stripe, PayPal, and M-Pesa support
+- 👤 **User Management** - Authentication, profiles, and wishlists
+- 📊 **Admin Dashboard** - Comprehensive admin panel for store management
+- 📱 **Responsive Design** - Mobile-first design with PWA support
+- 🔍 **Advanced Search** - Smart search with filters and recommendations
+- 📈 **Analytics** - Built-in analytics and reporting
+- 🚀 **Performance Optimized** - Fast loading with lazy loading and caching
 
 ## Tech Stack
 
-- **Frontend:** React, Tailwind CSS, Axios, Vite
-- **Backend:** Node.js, Express, MongoDB (Mongoose)
-- **Payments:** Stripe
-- **Authentication:** JWT, Google OAuth
-- **Other:** Nginx (for deployment), GitHub Actions (optional for CI/CD)
+### Frontend
+- **React 18** with Vite
+- **Tailwind CSS** for styling
+- **React Router** for navigation
+- **Axios** for API calls
+- **React Helmet** for SEO
+- **Framer Motion** for animations
 
----
+### Backend
+- **Node.js** with Express
+- **MongoDB** with Mongoose
+- **JWT** for authentication
+- **Multer** for file uploads
+- **Cloudinary** for image management
+- **Stripe/PayPal** for payments
 
-## Getting Started
+## Quick Start
 
 ### Prerequisites
-
-- Node.js (v16+ recommended)
+- Node.js 18+ 
+- MongoDB
 - npm or yarn
-- MongoDB (local or cloud)
-- [Stripe account](https://dashboard.stripe.com/register) for payments
-- [Cloudinary account](https://cloudinary.com/users/register/free) for image uploads
 
-### 1. Clone the repository
+### Installation
 
-
-```sh
-git clone https://github.com/Daninc24/myshoppingcenter.git
-cd myshoppingcenter
-```
-
-### 2. Setup the Backend
-
-```sh
-cd backend
-cp .env.example .env   # Create your .env file and fill in the required values
-npm install
-npm start              # or: npm run dev
-```
-
-**.env Example:**
-```
-# Database
-MONGO_URI=your_mongodb_uri
-
-# Authentication
-JWT_SECRET=your_jwt_secret
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-
-# Payment
-STRIPE_SECRET_KEY=your_stripe_secret
-STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
-
-# Cloudinary (for image uploads)
-CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-
-# Server
-PORT=5000
-FRONTEND_URL=http://localhost:5173
-```
-
-### 3. Setup the Frontend
-
-```sh
-cd ../frontend
-npm install
-npm run dev
-```
-
-The frontend will be available at [http://localhost:5173](http://localhost:5173) (default Vite port).
-
-### 4. Setup Cloudinary (Image Uploads)
-
-1. Create a free account at [Cloudinary](https://cloudinary.com/users/register/free)
-2. Verify your email address (this is crucial for API access)
-3. Go to your [Cloudinary Console Dashboard](https://cloudinary.com/console)
-4. Copy your **Cloud Name**, **API Key**, and **API Secret** from the dashboard
-5. Add these credentials to your `.env` file:
-   ```
-   CLOUDINARY_CLOUD_NAME=your_cloud_name_here
-   CLOUDINARY_API_KEY=your_api_key_here
-   CLOUDINARY_API_SECRET=your_api_secret_here
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd myshop
    ```
 
-**Important Notes:**
-- Make sure your Cloudinary account is verified via email
-- The cloud name should match exactly what's shown in your dashboard
-- Keep your API secret secure and never commit it to version control
+2. **Install dependencies**
+   ```bash
+   # Install frontend dependencies
+   cd frontend
+   npm install
+   
+   # Install backend dependencies
+   cd ../backend
+   npm install
+   ```
 
----
+3. **Environment Setup**
+   
+   **Frontend (.env)**
+   ```env
+   VITE_API_URL=http://localhost:5002/api
+   VITE_PAYPAL_CLIENT_ID=your_paypal_client_id_here
+   VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key_here
+   VITE_GA_ID=your_google_analytics_id_here
+   ```
+   
+   **Backend (.env)**
+   ```env
+   NODE_ENV=development
+   PORT=5002
+   FRONTEND_URL=http://localhost:5173
+   MONGO_URI=your_mongodb_connection_string_here
+   JWT_SECRET=your_super_secret_jwt_key_here
+   CLOUDINARY_API_KEY=your_cloudinary_api_key_here
+   CLOUDINARY_API_SECRET=your_cloudinary_api_secret_here
+   CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name_here
+   STRIPE_SECRET_KEY=your_stripe_secret_key_here
+   PAYPAL_CLIENT_ID=your_paypal_client_id_here
+   PAYPAL_CLIENT_SECRET=your_paypal_client_secret_here
+   ```
+
+4. **Start the development servers**
+   ```bash
+   # Start backend (from backend directory)
+   npm run dev
+   
+   # Start frontend (from frontend directory)
+   npm run dev
+   ```
+
+5. **Access the application**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:5002/api
+   - Admin Panel: http://localhost:5173/admin
+
+## Production Deployment
+
+### Frontend (Vercel)
+1. Connect your repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+### Backend (Render/Railway)
+1. Connect your repository to your preferred platform
+2. Set environment variables
+3. Configure MongoDB connection
+4. Deploy
 
 ## Project Structure
 
 ```
-myshoppingcenter/
-  backend/      # Express API, models, controllers, routes, uploads
-  frontend/     # React app, components, pages, contexts, assets
-  nginx-1.29.0/ # Nginx config (for deployment)
+myshop/
+├── frontend/                 # React frontend
+│   ├── src/
+│   │   ├── components/      # Reusable components
+│   │   ├── pages/          # Page components
+│   │   ├── contexts/       # React contexts
+│   │   ├── hooks/          # Custom hooks
+│   │   ├── services/       # API services
+│   │   ├── utils/          # Utility functions
+│   │   └── config/         # Configuration files
+│   └── public/             # Static assets
+├── backend/                 # Node.js backend
+│   ├── src/
+│   │   ├── routes/         # API routes
+│   │   ├── models/         # MongoDB models
+│   │   ├── middleware/     # Express middleware
+│   │   ├── utils/          # Utility functions
+│   │   └── config/         # Configuration files
+│   └── uploads/            # File uploads
+└── README.md
 ```
 
----
+## Key Features
 
-## Scripts
+### User Features
+- **Product Browsing** - Browse products by category, search, and filters
+- **Shopping Cart** - Add/remove items, quantity management
+- **Wishlist** - Save products for later
+- **User Profile** - Manage personal information and orders
+- **Order Tracking** - Track order status and history
+- **Reviews & Ratings** - Product reviews and ratings system
 
-### Backend
+### Admin Features
+- **Product Management** - Add, edit, delete products
+- **Category Management** - Organize products by categories
+- **Order Management** - Process and track orders
+- **User Management** - Manage customer accounts
+- **Analytics Dashboard** - Sales reports and insights
+- **Inventory Management** - Stock tracking and alerts
 
-- `npm start` — Start the server
-- `npm run dev` — Start with nodemon (dev mode)
-- `npm run seed` — Seed the database
+### Technical Features
+- **SEO Optimized** - Meta tags, structured data, sitemap
+- **Performance** - Lazy loading, image optimization, caching
+- **Security** - JWT authentication, input validation, rate limiting
+- **Mobile Responsive** - Works on all device sizes
+- **PWA Ready** - Progressive Web App capabilities
+- **Error Handling** - Comprehensive error boundaries and logging
 
-### Frontend
+## Configuration
 
-- `npm run dev` — Start the React app (Vite)
-- `npm run build` — Build for production
+### Branding
+Update the branding configuration in `frontend/src/config/branding.js`:
+```javascript
+export const BRAND_CONFIG = {
+  name: 'Your Brand Name',
+  tagline: 'Your Brand Tagline',
+  email: 'info@yourbrand.com',
+  // ... other branding settings
+};
+```
 
----
+### Sections
+Configure page sections in `frontend/src/config/sections.js`:
+```javascript
+export const SECTIONS_CONFIG = {
+  hero: {
+    enabled: true,
+    title: 'Your Hero Title',
+    // ... other section settings
+  },
+  // ... other sections
+};
+```
 
-## Deployment
+## API Endpoints
 
-- **Nginx** is included for reverse proxy and static file serving.
-- Configure your environment variables in production.
-- Use a process manager like **PM2** for backend.
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
 
----
+### Products
+- `GET /api/products` - Get all products
+- `GET /api/products/:id` - Get product by ID
+- `POST /api/products` - Create product (admin)
+- `PUT /api/products/:id` - Update product (admin)
+- `DELETE /api/products/:id` - Delete product (admin)
 
-## Security
+### Orders
+- `GET /api/orders` - Get user orders
+- `POST /api/orders` - Create order
+- `PUT /api/orders/:id` - Update order status (admin)
 
-- **Never commit your `.env` files or secrets.**
-- If secrets are accidentally committed, follow [GitHub’s guide to removing sensitive data](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository) and rotate your credentials.
+### Categories
+- `GET /api/categories` - Get all categories
+- `POST /api/categories` - Create category (admin)
 
----
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## License
 
 This project is licensed under the MIT License.
 
----
+## Support
 
-## Contact
+For support, email support@myshop.com or create an issue in the repository.
 
-- Email: [info@myshoppingcenter.com](mailto:info@myshoppingcenter.com)
-- WhatsApp: [Chat on WhatsApp](https://wa.me/254791991154)
-- Facebook: [facebook.com/myshoppingcenter](https://facebook.com/myshoppingcenter)
-- Twitter: [twitter.com/myshoppingcenter](https://twitter.com/myshoppingcenter)
+## Changelog
 
----
-
-## Acknowledgements
-
-- [React](https://react.dev/)
-- [Express](https://expressjs.com/)
-- [MongoDB](https://www.mongodb.com/)
-- [Stripe](https://stripe.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
+### v1.0.0 (Production Ready)
+- Cleaned up all hardcoded data and test content
+- Removed development-specific configurations
+- Updated branding to generic "MyShop"
+- Optimized for production deployment
+- Enhanced security and performance
+- Comprehensive documentation

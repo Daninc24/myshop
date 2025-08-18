@@ -131,18 +131,18 @@ const ProductDetail = () => {
   return (
     <>
       <Helmet>
-        <title>{product ? `${product.title} - LuxeCart` : 'Product - LuxeCart'}</title>
-        <meta name="description" content={product ? product.description : 'View product details, images, price, and stock at LuxeCart.'} />
-        <meta property="og:title" content={product ? `${product.title} - LuxeCart` : 'Product - LuxeCart'} />
-        <meta property="og:description" content={product ? product.description : 'View product details, images, price, and stock at LuxeCart.'} />
+        <title>{product ? `${product.title} - MyShop` : 'Product - MyShop'}</title>
+        <meta name="description" content={product ? product.description : 'View product details, images, price, and stock at MyShop.'} />
+        <meta property="og:title" content={product ? `${product.title} - MyShop` : 'Product - MyShop'} />
+        <meta property="og:description" content={product ? product.description : 'View product details, images, price, and stock at MyShop.'} />
         <meta property="og:type" content="product" />
-        <meta property="og:url" content={`https://luxecart.com/products/${product ? product._id : ''}`} />
-        <meta property="og:image" content={getOptimizedImageUrl(product && product.images && product.images[0]) || 'https://luxecart.com/logo.png'} />
+        <meta property="og:url" content={`https://myshop.com/products/${product ? product._id : ''}`} />
+        <meta property="og:image" content={getOptimizedImageUrl(product && product.images && product.images[0]) || 'https://myshop.com/logo.png'} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={product ? `${product.title} - LuxeCart` : 'Product - LuxeCart'} />
-        <meta name="twitter:description" content={product ? product.description : 'View product details, images, price, and stock at LuxeCart.'} />
-        <meta name="twitter:image" content={getOptimizedImageUrl(product && product.images && product.images[0]) || 'https://luxecart.com/logo.png'} />
-        <link rel="canonical" href={`https://luxecart.com/products/${product ? product._id : ''}`} />
+        <meta name="twitter:title" content={product ? `${product.title} - MyShop` : 'Product - MyShop'} />
+        <meta name="twitter:description" content={product ? product.description : 'View product details, images, price, and stock at MyShop.'} />
+        <meta name="twitter:image" content={getOptimizedImageUrl(product && product.images && product.images[0]) || 'https://myshop.com/logo.png'} />
+        <link rel="canonical" href={`https://myshop.com/products/${product ? product._id : ''}`} />
         {product && (
           <script type="application/ld+json">{`
             {
@@ -156,7 +156,7 @@ const ProductDetail = () => {
               "sku": "${product._id}",
               "offers": {
                 "@type": "Offer",
-                "url": "https://luxecart.com/products/${product._id}",
+                "url": "https://myshop.com/products/${product._id}",
                 "priceCurrency": "KES",
                 "price": "${displayPrice}",
                 "availability": "${availableStock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}"
@@ -200,7 +200,7 @@ const ProductDetail = () => {
             {/* Main Image */}
             <div className="relative w-full mb-4">
               <img
-                src={getOptimizedImageUrl(product.images && product.images[selectedImage]) || 'https://luxecart.com/logo.png'}
+                src={getOptimizedImageUrl(product.images && product.images[selectedImage]) || 'https://myshop.com/logo.png'}
                 alt={product.title + ' main image'}
                 className="w-full max-w-md mx-auto h-64 object-contain rounded-2xl bg-white shadow-lg"
                 loading="lazy"

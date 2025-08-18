@@ -23,22 +23,13 @@ router.post('/search', async (req, res) => {
 // Get trending searches
 router.get('/trending-searches', async (req, res) => {
   try {
-    // In production, this would query a real analytics database
-    // For now, return mock trending data with dynamic values
-    const mockTrends = [
-      'iPhone 15', 'Nike Air Max', 'Samsung Galaxy', 'MacBook Pro', 'Adidas Ultraboost',
-      'Wireless Headphones', 'Smart Watch', 'Gaming Laptop', 'Fitness Tracker', 'Bluetooth Speaker'
-    ];
-    
-    const liveTrends = mockTrends.slice(0, 5).map(term => ({
-      term,
-      trend: Math.random() > 0.5 ? 'up' : 'down',
-      change: Math.floor(Math.random() * 50) + 10,
-      volume: Math.floor(Math.random() * 1000) + 100
-    }));
+    // TODO: Implement real trending searches functionality
+    // This would query the analytics database for actual trending data
+    const trends = [];
+    const liveTrends = [];
     
     res.json({
-      trends: mockTrends,
+      trends,
       liveTrends,
       lastUpdated: new Date().toISOString()
     });
@@ -51,21 +42,15 @@ router.get('/trending-searches', async (req, res) => {
 // Get search statistics
 router.get('/search-stats', async (req, res) => {
   try {
-    // Mock search statistics with dynamic values
+    // TODO: Implement real search statistics functionality
+    // This would query the analytics database for actual search data
     const stats = {
-      totalSearches: Math.floor(Math.random() * 10000) + 5000,
-      averageResults: Math.floor(Math.random() * 30) + 30,
-      averageSearchTime: (Math.random() * 1.5 + 0.5).toFixed(2),
-      successRate: Math.floor(Math.random() * 15) + 85,
-      popularTerms: [
-        'iPhone', 'Nike', 'Samsung', 'MacBook', 'Adidas',
-        'Headphones', 'Watch', 'Laptop', 'Tracker', 'Speaker'
-      ],
-      searchTrends: [
-        { term: 'iPhone', trend: 'up', change: 25 },
-        { term: 'Nike', trend: 'down', change: 10 },
-        { term: 'Samsung', trend: 'up', change: 15 }
-      ]
+      totalSearches: 0,
+      averageResults: 0,
+      averageSearchTime: 0,
+      successRate: 0,
+      popularTerms: [],
+      searchTrends: []
     };
     
     res.json(stats);

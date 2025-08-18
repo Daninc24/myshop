@@ -85,17 +85,9 @@ router.get('/price-alerts', auth, async (req, res) => {
   try {
     const userId = req.user.id;
     
-    // Mock price alerts data
-    const priceAlerts = [
-      {
-        productId: 'mock-product-1',
-        productName: 'Sample Product',
-        currentPrice: 1500,
-        targetPrice: 1200,
-        alertType: 'price_drop',
-        createdAt: new Date().toISOString()
-      }
-    ];
+    // TODO: Implement real price alerts functionality
+    // This would query the database for actual price alerts
+    const priceAlerts = [];
     
     res.json(priceAlerts);
   } catch (error) {

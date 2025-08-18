@@ -85,18 +85,18 @@ const Checkout = () => {
   return (
     <>
       <Helmet>
-        <title>Checkout - LuxeCart</title>
-<meta name="description" content="Complete your purchase at LuxeCart. Secure payment and fast delivery!" />
-<meta property="og:title" content="Checkout - LuxeCart" />
-<meta property="og:description" content="Complete your purchase at LuxeCart. Secure payment and fast delivery!" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://luxecart.com/checkout" />
-<meta property="og:image" content="https://luxecart.com/logo.png" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Checkout - LuxeCart" />
-<meta name="twitter:description" content="Complete your purchase at LuxeCart. Secure payment and fast delivery!" />
-<meta name="twitter:image" content="https://luxecart.com/logo.png" />
-<link rel="canonical" href="https://luxecart.com/checkout" />
+                <title>Checkout - MyShop</title>
+        <meta name="description" content="Complete your purchase at MyShop. Secure payment and fast delivery!" />
+        <meta property="og:title" content="Checkout - MyShop" />
+        <meta property="og:description" content="Complete your purchase at MyShop. Secure payment and fast delivery!" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://myshop.com/checkout" />
+        <meta property="og:image" content="https://myshop.com/logo.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Checkout - MyShop" />
+        <meta name="twitter:description" content="Complete your purchase at MyShop. Secure payment and fast delivery!" />
+        <meta name="twitter:image" content="https://myshop.com/logo.png" />
+        <link rel="canonical" href="https://myshop.com/checkout" />
       </Helmet>
       {/* Ant Design checkout container and form */}
       <div className="max-w-4xl mx-auto py-10 animate-fade-in">

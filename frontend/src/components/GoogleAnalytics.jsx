@@ -220,17 +220,17 @@ const GoogleAnalytics = () => {
       };
 
       // Add custom event listeners
-      window.addEventListener('luxecart:add_to_cart', trackAddToCart);
-      window.addEventListener('luxecart:purchase', trackPurchase);
-      window.addEventListener('luxecart:add_to_wishlist', trackWishlist);
-      window.addEventListener('luxecart:search', trackSearch);
+          window.addEventListener('myshop:add_to_cart', trackAddToCart);
+    window.addEventListener('myshop:purchase', trackPurchase);
+    window.addEventListener('myshop:add_to_wishlist', trackWishlist);
+    window.addEventListener('myshop:search', trackSearch);
 
       // Cleanup
       return () => {
-        window.removeEventListener('luxecart:add_to_cart', trackAddToCart);
-        window.removeEventListener('luxecart:purchase', trackPurchase);
-        window.removeEventListener('luxecart:add_to_wishlist', trackWishlist);
-        window.removeEventListener('luxecart:search', trackSearch);
+              window.removeEventListener('myshop:add_to_cart', trackAddToCart);
+      window.removeEventListener('myshop:purchase', trackPurchase);
+      window.removeEventListener('myshop:add_to_wishlist', trackWishlist);
+      window.removeEventListener('myshop:search', trackSearch);
       };
     }
   }, []);

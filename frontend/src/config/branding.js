@@ -1,37 +1,37 @@
-// Dynamic Branding Configuration for LuxeCart
+// Dynamic Branding Configuration
 export const BRAND_CONFIG = {
   // Brand Identity
-  name: 'LuxeCart',
-  tagline: 'Where Luxury Meets Convenience',
-  description: 'Your Premium Shopping Destination',
+  name: 'MyShop',
+  tagline: 'Your Premium Shopping Destination',
+  description: 'Discover amazing products with confidence',
   
   // Contact Information
-  email: 'info@luxecart.com',
-  phone: '+254791991154',
-  whatsapp: '+254791991154',
+  email: 'info@myshop.com',
+  phone: '+1234567890',
+  whatsapp: '+1234567890',
   
   // Social Media
   social: {
-    facebook: 'https://facebook.com/luxecart',
-    twitter: 'https://twitter.com/luxecart',
-    instagram: 'https://instagram.com/luxecart',
-    linkedin: 'https://linkedin.com/company/luxecart'
+    facebook: 'https://facebook.com/myshop',
+    twitter: 'https://twitter.com/myshop',
+    instagram: 'https://instagram.com/myshop',
+    linkedin: 'https://linkedin.com/company/myshop'
   },
   
   // Website URLs
   website: {
-    base: 'https://luxecart.com',
-    logo: 'https://luxecart.com/logo.png',
-    favicon: 'https://luxecart.com/favicon.ico'
+    base: 'https://myshop.com',
+    logo: 'https://myshop.com/logo.png',
+    favicon: 'https://myshop.com/favicon.ico'
   },
   
   // SEO Defaults
   seo: {
-    defaultTitle: 'LuxeCart - Your Premium Shopping Destination',
-    defaultDescription: 'Discover premium products, exclusive deals, and luxury shopping experience at LuxeCart. Fast delivery, secure payments, and exceptional customer service.',
-    defaultKeywords: 'luxury shopping, premium products, exclusive deals, fast delivery, secure payments, online store, ecommerce, luxecart',
-    defaultImage: 'https://luxecart.com/logo.png',
-    defaultUrl: 'https://luxecart.com'
+    defaultTitle: 'MyShop - Your Premium Shopping Destination',
+    defaultDescription: 'Discover premium products, exclusive deals, and excellent shopping experience at MyShop. Fast delivery, secure payments, and exceptional customer service.',
+    defaultKeywords: 'online shopping, premium products, exclusive deals, fast delivery, secure payments, ecommerce, myshop',
+    defaultImage: 'https://myshop.com/logo.png',
+    defaultUrl: 'https://myshop.com'
   },
   
   // Colors (matching Tailwind config)
@@ -58,10 +58,10 @@ export const BRAND_CONFIG = {
   // Business Info
   business: {
     founded: '2024',
-    location: 'Nairobi, Kenya',
-    currency: 'KES',
-    timezone: 'Africa/Nairobi',
-    languages: ['English', 'Swahili']
+    location: 'Your Location',
+    currency: 'USD',
+    timezone: 'UTC',
+    languages: ['English']
   },
   
   // Performance Targets
