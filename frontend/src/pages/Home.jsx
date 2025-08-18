@@ -147,7 +147,7 @@ const Home = () => {
   const fetchProducts = useCallback(async () => {
     try {
       setLoadingProducts(true);
-      const response = await axios.get('/api/products?limit=20&featured=true');
+      const response = await axios.get('/products?limit=20&featured=true');
       setProducts(response.data.products || response.data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -183,7 +183,7 @@ const Home = () => {
   const fetchNewArrivals = useCallback(async () => {
     try {
       setLoadingNewArrivals(true);
-      const response = await axios.get('/api/products?sort=newest&limit=8');
+      const response = await axios.get('/products?sort=newest&limit=8');
       setNewArrivals(response.data.products || response.data || []);
     } catch (error) {
       console.error('Error fetching new arrivals:', error);
@@ -209,7 +209,7 @@ const Home = () => {
   const fetchBestSelling = useCallback(async () => {
     try {
       setLoadingBestSelling(true);
-      const response = await axios.get('/api/products?featured=true&limit=8');
+      const response = await axios.get('/products?featured=true&limit=8');
       setBestSelling(response.data.products || response.data || []);
     } catch (error) {
       console.error('Error fetching best selling:', error);
@@ -235,7 +235,7 @@ const Home = () => {
   const fetchCategories = useCallback(async () => {
     try {
       setLoadingCategories(true);
-      const response = await axios.get('/api/categories');
+      const response = await axios.get('/categories');
       setCategoriesList(response.data.categories || response.data || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -290,7 +290,7 @@ const Home = () => {
   // Fetch trending products (fallback to new arrivals if endpoint doesn't exist)
   const fetchTrendingProducts = useCallback(async () => {
     try {
-      const response = await axios.get('/api/products?sort=newest&limit=6');
+      const response = await axios.get('/products?sort=newest&limit=6');
       setTrendingProducts(response.data.products || response.data || []);
     } catch (error) {
       console.error('Error fetching trending products:', error);
