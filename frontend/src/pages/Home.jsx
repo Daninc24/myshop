@@ -228,26 +228,42 @@ const Home = () => {
     }
   }, []);
 
-  // Initialize data
+  // Initialize data with optimized loading
   useEffect(() => {
     const initializeData = async () => {
       setLoading(true);
 
-      // Fetch critical data first
-      await Promise.allSettled([
-        fetchProducts(),
-        fetchCategories(),
-        fetchAssurances()
-      ]);
+      // Add timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        setLoading(false);
+      }, 10000); // 10 second timeout
 
-      // Fetch secondary data
-      Promise.allSettled([
-        fetchNewArrivals(),
-        fetchBestSelling(),
-        fetchTrendingProducts()
-      ]);
+      try {
+        // Fetch critical data first (products and categories)
+        await Promise.allSettled([
+          fetchProducts(),
+          fetchCategories()
+        ]);
 
-      setLoading(false);
+        // Clear timeout and set loading to false
+        clearTimeout(timeoutId);
+        setLoading(false);
+
+        // Fetch secondary data in background
+        setTimeout(() => {
+          Promise.allSettled([
+            fetchNewArrivals(),
+            fetchBestSelling(),
+            fetchTrendingProducts(),
+            fetchAssurances()
+          ]);
+        }, 100);
+
+      } catch (error) {
+        console.error('Error initializing data:', error);
+        clearTimeout(timeoutId);
+        setLoading(false);
+      }
     };
 
     initializeData();
@@ -292,7 +308,10 @@ const Home = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
-        <LoadingSpinner size="lg" />
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-text-secondary">Loading amazing products...</p>
+        </div>
       </div>
     );
   }

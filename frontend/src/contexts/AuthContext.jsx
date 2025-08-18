@@ -66,6 +66,10 @@ export const AuthProvider = ({ children }) => {
       // Sending login data
       const response = await axios.post('/auth/login', { email, password });
       setUser(response.data.user);
+      
+      // Immediately check auth status to ensure consistency
+      await checkAuth();
+      
       return { success: true };
     } catch (error) {
       return { 

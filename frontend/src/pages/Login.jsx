@@ -23,14 +23,22 @@ const Login = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
-    const result = await login(formData.email, formData.password);
-    if (result.success) {
-      success('Login successful! Welcome back.');
-      navigate('/');
-    } else {
-      showError(result.error);
+    try {
+      const result = await login(formData.email, formData.password);
+      if (result.success) {
+        success('Login successful! Welcome back.');
+        // Add a small delay to ensure auth state is updated
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 100);
+      } else {
+        showError(result.error);
+      }
+    } catch (error) {
+      showError('Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
