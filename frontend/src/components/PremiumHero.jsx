@@ -57,11 +57,15 @@ const PremiumHero = ({
 
   // Rotate highlights
   useEffect(() => {
+    if (!heroContent || !heroContent.highlights || heroContent.highlights.length === 0) {
+      return;
+    }
+    
     const interval = setInterval(() => {
       setCurrentHighlight((prev) => (prev + 1) % heroContent.highlights.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [heroContent.highlights.length]);
+  }, [heroContent?.highlights?.length]);
 
   // Animate in on mount
   useEffect(() => {
@@ -176,7 +180,7 @@ const PremiumHero = ({
                 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight px-2"
               >
                 <span className="bg-gradient-to-r from-yellow-200 via-orange-300 to-red-400 bg-clip-text text-transparent drop-shadow-2xl filter contrast-125" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -2px -2px 4px rgba(255,255,255,0.3)' }}>
-                  {heroContent.title}
+                  {heroContent?.title || 'Welcome to MyShop'}
                 </span>
               </motion.h1>
 
@@ -188,7 +192,7 @@ const PremiumHero = ({
                 className="text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-3xl mx-auto drop-shadow-2xl px-4"
                 style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.9), -1px -1px 3px rgba(255,255,255,0.2)' }}
               >
-                {heroContent.subtitle}
+                {heroContent?.subtitle || 'Discover premium products with confidence'}
               </motion.p>
 
               {/* Smart Search */}
@@ -211,26 +215,28 @@ const PremiumHero = ({
               </motion.div>
 
               {/* Rotating highlights */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="flex justify-center px-4"
-              >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentHighlight}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5 }}
-                    className="text-sm md:text-lg text-white font-bold bg-white/30 backdrop-blur-sm rounded-lg px-4 md:px-6 py-2 md:py-3 border border-white/40 shadow-xl max-w-xs md:max-w-none"
-                    style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.9)' }}
-                  >
-                    {heroContent.highlights[currentHighlight]}
-                  </motion.div>
-                </AnimatePresence>
-              </motion.div>
+              {heroContent?.highlights && heroContent.highlights.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                  className="flex justify-center px-4"
+                >
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentHighlight}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5 }}
+                      className="text-sm md:text-lg text-white font-bold bg-white/30 backdrop-blur-sm rounded-lg px-4 md:px-6 py-2 md:py-3 border border-white/40 shadow-xl max-w-xs md:max-w-none"
+                      style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.9)' }}
+                    >
+                      {heroContent.highlights[currentHighlight]}
+                    </motion.div>
+                  </AnimatePresence>
+                </motion.div>
+              )}
 
               {/* CTA buttons */}
               <motion.div

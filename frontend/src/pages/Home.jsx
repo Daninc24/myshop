@@ -21,6 +21,7 @@ import AIRecommendationEngine from '../components/AIRecommendationEngine';
 import WishlistWithPriceAlerts from '../components/WishlistWithPriceAlerts';
 import SocialMediaSharing from '../components/SocialMediaSharing';
 import ReferralSystem from '../components/ReferralSystem';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 // Icons
 import {
@@ -51,7 +52,30 @@ const Home = () => {
   const [bestSelling, setBestSelling] = useState([]);
   const [categoriesList, setCategoriesList] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
-  const [heroContent, setHeroContent] = useState(null);
+  const [heroContent, setHeroContent] = useState({
+    title: `Welcome to ${getBrandName()}`,
+    subtitle: 'Discover premium products with confidence. Shop the latest trends and enjoy fast delivery!',
+    highlights: [
+      'Premium Quality Products',
+      'Fast & Secure Delivery',
+      '24/7 Customer Support',
+      'Easy Returns & Exchanges'
+    ],
+    ctaButtons: [
+      {
+        text: 'Shop Now',
+        link: '/products',
+        variant: 'primary',
+        enabled: true
+      },
+      {
+        text: 'View Deals',
+        link: '/products?sort=discount',
+        variant: 'secondary',
+        enabled: true
+      }
+    ]
+  });
 
   // Loading states
   const [loading, setLoading] = useState(true);
@@ -142,11 +166,11 @@ const Home = () => {
     }
   }, []);
 
-  // Fetch best selling
+  // Fetch best selling (fallback to featured products if endpoint doesn't exist)
   const fetchBestSelling = useCallback(async () => {
     try {
       setLoadingBestSelling(true);
-      const response = await axios.get('/api/products/best-selling?limit=8');
+      const response = await axios.get('/api/products?featured=true&limit=8');
       setBestSelling(response.data.products || response.data || []);
     } catch (error) {
       console.error('Error fetching best selling:', error);
@@ -168,10 +192,10 @@ const Home = () => {
     }
   }, []);
 
-  // Fetch trending products
+  // Fetch trending products (fallback to new arrivals if endpoint doesn't exist)
   const fetchTrendingProducts = useCallback(async () => {
     try {
-      const response = await axios.get('/api/products/trending?limit=6');
+      const response = await axios.get('/api/products?sort=newest&limit=6');
       setTrendingProducts(response.data.products || response.data || []);
     } catch (error) {
       console.error('Error fetching trending products:', error);
@@ -288,27 +312,35 @@ const Home = () => {
       </Helmet>
 
       {/* Premium Hero Section */}
-      <PremiumHero
-        heroContent={heroContent}
-        trendingProducts={trendingProducts}
-        onShopNow={handleShopNow}
-        onViewDeals={handleViewDeals}
-      />
+      <ErrorBoundary>
+        <PremiumHero
+          heroContent={heroContent}
+          trendingProducts={trendingProducts}
+          onShopNow={handleShopNow}
+          onViewDeals={handleViewDeals}
+        />
+      </ErrorBoundary>
 
       {/* Advertisement Section - Top */}
-      <AdvertisementSection 
-        sectionName="hero-bottom"
-        className="my-8"
-      />
+      <ErrorBoundary>
+        <AdvertisementSection 
+          sectionName="hero-bottom"
+          className="my-8"
+        />
+      </ErrorBoundary>
 
       {/* Premium Features Section */}
-      <PremiumFeatures />
+      <ErrorBoundary>
+        <PremiumFeatures />
+      </ErrorBoundary>
 
       {/* Advertisement Section - Features */}
-      <AdvertisementSection 
-        sectionName="features-bottom"
-        className="my-8"
-      />
+      <ErrorBoundary>
+        <AdvertisementSection 
+          sectionName="features-bottom"
+          className="my-8"
+        />
+      </ErrorBoundary>
 
       {/* Categories Section */}
       {safeCategoriesList.length > 0 && (
@@ -353,10 +385,12 @@ const Home = () => {
       )}
 
       {/* Advertisement Section - Categories */}
-      <AdvertisementSection 
-        sectionName="categories-bottom"
-        className="my-8"
-      />
+      <ErrorBoundary>
+        <AdvertisementSection 
+          sectionName="categories-bottom"
+          className="my-8"
+        />
+      </ErrorBoundary>
 
       {/* Featured Products */}
       {safeProducts.length > 0 && (
@@ -390,12 +424,14 @@ const Home = () => {
       {user && (
         <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <AIRecommendationEngine
-              userId={user._id}
-              limit={8}
-              title="Recommended for You"
-              subtitle="AI-powered suggestions based on your preferences"
-            />
+            <ErrorBoundary>
+              <AIRecommendationEngine
+                userId={user._id}
+                limit={8}
+                title="Recommended for You"
+                subtitle="AI-powered suggestions based on your preferences"
+              />
+            </ErrorBoundary>
           </div>
         </section>
       )}
@@ -419,10 +455,12 @@ const Home = () => {
       )}
 
       {/* Advertisement Section - New Arrivals */}
-      <AdvertisementSection 
-        sectionName="new-arrivals-bottom"
-        className="my-8"
-      />
+      <ErrorBoundary>
+        <AdvertisementSection 
+          sectionName="new-arrivals-bottom"
+          className="my-8"
+        />
+      </ErrorBoundary>
 
       {/* Best Selling */}
       {safeBestSelling.length > 0 && (
@@ -446,7 +484,9 @@ const Home = () => {
       {user && (
         <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <WishlistWithPriceAlerts />
+            <ErrorBoundary>
+              <WishlistWithPriceAlerts />
+            </ErrorBoundary>
           </div>
         </section>
       )}
@@ -455,7 +495,9 @@ const Home = () => {
       {user && (
         <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <ReferralSystem userId={user._id} />
+            <ErrorBoundary>
+              <ReferralSystem userId={user._id} />
+            </ErrorBoundary>
           </div>
         </section>
       )}
@@ -475,16 +517,20 @@ const Home = () => {
       </section>
 
       {/* Advertisement Section - Bottom */}
-      <AdvertisementSection 
-        sectionName="bottom"
-        className="my-8"
-      />
+      <ErrorBoundary>
+        <AdvertisementSection 
+          sectionName="bottom"
+          className="my-8"
+        />
+      </ErrorBoundary>
 
       {/* Social Media Sharing */}
-      <SocialMediaSharing 
-        showFloating={true}
-        position="bottom-right"
-      />
+      <ErrorBoundary>
+        <SocialMediaSharing 
+          showFloating={true}
+          position="bottom-right"
+        />
+      </ErrorBoundary>
     </div>
   );
 };
