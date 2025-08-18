@@ -65,25 +65,37 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       const res = await axios.get(`/analytics?timeRange=${timeRange}`);
-      const monthlyRevenue = (res.data.salesByMonth || []).map(item => ({
+      const monthlyRevenue = (res.data?.salesByMonth || []).map(item => ({
         month: item._id,
         revenue: item.total || 0
       }));
       setStats({
         ...stats,
-        totalOrders: res.data.totalOrders,
-        totalProducts: res.data.totalProducts,
-        totalUsers: res.data.totalUsers,
-        totalRevenue: res.data.totalSales,
-        totalPageViews: res.data.totalPageViews,
+        totalOrders: res.data?.totalOrders || 0,
+        totalProducts: res.data?.totalProducts || 0,
+        totalUsers: res.data?.totalUsers || 0,
+        totalRevenue: res.data?.totalSales || 0,
+        totalPageViews: res.data?.totalPageViews || 0,
         monthlyRevenue,
-        usersByMonth: res.data.usersByMonth
+        usersByMonth: res.data?.usersByMonth || []
       });
     } catch (err) {
-      // Avoid noisy toasts for unauthorized in dev; log instead
-      if (axios.isAxiosError?.(err) && (err.response?.status === 401 || err.response?.status === 403)) {
-        console.debug('Analytics endpoint unauthorized; skipping');
+      // Silent handling for expected errors
+      if (axios.isAxiosError?.(err) && (err.response?.status === 401 || err.response?.status === 403 || err.response?.status === 404)) {
+        console.debug('Analytics endpoint not available; using default data');
+        // Set default stats instead of showing error
+        setStats({
+          ...stats,
+          totalOrders: 0,
+          totalProducts: 0,
+          totalUsers: 0,
+          totalRevenue: 0,
+          totalPageViews: 0,
+          monthlyRevenue: [],
+          usersByMonth: []
+        });
       } else {
+        console.error('Unexpected error fetching analytics:', err);
         showError('Error fetching analytics');
       }
     } finally {
@@ -95,9 +107,16 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       const res = await axios.get('/users');
-      setUsers(res.data.users);
+      setUsers(res.data?.users || []);
     } catch (err) {
-      showError('Error fetching users');
+      // Silent handling for expected errors
+      if (axios.isAxiosError?.(err) && (err.response?.status === 401 || err.response?.status === 403 || err.response?.status === 404)) {
+        console.debug('Users endpoint not available; using empty array');
+        setUsers([]);
+      } else {
+        console.error('Unexpected error fetching users:', err);
+        showError('Error fetching users');
+      }
     } finally {
       setLoading(false);
     }

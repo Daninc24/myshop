@@ -64,6 +64,11 @@ const Home = () => {
   // Add error state
   const [hasError, setHasError] = useState(false);
   
+  // Reset error state when component mounts
+  useEffect(() => {
+    setHasError(false);
+  }, []);
+  
   // State management - Initialize with empty arrays to prevent undefined errors
   const [products, setProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
@@ -242,6 +247,7 @@ const Home = () => {
   useEffect(() => {
     const initializeData = async () => {
       setLoading(true);
+      setHasError(false); // Reset error state on data initialization
 
       // Add timeout to prevent infinite loading
       const timeoutId = setTimeout(() => {
@@ -299,11 +305,34 @@ const Home = () => {
     }
   }, [search]);
 
-  // Global error handler
+  // Global error handler - only for unexpected errors
   useEffect(() => {
     const handleError = (error) => {
-      console.error('Global error caught:', error);
-      setHasError(true);
+      // Only set error state for truly unexpected errors
+      const errorString = error.toString();
+      const errorMessage = error.message || errorString;
+      
+      // Check if this is an expected error that should be ignored
+      const expectedErrors = [
+        /401/, // Auth errors
+        /503/, // Service unavailable
+        /analytics\/ad-impression.*404/, // Analytics errors
+        /analytics\/ad-click.*404/, // Analytics errors
+        /maps\.googleapis\.com.*ERR_BLOCKED_BY_CLIENT/, // Google Maps blocked
+        /maps\.gstatic\.com.*ERR_BLOCKED_BY_CLIENT/, // Google Maps blocked
+        /Node cannot be found in the current page/, // React DevTools
+        /Service Worker.*Loaded/, // Service Worker
+        /Service Worker.*registered/ // Service Worker
+      ];
+      
+      const isExpectedError = expectedErrors.some(pattern => 
+        pattern.test(errorString) || pattern.test(errorMessage)
+      );
+      
+      if (!isExpectedError) {
+        console.error('Unexpected error caught:', error);
+        setHasError(true);
+      }
     };
 
     window.addEventListener('error', handleError);

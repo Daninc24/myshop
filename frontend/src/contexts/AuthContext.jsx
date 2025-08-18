@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useToast } from './ToastContext';
+import { handleApiError } from '../utils/errorHandler.js';
 
 export const AuthContext = createContext();
 
@@ -45,14 +46,8 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
     } catch (error) {
       setUser(null);
-      // Silent handling for expected errors
-      if (error.response && (error.response.status === 401 || error.response.status === 503)) {
-        // Don't log 401 or 503 errors - they're expected
-        return;
-      } else {
-        // Only log unexpected errors
-        console.debug('Auth check failed:', error.message);
-      }
+      // Use the new error handler for consistent error management
+      handleApiError(error, 'AuthContext');
     } finally {
       setLoading(false);
     }
