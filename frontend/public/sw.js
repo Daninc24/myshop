@@ -3,13 +3,12 @@ const STATIC_CACHE = 'static-v1.0.1';
 const DYNAMIC_CACHE = 'dynamic-v1.0.1';
 const API_CACHE = 'api-v1.0.1';
 
-// Files to cache immediately - only essential files
+// Files to cache immediately - only essential files that exist
 const STATIC_FILES = [
   '/',
   '/index.html',
   '/offline.html',
-  '/favicon.ico',
-  '/manifest.json'
+  '/favicon.ico'
 ];
 
 // API endpoints to cache

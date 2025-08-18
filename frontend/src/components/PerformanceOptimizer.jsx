@@ -89,10 +89,10 @@ const PerformanceOptimizer = () => {
 
     // Preload critical resources
     const preloadCriticalResources = () => {
-      // Only preload resources that actually exist
+      // Only preload resources that actually exist and are needed
       const criticalResources = [
         // Only preload essential resources that we know exist
-        '/favicon.ico'
+        // Removed favicon.ico to prevent preload warnings
       ];
 
       criticalResources.forEach(resource => {

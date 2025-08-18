@@ -15,7 +15,7 @@ import {
   HeartIcon as HeartSolid,
   ShoppingCartIcon as ShoppingCartSolid
 } from '@heroicons/react/24/solid';
-import { getLazyImageProps, getOptimizedImageUrl } from '../utils/imageUtils';
+import { getLazyImageProps, getOptimizedImageUrl, getProductImage } from '../utils/imageUtils';
 
 const ProductCard = ({ product, showQuickView = true, showWishlist = true, compact = false }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -179,14 +179,14 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
           <div className="flex gap-3 p-3">
             {/* Compact Image */}
             <div className="w-20 h-20 bg-surface-hover rounded-lg overflow-hidden flex-shrink-0">
-              <img
-                src={getOptimizedImageUrl(images[0]) || '/placeholder-image.svg'}
-                alt={title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = '/placeholder-image.svg';
-                }}
-              />
+                          <img
+              src={getProductImage(product)}
+              alt={title}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.src = getProductImage(product);
+              }}
+            />
             </div>
             
             {/* Compact Content */}
@@ -272,14 +272,14 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
           <div className="aspect-square bg-surface-hover relative w-full h-48 sm:h-56 md:h-64">
             {/* Main Image */}
             <img
-              src={getOptimizedImageUrl(images[selectedImageIndex] || images[0]) || '/placeholder-image.svg'}
+              src={getProductImage(product, { width: 400, height: 400 })}
               alt={title}
               className={`w-full h-full object-cover transition-all duration-500 ${
                 isImageLoaded ? 'opacity-100' : 'opacity-0'
               } ${isHovered ? 'scale-110' : 'scale-100'}`}
               onLoad={handleImageLoad}
               onError={(e) => {
-                e.target.src = '/placeholder-image.svg';
+                e.target.src = getProductImage(product);
               }}
             />
             

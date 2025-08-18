@@ -98,7 +98,7 @@ class AdvertisementService {
         });
       } catch (analyticsError) {
         // Silently fail if analytics endpoint doesn't exist
-        console.debug('Analytics endpoint not available:', analyticsError.message);
+        // No console logging to avoid spam
       }
     } catch (error) {
       console.error('Error tracking ad impression:', error);
@@ -118,13 +118,18 @@ class AdvertisementService {
       }
       
       // You can also send to your backend
-      await axios.post('/analytics/ad-click', {
-        adId,
-        position,
-        type,
-        link,
-        timestamp: new Date().toISOString()
-      });
+      try {
+        await axios.post('/analytics/ad-click', {
+          adId,
+          position,
+          type,
+          link,
+          timestamp: new Date().toISOString()
+        });
+      } catch (analyticsError) {
+        // Silently fail if analytics endpoint doesn't exist
+        // No console logging to avoid spam
+      }
     } catch (error) {
       console.error('Error tracking ad click:', error);
     }

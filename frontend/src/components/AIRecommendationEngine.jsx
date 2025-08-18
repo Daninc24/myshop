@@ -107,8 +107,8 @@ const AIRecommendationEngine = ({
       }
 
     } catch (error) {
-      console.error('Error fetching AI recommendations:', error);
-      setError('Failed to load recommendations');
+      console.debug('AI recommendations endpoint not available:', error.message);
+      setError(null); // Don't show error, just use fallback
       
       // Fallback to mock data
       setRecommendations(generateMockRecommendations());
