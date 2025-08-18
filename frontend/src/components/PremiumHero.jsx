@@ -290,11 +290,14 @@ const PremiumHero = ({
                         className="relative group"
                       >
                         <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-yellow-400 transition-colors">
-                          <img
-                            src={getOptimizedImageUrl(product.images?.[0]) || '/placeholder-image.svg'}
-                            alt={product.title}
-                            className="w-full h-full object-cover"
-                          />
+                                                     <img
+                             src={getOptimizedImageUrl(product.images?.[0]) || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=64&h=64&fit=crop'}
+                             alt={product.title}
+                             className="w-full h-full object-cover"
+                             onError={(e) => {
+                               e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=64&h=64&fit=crop';
+                             }}
+                           />
                         </div>
                         <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
                           {index + 1}

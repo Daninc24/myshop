@@ -184,7 +184,9 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
               alt={title}
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.target.src = getProductImage(product);
+                console.log('Compact image failed to load:', e.target.src);
+                // Fallback to a reliable placeholder
+                e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop';
               }}
             />
             </div>
@@ -279,7 +281,10 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
               } ${isHovered ? 'scale-110' : 'scale-100'}`}
               onLoad={handleImageLoad}
               onError={(e) => {
-                e.target.src = getProductImage(product);
+                console.log('Image failed to load:', e.target.src);
+                // Fallback to a reliable placeholder
+                e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop';
+                setIsImageLoaded(true);
               }}
             />
             

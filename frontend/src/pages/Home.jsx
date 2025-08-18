@@ -159,7 +159,7 @@ const Home = () => {
           price: 99.99,
           description: 'A high-quality sample product',
           category: 'Electronics',
-          images: ['https://via.placeholder.com/300x300?text=Product+1'],
+          images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop'],
           rating: 4.5,
           inStock: true
         },
@@ -169,7 +169,7 @@ const Home = () => {
           price: 149.99,
           description: 'Another amazing sample product',
           category: 'Fashion',
-          images: ['https://via.placeholder.com/300x300?text=Product+2'],
+          images: ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop'],
           rating: 4.8,
           inStock: true
         }
@@ -195,7 +195,7 @@ const Home = () => {
           price: 79.99,
           description: 'Latest arrival in our collection',
           category: 'Home & Garden',
-          images: ['https://via.placeholder.com/300x300?text=New+1'],
+          images: ['https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=300&h=300&fit=crop'],
           rating: 4.2,
           inStock: true
         }
@@ -221,7 +221,7 @@ const Home = () => {
           price: 199.99,
           description: 'Our most popular product',
           category: 'Electronics',
-          images: ['https://via.placeholder.com/300x300?text=Best+1'],
+          images: ['https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop'],
           rating: 4.9,
           inStock: true
         }
@@ -302,7 +302,7 @@ const Home = () => {
           price: 129.99,
           description: 'Hot trending product',
           category: 'Electronics',
-          images: ['https://via.placeholder.com/300x300?text=Trending+1'],
+          images: ['https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=300&fit=crop'],
           rating: 4.7,
           inStock: true
         },
@@ -312,7 +312,7 @@ const Home = () => {
           price: 89.99,
           description: 'Popular trending item',
           category: 'Fashion',
-          images: ['https://via.placeholder.com/300x300?text=Trending+2'],
+          images: ['https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&h=300&fit=crop'],
           rating: 4.6,
           inStock: true
         }
