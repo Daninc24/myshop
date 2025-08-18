@@ -99,6 +99,7 @@ class AdvertisementService {
       } catch (analyticsError) {
         // Silently fail if analytics endpoint doesn't exist
         // No console logging to avoid spam
+        return; // Early return to prevent further processing
       }
     } catch (error) {
       console.error('Error tracking ad impression:', error);
@@ -117,7 +118,7 @@ class AdvertisementService {
         });
       }
       
-      // You can also send to your backend
+      // You can also send to your backend (silent fail)
       try {
         await axios.post('/analytics/ad-click', {
           adId,
@@ -129,6 +130,7 @@ class AdvertisementService {
       } catch (analyticsError) {
         // Silently fail if analytics endpoint doesn't exist
         // No console logging to avoid spam
+        return; // Early return to prevent further processing
       }
     } catch (error) {
       console.error('Error tracking ad click:', error);

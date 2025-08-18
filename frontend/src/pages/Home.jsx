@@ -61,7 +61,7 @@ const Home = () => {
   const { user } = useAuth();
   const { error: showError } = useToast();
   
-  // State management
+  // State management - Initialize with empty arrays to prevent undefined errors
   const [products, setProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
   const [bestSelling, setBestSelling] = useState([]);
@@ -128,19 +128,19 @@ const Home = () => {
   // Hero content
   const heroContent = useMemo(() => ({
     title: getBrandName(),
-    subtitle: getSectionConfig('hero').subtitle || `Discover ${products.length > 0 ? products.length : 'thousands of'} premium products with confidence. Shop the latest trends and enjoy lightning-fast delivery!`,
+    subtitle: getSectionConfig('hero').subtitle || `Discover ${safeProducts.length > 0 ? safeProducts.length : 'thousands of'} premium products with confidence. Shop the latest trends and enjoy lightning-fast delivery!`,
     highlights: [
       "🎯 Premium Quality Products",
       "⚡ Same Day Delivery",
       "🛡️ 100% Secure Shopping",
-      `💎 ${products.length > 0 ? products.length : '15,000'}+ Premium Products`,
+      `💎 ${safeProducts.length > 0 ? safeProducts.length : '15,000'}+ Premium Products`,
       "🌟 World-Class Service"
     ],
     cta: {
       primary: "Shop Now",
       secondary: "View Deals"
     }
-  }), [products.length]);
+  }), [safeProducts.length]);
 
   // Event handlers
   const handleShopNow = useCallback(() => {
@@ -163,22 +163,23 @@ const Home = () => {
     try {
       setLoadingProducts(true);
       const response = await axios.get('/products?limit=8');
-      setProducts(response.data.products || []);
+      setProducts(response.data?.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);
-      showError('Failed to load products');
+      setProducts([]); // Ensure we always have an array
     } finally {
       setLoadingProducts(false);
     }
-  }, [showError]);
+  }, []);
 
   const fetchNewArrivals = useCallback(async () => {
     try {
       setLoadingNewArrivals(true);
       const response = await axios.get('/products?sort=newest&limit=4');
-      setNewArrivals(response.data.products || []);
+      setNewArrivals(response.data?.products || []);
     } catch (error) {
       console.error('Error fetching new arrivals:', error);
+      setNewArrivals([]); // Ensure we always have an array
     } finally {
       setLoadingNewArrivals(false);
     }
@@ -188,9 +189,10 @@ const Home = () => {
     try {
       setLoadingBestSelling(true);
       const response = await axios.get('/products/best-selling?limit=4');
-      setBestSelling(response.data.products || []);
+      setBestSelling(response.data?.products || []);
     } catch (error) {
       console.error('Error fetching best selling:', error);
+      setBestSelling([]); // Ensure we always have an array
     } finally {
       setLoadingBestSelling(false);
     }
@@ -202,9 +204,12 @@ const Home = () => {
       const response = await axios.get('/categories');
       if (Array.isArray(response.data)) {
         setCategoriesList(response.data);
+      } else {
+        setCategoriesList([]); // Ensure we always have an array
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
+      setCategoriesList([]); // Ensure we always have an array
     } finally {
       setLoadingCategories(false);
     }
@@ -213,9 +218,10 @@ const Home = () => {
   const fetchTrendingProducts = useCallback(async () => {
     try {
       const response = await axios.get('/products?sort=trending&limit=3');
-      setTrendingProducts(response.data.products || []);
+      setTrendingProducts(response.data?.products || []);
     } catch (error) {
       console.error('Error fetching trending products:', error);
+      setTrendingProducts([]); // Ensure we always have an array
     }
   }, []);
 
@@ -316,6 +322,13 @@ const Home = () => {
     );
   }
 
+  // Safety check for all arrays to prevent undefined errors
+  const safeProducts = products || [];
+  const safeNewArrivals = newArrivals || [];
+  const safeBestSelling = bestSelling || [];
+  const safeCategoriesList = categoriesList || [];
+  const safeTrendingProducts = trendingProducts || [];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       {/* Enhanced SEO */}
@@ -355,7 +368,7 @@ const Home = () => {
       {/* Premium Hero Section */}
       <PremiumHero
         heroContent={heroContent}
-        trendingProducts={trendingProducts}
+        trendingProducts={safeTrendingProducts}
         onShopNow={handleShopNow}
         onViewDeals={handleViewDeals}
         backgroundImage={gambiaMarket}
@@ -428,7 +441,7 @@ const Home = () => {
             </div>
           ) : (
             <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4">
-              {(categoriesList || []).slice(0, getSectionMaxDisplay('categories')).map((category, index) => (
+              {safeCategoriesList.slice(0, getSectionMaxDisplay('categories') || 4).map((category, index) => (
                 <Link
                   key={category.id || category._id || index}
                   to={`/products?category=${encodeURIComponent(category.id || category.name)}`}
@@ -483,7 +496,7 @@ const Home = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {(products || []).slice(0, 3).map(product => (
+                {safeProducts.slice(0, 3).map(product => (
                   <ProductCard key={product._id} product={product} compact={true} />
                 ))}
               </div>
@@ -515,7 +528,7 @@ const Home = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {(newArrivals || []).slice(0, 3).map(product => (
+                {safeNewArrivals.slice(0, 3).map(product => (
                   <ProductCard key={product._id} product={product} compact={true} />
                 ))}
               </div>
@@ -547,7 +560,7 @@ const Home = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {(bestSelling || []).slice(0, 3).map(product => (
+                {safeBestSelling.slice(0, 3).map(product => (
                   <ProductCard key={product._id} product={product} compact={true} />
                 ))}
               </div>
