@@ -73,8 +73,8 @@ const WishlistWithPriceAlerts = () => {
   // Fetch AI recommendations for wishlist
   const fetchRecommendations = useCallback(async () => {
     try {
-      const response = await axios.get('/wishlist/recommendations');
-      setRecommendations(response.data.recommendations || []);
+      const response = await axios.get('/recommendations');
+      setRecommendations(response.data.products || []);
     } catch (error) {
       console.error('Error fetching recommendations:', error);
     }

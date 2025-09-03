@@ -342,8 +342,8 @@ const Home = () => {
     }
 
     try {
-      const response = await axios.get(`/api/products/search-suggestions?q=${encodeURIComponent(query)}`);
-      setSearchSuggestions(response.data.suggestions || []);
+      const response = await axios.get(`/products/search/suggestions?q=${encodeURIComponent(query)}`);
+      setSearchSuggestions(response.data || []);
     } catch (error) {
       console.error('Error fetching search suggestions:', error);
       setSearchSuggestions([]);

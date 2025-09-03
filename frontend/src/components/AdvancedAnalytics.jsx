@@ -118,7 +118,7 @@ const AdvancedAnalytics = () => {
   // Send analytics data to server
   const sendAnalyticsData = async (type, data) => {
     try {
-              await fetch('/analytics/track', {
+      await fetch('/api/analytics/interaction', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,11 +147,24 @@ const AdvancedAnalytics = () => {
       try {
         setLoading(true);
         
-        // Fetch analytics data from server
-        const response = await fetch(`/api/analytics/metrics?range=${timeRange}`);
+        // Fetch analytics dashboard data from server
+        const response = await fetch(`/api/analytics/dashboard?range=${timeRange}`);
         const data = await response.json();
-        
-        setMetrics(data);
+
+        // Map backend dashboard response to component metrics shape
+        setMetrics(prev => ({
+          ...prev,
+          pageViews: data?.realTime?.recentViews ?? prev.pageViews ?? 0,
+          conversionRate: data?.realTime?.conversionRate ?? prev.conversionRate ?? 0,
+          topProducts: data?.popularProducts?.map(p => ({ productId: p._id || p.title, views: p.viewCount || 0 })) || prev.topProducts || [],
+          // Keep existing or locally computed values for unavailable fields
+          uniqueVisitors: prev.uniqueVisitors ?? 0,
+          sessionDuration: prev.sessionDuration ?? 0,
+          bounceRate: prev.bounceRate ?? 0,
+          cartAbandonment: prev.cartAbandonment ?? 0,
+          userBehavior: prev.userBehavior || {},
+          performance: prev.performance || {}
+        }));
       } catch (error) {
         console.error('Error loading analytics data:', error);
         // Load from localStorage as fallback
