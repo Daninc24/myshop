@@ -1,4 +1,7 @@
 const logger = (req, res, next) => {
+  const shouldLog = process.env.DEBUG === 'true' || process.env.NODE_ENV !== 'production';
+  if (!shouldLog) return next();
+
   const start = Date.now();
   
   // Log request

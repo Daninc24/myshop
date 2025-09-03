@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const { auth } = require('../middleware/auth');
+const paymentController = require('../controllers/paymentController');
 
 // Currency list endpoint
 router.get('/currency/list', (req, res) => {
@@ -151,4 +153,24 @@ router.get('/currency/rates', async (req, res) => {
   }
 });
 
-module.exports = router; 
+/**
+ * Stripe endpoints
+ */
+router.post('/create-payment-intent', auth, paymentController.createPaymentIntent);
+router.post('/confirm-payment', auth, paymentController.confirmPayment);
+router.get('/status/:paymentIntentId', auth, paymentController.getPaymentStatus);
+
+/**
+ * PayPal endpoints
+ */
+router.post('/paypal/create-order', auth, paymentController.createPayPalOrder);
+router.post('/paypal/capture-order', auth, paymentController.capturePayPalOrder);
+
+/**
+ * Mpesa endpoints
+ */
+router.post('/mpesa/initiate', auth, paymentController.initiateMpesaPayment);
+// Callback can be public (called by Mpesa). Keep simple stub for now.
+router.post('/mpesa/callback', paymentController.confirmMpesaPayment);
+
+module.exports = router;

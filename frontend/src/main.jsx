@@ -20,8 +20,8 @@ import { ConfigProvider, theme as antdTheme } from 'antd';
   // In development, use the proxy (no base URL needed)
   // In production, use the full API URL
   if (import.meta.env.DEV) {
-    // Development: let Vite proxy handle API calls
-    axios.defaults.baseURL = '';
+    // Development: point to Vite proxy so calls like '/products' resolve to backend '/api/products'
+    axios.defaults.baseURL = '/api';
   } else {
     // Production: use the full API URL as provided by environment variable
     let raw = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com';

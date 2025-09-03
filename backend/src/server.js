@@ -64,33 +64,6 @@ const compressionMiddleware = require('./middleware/compression');
 
 const app = express();
 const server = http.createServer(app);
-app.use(cors({
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      process.env.FRONTEND_URL || 'http://localhost:5173',
-      'http://localhost:5173/',
-      'http://localhost:5174',
-      'https://myshoppingcenters-8knn.vercel.app',
-      'https://myshoppingcenters.vercel.app',
-      'https://myshoppingcenter.vercel.app',
-      'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
-      'https://myshop-git-main-daniel-mailus-projects.vercel.app',
-      'https://*.vercel.app',
-      'https://myshop-hhfv.vercel.app',
-      'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app',
-      'https://myshop-git-main-daniel-mailus-projects.vercel.app'
-    ];
-
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-      return callback(null, true);
-    }
-
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-}));
 
 const io = new Server(server, {
   cors: {
@@ -131,14 +104,28 @@ const onlineUsers = new Set();
 // === SOCKET.IO ===
 // Implement connection pooling with a Map to store user connections
 const userSocketMap = new Map();
+// Simple in-memory cache for user objects to reduce DB lookups during reconnect storms
+// Cache entries live for 60 seconds
+const userCache = new Map(); // key: userId, value: { user, exp }
 
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.headers.cookie?.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
     if (!token) return next(new Error('No token'));
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Use lean() for better performance
-    const user = await User.findById(decoded.userId).select('-password').lean();
+    // Check cache first
+    const now = Date.now();
+    const cached = userCache.get(decoded.userId);
+    let user;
+    if (cached && cached.exp > now) {
+      user = cached.user;
+    } else {
+      // Use lean() for better performance
+      user = await User.findById(decoded.userId).select('-password').lean();
+      if (user) {
+        userCache.set(decoded.userId, { user, exp: now + 60_000 });
+      }
+    }
     if (!user) return next(new Error('Invalid user'));
     socket.user = user;
     next();
@@ -258,14 +245,6 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-// Enable gzip compression when available to reduce payload size
-try {
-  const compression = require('compression');
-  app.use(compression());
-  console.log('✅ Compression enabled');
-} catch (e) {
-  console.log('ℹ️ compression package not installed; skipping gzip');
-}
 
 // Security headers via Helmet (optional)
 try {
