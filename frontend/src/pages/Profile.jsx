@@ -135,8 +135,9 @@ const Profile = () => {
           </form>
         </div>
         {/* Order History */}
-        <div className="card mt-10">
+        <div id="orders" className="card mt-10">
           <h2 className="text-xl font-heading font-bold text-secondary mb-4">Order History</h2>
+
           {orders.length === 0 ? (
             <p className="text-gray-500">You have no orders yet.</p>
           ) : (

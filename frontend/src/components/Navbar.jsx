@@ -409,7 +409,7 @@ const Navbar = () => {
                         <span>Profile</span>
                       </Link>
                       <Link
-                        to="/orders"
+                        to="/profile#orders"
                         className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-hover rounded-lg transition-colors duration-200"
                         onClick={() => setShowUserMenu(false)}
                       >

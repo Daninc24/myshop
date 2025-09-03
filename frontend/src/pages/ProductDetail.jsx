@@ -136,13 +136,13 @@ const ProductDetail = () => {
         <meta property="og:title" content={product ? `${product.title} - MyShop` : 'Product - MyShop'} />
         <meta property="og:description" content={product ? product.description : 'View product details, images, price, and stock at MyShop.'} />
         <meta property="og:type" content="product" />
-        <meta property="og:url" content={`https://myshop.com/products/${product ? product._id : ''}`} />
+        <meta property="og:url" content={`https://myshop.com/product/${product ? product._id : ''}`} />
         <meta property="og:image" content={getOptimizedImageUrl(product && product.images && product.images[0]) || 'https://myshop.com/logo.png'} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={product ? `${product.title} - MyShop` : 'Product - MyShop'} />
         <meta name="twitter:description" content={product ? product.description : 'View product details, images, price, and stock at MyShop.'} />
         <meta name="twitter:image" content={getOptimizedImageUrl(product && product.images && product.images[0]) || 'https://myshop.com/logo.png'} />
-        <link rel="canonical" href={`https://myshop.com/products/${product ? product._id : ''}`} />
+        <link rel="canonical" href={`https://myshop.com/product/${product ? product._id : ''}`} />
         {product && (
           <script type="application/ld+json">{`
             {
@@ -156,7 +156,7 @@ const ProductDetail = () => {
               "sku": "${product._id}",
               "offers": {
                 "@type": "Offer",
-                "url": "https://myshop.com/products/${product._id}",
+                "url": "https://myshop.com/product/${product._id}",
                 "priceCurrency": "KES",
                 "price": "${displayPrice}",
                 "availability": "${availableStock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}"

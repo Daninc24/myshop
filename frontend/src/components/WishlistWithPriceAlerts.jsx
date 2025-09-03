@@ -424,7 +424,7 @@ const WishlistWithPriceAlerts = () => {
                     </button>
                     
                     <Link
-                      to={`/products/${item._id}`}
+                      to={`/product/${item._id}`}
                       className="p-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors"
                     >
                       <EyeIcon className="h-4 w-4" />

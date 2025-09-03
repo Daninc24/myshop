@@ -70,7 +70,7 @@ export const advertTemplates = [
             <h3 className="text-sm font-semibold truncate">{title}</h3>
             {message && <p className="text-xs opacity-90 hidden sm:block truncate">{message}</p>}
           </div>
-          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="outline" />
+          <CompactCtaButton to={productId ? `/product/${productId}` : undefined} variant="outline" />
         </div>
       </div>
     ),
@@ -105,7 +105,7 @@ export const advertTemplates = [
             <h3 className="text-sm font-semibold truncate">{title}</h3>
             {message && <p className="text-xs opacity-90 hidden sm:block truncate">{message}</p>}
           </div>
-          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="outline" />
+          <CompactCtaButton to={productId ? `/product/${productId}` : undefined} variant="outline" />
         </div>
       </div>
     ),
@@ -138,7 +138,7 @@ export const advertTemplates = [
               {message && <p className="text-xs text-gray-600 truncate">{message}</p>}
             </div>
           </div>
-          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="primary" />
+          <CompactCtaButton to={productId ? `/product/${productId}` : undefined} variant="primary" />
         </div>
       </div>
     ),
@@ -159,7 +159,7 @@ export const advertTemplates = [
             <h3 className="text-sm font-semibold truncate">{title}</h3>
             {message && <p className="text-xs opacity-90 hidden sm:block truncate">{message}</p>}
           </div>
-          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="outline" />
+          <CompactCtaButton to={productId ? `/product/${productId}` : undefined} variant="outline" />
         </div>
       </div>
     ),
@@ -183,7 +183,7 @@ export const advertTemplates = [
               {message && <p className="text-xs text-gray-600 truncate">{message}</p>}
             </div>
           </div>
-          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="secondary" />
+          <CompactCtaButton to={productId ? `/product/${productId}` : undefined} variant="secondary" />
         </div>
       </div>
     ),
@@ -207,7 +207,7 @@ export const advertTemplates = [
             <h3 className="text-sm font-semibold truncate">{title}</h3>
             {message && <p className="text-xs opacity-90 hidden sm:block truncate">{message}</p>}
           </div>
-          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="outline" />
+          <CompactCtaButton to={productId ? `/product/${productId}` : undefined} variant="outline" />
         </div>
       </div>
     ),
@@ -231,7 +231,7 @@ export const advertTemplates = [
             <h3 className="text-sm font-semibold truncate">{title}</h3>
             {message && <p className="text-xs opacity-90 hidden sm:block truncate">{message}</p>}
           </div>
-          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="outline" />
+          <CompactCtaButton to={productId ? `/product/${productId}` : undefined} variant="outline" />
         </div>
       </div>
     ),
@@ -255,7 +255,7 @@ export const advertTemplates = [
             <h3 className="text-sm font-semibold truncate">{title}</h3>
             {message && <p className="text-xs opacity-90 hidden sm:block truncate">{message}</p>}
           </div>
-          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="outline" />
+          <CompactCtaButton to={productId ? `/product/${productId}` : undefined} variant="outline" />
         </div>
       </div>
     ),
@@ -279,7 +279,7 @@ export const advertTemplates = [
               {message && <p className="text-xs text-gray-600 truncate">{message}</p>}
             </div>
           </div>
-          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="primary" />
+          <CompactCtaButton to={productId ? `/product/${productId}` : undefined} variant="primary" />
         </div>
       </div>
     ),
@@ -327,7 +327,7 @@ export const advertTemplates = [
               {message && <p className="text-xs text-gray-600 truncate">{message}</p>}
             </div>
           </div>
-          <CompactCtaButton to={productId ? `/products/${productId}` : undefined} variant="dark" />
+          <CompactCtaButton to={productId ? `/product/${productId}` : undefined} variant="dark" />
         </div>
       </div>
     ),
@@ -361,5 +361,4 @@ export const getTemplatePreview = (templateId, data) => {
 };
 
 export default advertTemplates;
-
 

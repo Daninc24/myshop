@@ -528,7 +528,7 @@ const AdminAdverts = () => {
                       </div>
                       {advert.product && (
                         <Link 
-                          to={`/products/${advert.product._id || advert.product}`}
+                          to={`/product/${advert.product._id || advert.product}`}
                           className="text-orange-600 hover:text-orange-700 font-medium"
                         >
                           View Product

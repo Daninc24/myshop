@@ -337,7 +337,7 @@ const MobileMenu = ({
                 <span className="font-medium">Profile</span>
               </Link>
               <Link
-                to="/orders"
+                to="/profile#orders"
                 className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
                 onClick={onClose}
                 title="Orders"
