@@ -90,9 +90,7 @@ const Cart = () => {
 
         setCartProducts(cartWithProducts);
       } catch (err) {
-        console.error('Error processing cart items:', err);
-        error('Error loading cart items. Please try refreshing the page.');
-        
+        console.warn('Products fetch failed, using cart fallback:', err);
         // Fallback: use cart data as is
         const fallbackCart = cart.map(item => ({
           ...item,
@@ -102,6 +100,10 @@ const Cart = () => {
           category: item.category || 'Unknown'
         }));
         setCartProducts(fallbackCart);
+        // Only toast if even fallback is empty (nothing to show)
+        if (fallbackCart.length === 0) {
+          error('Error loading cart items. Please try refreshing the page.');
+        }
       } finally {
         setLoading(false);
       }
