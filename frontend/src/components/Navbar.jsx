@@ -111,6 +111,28 @@ const Navbar = () => {
     };
   }, []);
 
+  // Close any open menus when route changes (tidier UX)
+  useEffect(() => {
+    setShowUserMenu(false);
+    setShowNotifications(false);
+    setShowCategoryMenu(false);
+    setShowMobileMenu(false);
+  }, [location.pathname]);
+
+  // Close menus with Escape key
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setShowUserMenu(false);
+        setShowNotifications(false);
+        setShowCategoryMenu(false);
+        setShowMobileMenu(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   // Close user menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {

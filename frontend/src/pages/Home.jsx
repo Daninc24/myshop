@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Helmet } from 'react-helmet';
@@ -14,13 +14,13 @@ import {
 } from '../config/sections';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
-import PremiumFeatures from '../components/PremiumFeatures';
-import PremiumHero from '../components/PremiumHero';
-import AdvertisementSection from '../components/AdvertisementSection';
-import AIRecommendationEngine from '../components/AIRecommendationEngine';
-import WishlistWithPriceAlerts from '../components/WishlistWithPriceAlerts';
-import SocialMediaSharing from '../components/SocialMediaSharing';
-import ReferralSystem from '../components/ReferralSystem';
+const PremiumFeatures = lazy(() => import('../components/PremiumFeatures'));
+const PremiumHero = lazy(() => import('../components/PremiumHero'));
+const AdvertisementSection = lazy(() => import('../components/AdvertisementSection'));
+const AIRecommendationEngine = lazy(() => import('../components/AIRecommendationEngine'));
+const WishlistWithPriceAlerts = lazy(() => import('../components/WishlistWithPriceAlerts'));
+const SocialMediaSharing = lazy(() => import('../components/SocialMediaSharing'));
+const ReferralSystem = lazy(() => import('../components/ReferralSystem'));
 import ErrorBoundary from '../components/ErrorBoundary';
 
 // Icons
@@ -404,11 +404,11 @@ const Home = () => {
         <meta property="og:description" content={getSEODescription('home')} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={getSEOUrl('home')} />
-        <meta property="og:image" content={getSEOImage('home')} />
+        <meta property="og:image" content={getSEOImage()} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={getSEOTitle('home')} />
         <meta name="twitter:description" content={getSEODescription('home')} />
-        <meta name="twitter:image" content={getSEOImage('home')} />
+        <meta name="twitter:image" content={getSEOImage()} />
         <link rel="canonical" href={getSEOUrl('home')} />
         <script type="application/ld+json">{`
           {
@@ -431,33 +431,42 @@ const Home = () => {
 
       {/* Premium Hero Section */}
       <ErrorBoundary>
-        <PremiumHero
-          heroContent={heroContent}
-          trendingProducts={trendingProducts}
-          onShopNow={handleShopNow}
-          onViewDeals={handleViewDeals}
-        />
+        <Suspense fallback={<div className="h-[60vh]" />}> 
+          <PremiumHero
+            heroContent={heroContent}
+            trendingProducts={trendingProducts}
+            onShopNow={handleShopNow}
+            onViewDeals={handleViewDeals}
+            backgroundImage={getSEOImage()}
+          />
+        </Suspense>
       </ErrorBoundary>
 
       {/* Advertisement Section - Top */}
       <ErrorBoundary>
-        <AdvertisementSection 
-          sectionName="hero-bottom"
-          className="my-8"
-        />
+        <Suspense fallback={null}>
+          <AdvertisementSection 
+            sectionName="hero-bottom"
+            className="my-8"
+          />
+        </Suspense>
       </ErrorBoundary>
 
       {/* Premium Features Section */}
       <ErrorBoundary>
-        <PremiumFeatures />
+        <Suspense fallback={null}>
+          <PremiumFeatures />
+        </Suspense>
       </ErrorBoundary>
 
       {/* Advertisement Section - Features */}
       <ErrorBoundary>
-        <AdvertisementSection 
-          sectionName="features-bottom"
-          className="my-8"
-        />
+        <Suspense fallback={null}>
+          <AdvertisementSection 
+            sectionName="features-bottom"
+            className="my-8"
+          />
+        </Suspense>
       </ErrorBoundary>
 
       {/* Categories Section */}
@@ -543,12 +552,14 @@ const Home = () => {
         <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <ErrorBoundary>
-              <AIRecommendationEngine
-                userId={user._id}
-                limit={8}
-                title="Recommended for You"
-                subtitle="AI-powered suggestions based on your preferences"
-              />
+              <Suspense fallback={null}>
+                <AIRecommendationEngine
+                  userId={user._id}
+                  limit={8}
+                  title="Recommended for You"
+                  subtitle="AI-powered suggestions based on your preferences"
+                />
+              </Suspense>
             </ErrorBoundary>
           </div>
         </section>
@@ -574,10 +585,12 @@ const Home = () => {
 
       {/* Advertisement Section - New Arrivals */}
       <ErrorBoundary>
-        <AdvertisementSection 
-          sectionName="new-arrivals-bottom"
-          className="my-8"
-        />
+        <Suspense fallback={null}>
+          <AdvertisementSection 
+            sectionName="new-arrivals-bottom"
+            className="my-8"
+          />
+        </Suspense>
       </ErrorBoundary>
 
       {/* Best Selling */}
@@ -603,7 +616,9 @@ const Home = () => {
         <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <ErrorBoundary>
-              <WishlistWithPriceAlerts />
+              <Suspense fallback={null}>
+                <WishlistWithPriceAlerts />
+              </Suspense>
             </ErrorBoundary>
           </div>
         </section>
@@ -614,7 +629,9 @@ const Home = () => {
         <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <ErrorBoundary>
-              <ReferralSystem userId={user._id} />
+              <Suspense fallback={null}>
+                <ReferralSystem userId={user._id} />
+              </Suspense>
             </ErrorBoundary>
           </div>
         </section>
@@ -636,18 +653,22 @@ const Home = () => {
 
       {/* Advertisement Section - Bottom */}
       <ErrorBoundary>
-        <AdvertisementSection 
-          sectionName="bottom"
-          className="my-8"
-        />
+        <Suspense fallback={null}>
+          <AdvertisementSection 
+            sectionName="bottom"
+            className="my-8"
+          />
+        </Suspense>
       </ErrorBoundary>
 
       {/* Social Media Sharing */}
       <ErrorBoundary>
-        <SocialMediaSharing 
-          showFloating={true}
-          position="bottom-right"
-        />
+        <Suspense fallback={null}>
+          <SocialMediaSharing 
+            showFloating={true}
+            position="bottom-right"
+          />
+        </Suspense>
       </ErrorBoundary>
     </div>
   );
