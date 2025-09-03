@@ -18,10 +18,7 @@ const payPalEnv = process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECR
 
 const payPalClient = payPalEnv ? new paypal.core.PayPalHttpClient(payPalEnv) : null;
 
-// Initial load
-loadCredentials();
-
-// Helper to reload credentials (call after update)
+// Helper to reload credentials (call after update). Do not eagerly load here.
 exports.reloadCredentials = loadCredentials;
 
 // Stripe instance getter
