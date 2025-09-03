@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -21,6 +21,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const [cartProducts, setCartProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const errorShownRef = useRef(false);
 
   // Fetch product details for cart items with improved error handling
   useEffect(() => {
@@ -100,17 +101,14 @@ const Cart = () => {
           category: item.category || 'Unknown'
         }));
         setCartProducts(fallbackCart);
-        // Only toast if even fallback is empty (nothing to show)
-        if (fallbackCart.length === 0) {
-          error('Error loading cart items. Please try refreshing the page.');
-        }
+        // No toast on load; empty cart is a valid state. We'll just render the empty state UI.
       } finally {
         setLoading(false);
       }
     };
 
     fetchCartProducts();
-  }, [cart, error]);
+  }, [cart]);
 
   // Utility for currency symbols
   const getCurrencySymbol = (cur) => {

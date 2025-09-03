@@ -25,14 +25,15 @@ const Checkout = () => {
       }
 
       try {
-        const productIds = cart.map(item => item.productId);
+        const productIds = cart.map(item => item.productId || item._id);
         const response = await axios.get('/products');
-        const products = response.data.filter(product => 
-          productIds.includes(product._id)
-        );
+        const payload = response.data;
+        const allProducts = Array.isArray(payload) ? payload : (payload?.products || []);
+        const products = allProducts.filter(product => productIds.includes(product._id));
 
         const cartWithProducts = cart.map(cartItem => {
-          const product = products.find(p => p._id === cartItem.productId);
+          const pid = cartItem.productId || cartItem._id;
+          const product = products.find(p => p._id === pid);
           return {
             ...cartItem,
             product
@@ -42,17 +43,27 @@ const Checkout = () => {
         setCartProducts(cartWithProducts);
         
         const totalAmount = cartWithProducts.reduce((sum, item) => {
-          return sum + (item.product?.price * item.quantity);
+          const price = item.product?.price ?? item.price ?? 0;
+          const qty = item.quantity ?? 1;
+          return sum + (price * qty);
         }, 0);
         
         setTotal(totalAmount);
       } catch (err) {
-        error('Error loading cart items');
+        // Fallback: just use cart data without products API
+        const fallbackCart = cart.map(item => ({
+          ...item,
+          product: null
+        }));
+        setCartProducts(fallbackCart);
+        if (fallbackCart.length === 0) {
+          error('Error loading cart items');
+        }
       }
     };
 
     fetchCartProducts();
-  }, [cart, navigate, error]);
+  }, [cart, navigate]);
 
   const handlePaymentSuccess = (order) => {
     success('Order placed successfully!');
