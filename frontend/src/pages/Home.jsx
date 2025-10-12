@@ -372,18 +372,39 @@ const Home = () => {
     navigate('/products?sort=discount');
   }, [navigate]);
 
-  // Load data on mount
+  // Optimized progressive loading for better performance
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.allSettled([
-        fetchProducts(),
-        fetchNewArrivals(),
-        fetchBestSelling(),
-        fetchCategories(),
-        fetchTrendingProducts()
-      ]);
-      setLoading(false);
+      
+      try {
+        // Phase 1: Load critical data first (products and categories)
+        await Promise.allSettled([
+          fetchProducts(),
+          fetchCategories()
+        ]);
+        
+        // Show page immediately with critical content
+        setLoading(false);
+        
+        // Phase 2: Load secondary data in background (non-blocking)
+        setTimeout(() => {
+          Promise.allSettled([
+            fetchNewArrivals(),
+            fetchBestSelling(),
+            fetchTrendingProducts()
+          ]);
+        }, 100);
+        
+      } catch (error) {
+        console.error('Error loading data:', error);
+        setLoading(false);
+      }
+      
+      // Timeout protection - ensure loading stops after 10 seconds
+      setTimeout(() => {
+        setLoading(false);
+      }, 10000);
     };
 
     loadData();

@@ -112,13 +112,14 @@ const getAllProducts = async (req, res) => {
     const sortOptions = {};
     sortOptions[sort] = order === 'desc' ? -1 : 1;
     
-    // Execute query with pagination and sorting
+    // Execute query with pagination and sorting (optimized with lean)
     const products = await Product.find(query)
       .select('title price compareAtPrice images category subcategory stock updatedAt createdAt rating reviewCount')
       .sort(sortOptions)
       .skip(skip)
       .limit(limitNum)
-      .lean();
+      .lean() // Use lean for better performance
+      .hint({ [sort]: order === 'desc' ? -1 : 1 }); // Use index hint for better performance
     
     // Get total count for pagination info
     const total = await Product.countDocuments(query);

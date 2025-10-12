@@ -495,7 +495,12 @@ passport.deserializeUser(async (id, done) => {
     await mongoose.connect(MONGO_URI, {
       serverSelectionTimeoutMS: 5000, // 5 second timeout
       socketTimeoutMS: 45000, // 45 second timeout
-      bufferCommands: false // Disable mongoose buffering
+      bufferCommands: false, // Disable mongoose buffering
+      maxPoolSize: 10, // Maintain up to 10 socket connections
+      minPoolSize: 2, // Maintain at least 2 socket connections
+      maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
+      connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
+      heartbeatFrequencyMS: 10000, // Check server status every 10 seconds
     });
 
     console.log('✅ MongoDB connected');

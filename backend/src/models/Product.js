@@ -4,7 +4,6 @@ const variantSchema = new mongoose.Schema({
   sku: {
     type: String,
     required: [true, 'SKU is required'],
-    unique: true,
     trim: true,
     index: true
   },
@@ -257,5 +256,7 @@ productSchema.index({ category: 1, subcategory: 1, price: 1, createdAt: -1 });
 // Indexes to accelerate variant option filtering and stock checks
 productSchema.index({ 'variants.options.name': 1, 'variants.options.value': 1 });
 productSchema.index({ 'variants.quantity': 1 });
+// Sparse index for variant SKUs to allow null values
+productSchema.index({ 'variants.sku': 1 }, { sparse: true });
 
 module.exports = mongoose.model('Product', productSchema);
