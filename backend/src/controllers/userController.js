@@ -4,7 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const Message = require('../models/Message');
-const io = require('../server').io || (global.io && global.io); // For Socket.IO access
+const { emitToUser } = require('../utils/socketManager');
 
 const uploadDir = path.join(__dirname, '../../uploads/profiles');
 if (!fs.existsSync(uploadDir)) {
@@ -186,9 +186,7 @@ exports.getMessages = async (req, res) => {
     // Mark all unread messages from withUser to userId as read
     await Message.updateMany({ sender: withUser, receiver: userId, read: false }, { $set: { read: true } });
     // Emit read receipt to sender (if online)
-    if (io) {
-      io.to(withUser).emit('messages_read', { from: userId, to: withUser });
-    }
+    emitToUser(withUser, 'messages_read', { from: userId, to: withUser });
 
     const messages = await Message.find({
       $or: [

@@ -4,8 +4,7 @@ const variantSchema = new mongoose.Schema({
   sku: {
     type: String,
     required: [true, 'SKU is required'],
-    trim: true,
-    index: true
+    trim: true
   },
   price: {
     type: Number,

@@ -1,8 +1,6 @@
 const Event = require('../models/Event');
-let io;
+const { emitToAll } = require('../utils/socketManager');
 const path = require('path');
-// Allow setting io from server.js
-exports.setIO = (ioInstance) => { io = ioInstance; };
 
 // Get all events (optionally filter by upcoming/past)
 exports.getEvents = async (req, res) => {
@@ -42,7 +40,7 @@ exports.createEvent = async (req, res) => {
       image: imageUrl
     });
     await event.save();
-    if (io) io.emit('event_created', event);
+    emitToAll('event_created', event);
     res.status(201).json(event);
   } catch (err) {
     res.status(500).json({ message: 'Failed to create event', error: err.message });
@@ -62,7 +60,7 @@ exports.updateEvent = async (req, res) => {
     if (imageUrl) updateData.image = imageUrl;
     const event = await Event.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!event) return res.status(404).json({ message: 'Event not found' });
-    if (io) io.emit('event_updated', event);
+    emitToAll('event_updated', event);
     res.json(event);
   } catch (err) {
     res.status(500).json({ message: 'Failed to update event', error: err.message });
@@ -74,7 +72,7 @@ exports.deleteEvent = async (req, res) => {
   try {
     const event = await Event.findByIdAndDelete(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
-    if (io) io.emit('event_deleted', event._id);
+    emitToAll('event_deleted', event._id);
     res.json({ message: 'Event deleted' });
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete event', error: err.message });

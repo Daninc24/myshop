@@ -10,6 +10,7 @@ const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: process.env.NODE_ENV === 'production', // Trust proxy in production
 });
 
 // Auth routes rate limiter (more strict)
@@ -22,6 +23,7 @@ const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: process.env.NODE_ENV === 'production',
 });
 
 // Order placement rate limiter
@@ -34,6 +36,7 @@ const orderLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: process.env.NODE_ENV === 'production',
 });
 
 // Product operations rate limiter (admin only) - more lenient
@@ -46,6 +49,7 @@ const productLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: process.env.NODE_ENV === 'production',
 });
 
 // Admin-specific rate limiter (very lenient for admin operations)
@@ -58,6 +62,7 @@ const adminLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: process.env.NODE_ENV === 'production',
 });
 
 module.exports = { apiLimiter, authLimiter, orderLimiter, productLimiter, adminLimiter }; 

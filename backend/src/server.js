@@ -29,6 +29,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('./models/User');
 const Product = require('./models/Product');
 const Message = require('./models/Message');
+const { setSocketIO } = require('./utils/socketManager');
 
 const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter, authLimiter, orderLimiter, productLimiter, adminLimiter } = require('./middleware/rateLimiter');
@@ -63,6 +64,12 @@ const { createIndexes } = require('./utils/databaseIndexes');
 const compressionMiddleware = require('./middleware/compression');
 
 const app = express();
+
+// Configure trust proxy for production deployment (Render, Heroku, etc.)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -98,6 +105,9 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
+// Set the Socket.IO instance for use in other modules
+setSocketIO(io);
 
 const onlineUsers = new Set();
 
