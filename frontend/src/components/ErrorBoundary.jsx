@@ -11,14 +11,26 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // Only log unexpected errors, not React hydration or common issues
+    if (!error.message.includes('Minified React error #31') && 
+        !error.message.includes('object with keys')) {
+      console.error('ErrorBoundary caught an error:', error, errorInfo);
+    }
   }
 
   render() {
     if (this.state.hasError) {
       return this.props.fallback || (
-        <div className="p-4 text-center text-gray-600">
-          <p>Something went wrong. Please try refreshing the page.</p>
+        <div className="p-4 text-center text-slate-600 bg-slate-50 rounded-lg border border-slate-200">
+          <div className="text-2xl mb-2">⚠️</div>
+          <p className="font-medium">Something went wrong</p>
+          <p className="text-sm text-slate-500 mt-1">Please refresh the page to continue</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+          >
+            Refresh Page
+          </button>
         </div>
       );
     }

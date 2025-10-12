@@ -78,6 +78,35 @@ const MobileMenu = ({
       </div>
       
       <div className="p-4 space-y-3 overflow-y-auto h-[calc(100vh-80px)]">
+        {/* Categories Section - Prominent */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
+            <Squares2X2Icon className="w-5 h-5 mr-2" />
+            Categories
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            {categories.slice(0, 6).map((category) => (
+              <Link
+                key={category._id || category.id}
+                to={`/products?category=${category.name}`}
+                onClick={onClose}
+                className="flex items-center p-3 bg-indigo-800/50 rounded-lg hover:bg-indigo-700/50 transition-all duration-200 text-white"
+              >
+                <span className="text-sm font-medium truncate">{category.name}</span>
+              </Link>
+            ))}
+          </div>
+          {categories.length > 6 && (
+            <Link
+              to="/products"
+              onClick={onClose}
+              className="block mt-2 text-center text-indigo-300 hover:text-white text-sm font-medium"
+            >
+              View All Categories →
+            </Link>
+          )}
+        </div>
+
         {/* Search Bar */}
         <div className="mb-4">
           <form onSubmit={handleSearch} className="relative">

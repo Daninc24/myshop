@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { setupGlobalErrorHandling } from './utils/errorHandler.js'
+import { initializeErrorFixes } from './utils/errorFixes.js'
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ToastProvider } from './contexts/ToastContext.jsx';
 import { CartProvider } from './contexts/CartContext.jsx';
@@ -37,6 +38,9 @@ import { ConfigProvider, theme as antdTheme } from 'antd';
   }
   axios.defaults.withCredentials = true;
 })();
+
+// Initialize error fixes for production
+initializeErrorFixes();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>

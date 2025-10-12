@@ -40,7 +40,7 @@ const Navbar = () => {
   const categoryMenuRef = useRef(null);
   const categoryButtonRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
-  const [currencies, setCurrencies] = useState([
+  const [currencies] = useState([
     { code: 'USD', symbol: '$', name: 'US Dollar' },
     { code: 'EUR', symbol: '€', name: 'Euro' },
     { code: 'GBP', symbol: '£', name: 'British Pound' },
@@ -169,25 +169,7 @@ const Navbar = () => {
     fetchCategories();
   }, []);
 
-  // Load currencies
-  useEffect(() => {
-    const fetchCurrencies = async () => {
-      try {
-        const response = await axios.get('/payment/currency/list');
-        const currencyData = response.data;
-        
-        // Ensure we have a valid array of currencies
-        if (Array.isArray(currencyData) && currencyData.length > 0) {
-          setCurrencies(currencyData);
-        }
-        // If no valid data, keep the default currencies
-      } catch (error) {
-        console.error('Error fetching currencies:', error);
-        // Keep the default currencies on error
-      }
-    };
-    fetchCurrencies();
-  }, []);
+  // Currencies are now static to avoid API issues
 
   // Search functionality
   const handleSearch = async (term) => {
@@ -243,7 +225,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-14 sm:h-16 lg:h-18">
           
-          {/* Logo */}
+          {/* Logo and Mobile Categories */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             <Link to="/" className="flex items-center space-x-2 group">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
@@ -251,20 +233,29 @@ const Navbar = () => {
               </div>
               <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">MyShop</span>
             </Link>
+            
+            {/* Mobile Categories Button */}
+            <button
+              onClick={() => setShowMobileMenu(true)}
+              className="lg:hidden flex items-center space-x-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold"
+            >
+              <Squares2X2Icon className="w-4 h-4" />
+              <span className="hidden sm:block">Categories</span>
+            </button>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-6">
+          {/* Center Section - Categories and Search */}
+          <div className="hidden lg:flex items-center flex-1 max-w-2xl mx-8">
             
-            {/* Categories Dropdown */}
-            <div className="relative">
+            {/* Categories Dropdown - More Prominent */}
+            <div className="relative mr-4">
               <button
                 onMouseEnter={handleCategoryMouseEnter}
                 onMouseLeave={handleCategoryMouseLeave}
-                className="flex items-center space-x-2 text-slate-600 hover:text-indigo-600 transition-all duration-200 font-medium px-3 py-2 rounded-lg hover:bg-slate-50"
+                className="flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
               >
                 <Squares2X2Icon className="w-5 h-5" />
-                <span className="text-sm font-semibold">Categories</span>
+                <span>Categories</span>
                 <svg className={`w-4 h-4 transition-transform duration-200 ${showCategoryMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -286,6 +277,33 @@ const Navbar = () => {
               )}
             </div>
 
+            {/* Search Bar */}
+            <div className="flex-1 max-w-md">
+              <form onSubmit={handleSearchSubmit} className="relative">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 pl-10 pr-4 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white text-slate-700 placeholder-slate-400"
+                />
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    <XMarkIcon className="w-4 h-4" />
+                  </button>
+                )}
+              </form>
+            </div>
+
+          </div>
+
+          {/* Desktop Admin Links */}
+          <div className="hidden lg:flex items-center space-x-4">
             {/* Admin Dashboard Link - Only for Admin Users */}
             {(user?.role === 'admin' || user?.role === 'shopkeeper' || user?.role === 'manager' || user?.role === 'warehouse_manager' || user?.role === 'store_manager') && (
               <Link
@@ -307,8 +325,6 @@ const Navbar = () => {
                 <span className="text-sm font-semibold">POS</span>
               </Link>
             )}
-
-
           </div>
 
           {/* Right Side Actions */}
@@ -321,20 +337,14 @@ const Navbar = () => {
                 onChange={(e) => setCurrency(e.target.value)}
                 className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-slate-300"
               >
-                {Array.isArray(currencies) && currencies.length > 0 ? (
-                  currencies.map((curr) => (
-                    <option key={curr.code} value={curr.code}>
-                      {curr.symbol} {curr.code} - {curr.name}
-                    </option>
-                  ))
-                ) : (
-                  <>
-                    <option value="USD">$ USD - US Dollar</option>
-                    <option value="EUR">€ EUR - Euro</option>
-                    <option value="GBP">£ GBP - British Pound</option>
-                    <option value="GMD">D GMD - Gambian Dalasi</option>
-                  </>
-                )}
+                <option value="USD">$ USD</option>
+                <option value="EUR">€ EUR</option>
+                <option value="GBP">£ GBP</option>
+                <option value="GMD">D GMD</option>
+                <option value="CAD">C$ CAD</option>
+                <option value="AUD">A$ AUD</option>
+                <option value="JPY">¥ JPY</option>
+                <option value="INR">₹ INR</option>
               </select>
             </div>
 
