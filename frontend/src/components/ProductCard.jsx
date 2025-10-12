@@ -16,6 +16,7 @@ import {
   ShoppingCartIcon as ShoppingCartSolid
 } from '@heroicons/react/24/solid';
 import { getLazyImageProps, getOptimizedImageUrl, getProductImage } from '../utils/imageUtils';
+import axios from 'axios';
 
 const ProductCard = ({ product, showQuickView = true, showWishlist = true, compact = false }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -57,15 +58,28 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
   // Check if item is in wishlist on component mount
   useEffect(() => {
     if (user) {
-      try {
-        const wishlistKey = `wishlist_${user._id}`;
-        const stored = localStorage.getItem(wishlistKey);
-        const wishlistItems = stored ? JSON.parse(stored) : [];
-        const isInList = wishlistItems.some(item => item._id === _id);
-        setIsInWishlist(isInList);
-      } catch (err) {
-        console.error('Error checking wishlist:', err);
-      }
+      const checkWishlistStatus = async () => {
+        try {
+          // Try backend first
+          const response = await axios.get('/wishlist');
+          const wishlistItems = response.data.items || [];
+          const isInList = wishlistItems.some(item => item._id === _id || item.productId === _id);
+          setIsInWishlist(isInList);
+        } catch (apiError) {
+          // Fallback to localStorage
+          try {
+            const wishlistKey = `wishlist_${user._id}`;
+            const stored = localStorage.getItem(wishlistKey);
+            const wishlistItems = stored ? JSON.parse(stored) : [];
+            const isInList = wishlistItems.some(item => item._id === _id);
+            setIsInWishlist(isInList);
+          } catch (err) {
+            console.error('Error checking wishlist:', err);
+          }
+        }
+      };
+      
+      checkWishlistStatus();
     }
   }, [user, _id]);
 
@@ -98,7 +112,7 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
     }
   };
 
-  const handleWishlistToggle = (e) => {
+  const handleWishlistToggle = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -108,24 +122,38 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
     }
 
     try {
-      const wishlistKey = `wishlist_${user._id}`;
-      const stored = localStorage.getItem(wishlistKey);
-      let wishlistItems = stored ? JSON.parse(stored) : [];
-      
-      const productExists = wishlistItems.find(item => item._id === _id);
-      
-      if (!productExists) {
-        // Add to wishlist
-        wishlistItems.push(product);
-        localStorage.setItem(wishlistKey, JSON.stringify(wishlistItems));
-        setIsInWishlist(true);
-        success('Added to wishlist!');
+      if (!isInWishlist) {
+        // Add to wishlist - try backend first, fallback to localStorage
+        try {
+          await axios.post('/wishlist', { productId: _id });
+          setIsInWishlist(true);
+          success('Added to wishlist!');
+        } catch (apiError) {
+          // Fallback to localStorage
+          const wishlistKey = `wishlist_${user._id}`;
+          const stored = localStorage.getItem(wishlistKey);
+          let wishlistItems = stored ? JSON.parse(stored) : [];
+          wishlistItems.push(product);
+          localStorage.setItem(wishlistKey, JSON.stringify(wishlistItems));
+          setIsInWishlist(true);
+          success('Added to wishlist!');
+        }
       } else {
-        // Remove from wishlist
-        wishlistItems = wishlistItems.filter(item => item._id !== _id);
-        localStorage.setItem(wishlistKey, JSON.stringify(wishlistItems));
-        setIsInWishlist(false);
-        success('Removed from wishlist');
+        // Remove from wishlist - try backend first, fallback to localStorage
+        try {
+          await axios.delete(`/wishlist/${_id}`);
+          setIsInWishlist(false);
+          success('Removed from wishlist');
+        } catch (apiError) {
+          // Fallback to localStorage
+          const wishlistKey = `wishlist_${user._id}`;
+          const stored = localStorage.getItem(wishlistKey);
+          let wishlistItems = stored ? JSON.parse(stored) : [];
+          wishlistItems = wishlistItems.filter(item => item._id !== _id);
+          localStorage.setItem(wishlistKey, JSON.stringify(wishlistItems));
+          setIsInWishlist(false);
+          success('Removed from wishlist');
+        }
       }
     } catch (err) {
       console.error('Wishlist error:', err);

@@ -399,6 +399,18 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Add API health endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    requestId: req.id,
+    environment: process.env.NODE_ENV || 'development',
+    version: '1.0.0'
+  });
+});
+
 // Basic robots.txt allowing all
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain');
