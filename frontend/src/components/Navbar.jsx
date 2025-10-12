@@ -34,6 +34,7 @@ const Navbar = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [categoriesList, setCategoriesList] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const categoryMenuRef = useRef(null);
@@ -149,6 +150,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setLoadingCategories(true);
         const response = await axios.get('/categories');
         const categoriesData = response.data;
         
@@ -160,6 +162,8 @@ const Navbar = () => {
       } catch (error) {
         console.error('Error fetching categories:', error);
         setCategoriesList([]);
+      } finally {
+        setLoadingCategories(false);
       }
     };
     fetchCategories();
@@ -233,34 +237,34 @@ const Navbar = () => {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       isScrolled 
-        ? 'bg-surface/95 backdrop-blur-lg border-b border-border shadow-medium' 
-        : 'bg-transparent'
+        ? 'bg-white/95 backdrop-blur-lg border-b border-slate-200 shadow-lg' 
+        : 'bg-white/90 backdrop-blur-sm'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="flex items-center justify-between h-14 sm:h-16 lg:h-18">
           
           {/* Logo */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <Link to="/" className="flex items-center space-x-2 group">
-              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow group-hover:shadow-glow-lg transition-all duration-300">
-                <SparklesIcon className="w-6 h-6 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                <SparklesIcon className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
-              <span className="text-xl font-bold gradient-text">MyShop</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">MyShop</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-6">
             
             {/* Categories Dropdown */}
             <div className="relative">
               <button
                 onMouseEnter={handleCategoryMouseEnter}
                 onMouseLeave={handleCategoryMouseLeave}
-                className="flex items-center space-x-2 text-text-secondary hover:text-primary transition-all duration-200 font-medium px-3 py-2 rounded-lg hover:bg-surface-hover"
+                className="flex items-center space-x-2 text-slate-600 hover:text-indigo-600 transition-all duration-200 font-medium px-3 py-2 rounded-lg hover:bg-slate-50"
               >
                 <Squares2X2Icon className="w-5 h-5" />
-                <span>Categories</span>
+                <span className="text-sm font-semibold">Categories</span>
                 <svg className={`w-4 h-4 transition-transform duration-200 ${showCategoryMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -286,10 +290,10 @@ const Navbar = () => {
             {(user?.role === 'admin' || user?.role === 'shopkeeper' || user?.role === 'manager' || user?.role === 'warehouse_manager' || user?.role === 'store_manager') && (
               <Link
                 to="/admin"
-                className="flex items-center space-x-2 text-text-secondary hover:text-primary transition-colors duration-200 font-medium"
+                className="flex items-center space-x-2 text-slate-600 hover:text-indigo-600 transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-slate-50"
               >
-                <Cog6ToothIcon className="w-5 h-5" />
-                <span>Admin Dashboard</span>
+                <Cog6ToothIcon className="w-4 h-4" />
+                <span className="text-sm font-semibold">Admin</span>
               </Link>
             )}
 
@@ -297,10 +301,10 @@ const Navbar = () => {
             {(user?.role === 'shopkeeper' || user?.role === 'warehouse_manager' || user?.role === 'admin') && (
               <Link
                 to="/pos"
-                className="flex items-center space-x-2 text-text-secondary hover:text-primary transition-colors duration-200 font-medium"
+                className="flex items-center space-x-2 text-slate-600 hover:text-indigo-600 transition-colors duration-200 font-medium px-3 py-2 rounded-lg hover:bg-slate-50"
               >
-                <ShoppingBagIcon className="w-5 h-5" />
-                <span>POS System</span>
+                <ShoppingBagIcon className="w-4 h-4" />
+                <span className="text-sm font-semibold">POS</span>
               </Link>
             )}
 
@@ -308,14 +312,14 @@ const Navbar = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             
             {/* Currency Selector */}
-            <div className="hidden md:block relative">
+            <div className="hidden xl:block relative">
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="bg-transparent border border-border rounded-lg px-3 py-1 text-sm text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-slate-300"
               >
                 {Array.isArray(currencies) && currencies.length > 0 ? (
                   currencies.map((curr) => (
@@ -337,12 +341,12 @@ const Navbar = () => {
 
 
             {/* Notifications */}
-            <div className="relative">
+            <div className="relative hidden sm:block">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300 relative"
+                className="p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 relative touch-target"
               >
-                <BellIcon className="w-5 h-5 text-text-secondary" />
+                <BellIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
                 {notifications.length > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-error text-white text-xs rounded-full flex items-center justify-center">
                     {notifications.length}
@@ -376,9 +380,9 @@ const Navbar = () => {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300 relative"
+              className="p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 relative touch-target"
             >
-              <HeartIcon className="w-5 h-5 text-text-secondary" />
+              <HeartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
               {getWishlistCount() > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
                   {getWishlistCount()}
@@ -389,11 +393,11 @@ const Navbar = () => {
             {/* Cart */}
             <Link
               to="/cart"
-              className="p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300 relative"
+              className="p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 relative touch-target"
             >
-              <ShoppingCartIcon className="w-5 h-5 text-text-secondary" />
+              <ShoppingCartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium">
+                <span className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
                   {cartItemCount}
                 </span>
               )}
@@ -404,13 +408,13 @@ const Navbar = () => {
               <div className="relative user-menu">
                 <button 
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300"
+                  className="flex items-center space-x-2 p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 touch-target"
                 >
-                  <UserIcon className="w-5 h-5 text-text-secondary" />
-                  <span className="hidden md:block text-sm font-medium text-text-primary">
+                  <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
+                  <span className="hidden lg:block text-sm font-medium text-slate-700 max-w-24 truncate">
                     {user.name || user.email}
                   </span>
-                  <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -463,22 +467,22 @@ const Navbar = () => {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center space-x-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors duration-200 font-medium"
+                className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-semibold text-sm touch-target"
               >
-                <UserIcon className="w-5 h-5" />
-                <span>Login</span>
+                <UserIcon className="w-4 h-4" />
+                <span className="hidden sm:block">Login</span>
               </Link>
             )}
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="lg:hidden p-2 rounded-xl bg-surface border border-border hover:bg-surface-hover hover:shadow-soft transition-all duration-300"
+              className="lg:hidden p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 touch-target"
             >
               {showMobileMenu ? (
-                <XMarkIcon className="w-5 h-5 text-text-secondary" />
+                <XMarkIcon className="w-5 h-5 text-slate-600" />
               ) : (
-                <Bars3Icon className="w-5 h-5 text-text-secondary" />
+                <Bars3Icon className="w-5 h-5 text-slate-600" />
               )}
             </button>
           </div>

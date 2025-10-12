@@ -68,11 +68,11 @@ const MobileMenu = ({
 
   return (
     <div
-      className={`fixed top-0 left-0 w-[280px] sm:w-80 h-full bg-gradient-to-b from-blue-900 to-blue-800 shadow-2xl z-50 transform transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      className={`fixed top-0 left-0 w-[280px] sm:w-80 h-full bg-gradient-to-b from-indigo-900 to-purple-900 shadow-2xl z-50 transform transition-transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
-      <div className="flex justify-between items-center p-6 border-b border-blue-700">
-        <h2 className="text-2xl font-bold text-yellow-400">Menu</h2>
-        <button onClick={onClose} className="text-white hover:text-yellow-400 transition-colors">
+      <div className="flex justify-between items-center p-6 border-b border-indigo-700">
+        <h2 className="text-2xl font-bold text-white">Menu</h2>
+        <button onClick={onClose} className="text-white hover:text-indigo-300 transition-colors touch-target">
           <XMarkIcon className="h-8 w-8" />
         </button>
       </div>
@@ -86,12 +86,12 @@ const MobileMenu = ({
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 pl-12 pr-4 bg-blue-800 border border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white placeholder-blue-300 transition-all duration-300"
+              className="w-full px-4 py-3 pl-12 pr-4 bg-indigo-800 border border-indigo-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent text-white placeholder-indigo-300 transition-all duration-300"
             />
-            <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-300" />
+            <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-300" />
             <button
               type="submit"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-blue-300 hover:text-yellow-400 transition-colors duration-200"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-indigo-300 hover:text-white transition-colors duration-200"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

@@ -125,7 +125,7 @@ const Home = () => {
       icon: CreditCardIcon,
       title: 'Flexible Payment',
       description: 'Multiple payment options',
-      gradient: 'from-orange-500 to-red-500',
+      gradient: 'from-indigo-500 to-purple-500',
       enabled: true
     }
   ], []);
@@ -502,8 +502,8 @@ const Home = () => {
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                  Shop by <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Category</span>
+                <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+                  Shop by <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Category</span>
                 </h2>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                   Discover amazing products across all our carefully curated categories
@@ -547,10 +547,10 @@ const Home = () => {
                       className="block bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center hover:shadow-2xl transition-all duration-300 border border-gray-100 group-hover:border-orange-200"
                     >
                       <div className="relative mb-6">
-                        <div className="w-20 h-20 md:w-24 md:h-24 mx-auto bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl flex items-center justify-center text-3xl md:text-4xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
+                        <div className="w-20 h-20 md:w-24 md:h-24 mx-auto bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center text-3xl md:text-4xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
                           {getCategoryIcon(category.name)}
                         </div>
-                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-0 group-hover:scale-100">
+                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-0 group-hover:scale-100">
                           {index + 1}
                         </div>
                       </div>
@@ -565,7 +565,7 @@ const Home = () => {
                         </p>
                       )}
                       
-                      <div className="inline-flex items-center gap-2 text-orange-500 font-semibold text-sm group-hover:gap-3 transition-all duration-300">
+                      <div className="inline-flex items-center gap-2 text-indigo-600 font-semibold text-sm group-hover:gap-3 transition-all duration-300">
                         <span>Explore</span>
                         <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                       </div>
@@ -585,7 +585,7 @@ const Home = () => {
               >
                 <Link
                   to="/products"
-                  className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-semibold text-lg"
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-semibold text-lg"
                 >
                   <ShoppingBagIcon className="w-6 h-6" />
                   View All Categories
@@ -623,7 +623,7 @@ const Home = () => {
             <div className="text-center mt-8">
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-semibold"
               >
                 View All Products
                 <ArrowRightIcon className="w-5 h-5" />
@@ -724,7 +724,7 @@ const Home = () => {
       )}
 
       {/* Stats Section */}
-      <section className="py-16 bg-gradient-to-r from-orange-500 to-red-500 text-white">
+      <section className="py-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {stats.map((stat, index) => (

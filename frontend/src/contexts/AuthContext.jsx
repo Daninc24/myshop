@@ -18,22 +18,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { error: showError } = useToast();
 
-  // Configure axios defaults (matches logic in main.jsx)
-  (() => {
-    // In development, use the proxy (no base URL needed)
-    // In production, use the full API URL
-    if (import.meta.env.DEV) {
-      // Development: let Vite proxy handle API calls
-      axios.defaults.baseURL = '';
-    } else {
-      // Production: use the full API URL
-      const raw = import.meta.env.VITE_API_URL || 'http://localhost:5002';
-      const trimmed = raw.replace(/\/+$/, ''); // remove trailing slashes
-      const base = /\/api\/?$/.test(trimmed) ? trimmed : `${trimmed}/api`;
-      axios.defaults.baseURL = base;
-    }
-    axios.defaults.withCredentials = true;
-  })();
+  // Axios configuration is handled in main.jsx - no need to duplicate here
 
   // Check if user is logged in on mount
   useEffect(() => {

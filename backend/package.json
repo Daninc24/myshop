@@ -15,6 +15,7 @@
     "verify": "node src/verifyProduction.js",
     "fix-indexes": "node src/fixDatabaseIndexes.js",
     "production-fixes": "node src/productionFixes.js",
+    "seed-categories": "node src/seedCategories.js",
     "build": "echo 'No build step required for Node.js'",
     "test": "echo 'No tests specified'",
     "lint": "echo 'No linter configured'"
