@@ -148,17 +148,20 @@ const Navbar = () => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
-  // Close user menu when clicking outside
+  // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showUserMenu && !event.target.closest('.user-menu')) {
         setShowUserMenu(false);
       }
+      if (showCategoryMenu && !event.target.closest('.category-menu')) {
+        setShowCategoryMenu(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showUserMenu]);
+  }, [showUserMenu, showCategoryMenu]);
 
   // Load categories
   useEffect(() => {
@@ -258,18 +261,42 @@ const Navbar = () => {
             {/* Mobile Categories Button */}
             <button
               onClick={() => setShowMobileMenu(true)}
-              className="lg:hidden flex items-center space-x-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold"
+              className="md:hidden flex items-center space-x-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold"
             >
               <Squares2X2Icon className="w-4 h-4" />
               <span className="hidden sm:block">Categories</span>
             </button>
+            
+            {/* Medium Screen Categories Dropdown */}
+            <div className="hidden md:block lg:hidden relative category-menu">
+              <button
+                onClick={() => setShowCategoryMenu(!showCategoryMenu)}
+                className="flex items-center space-x-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold"
+              >
+                <Squares2X2Icon className="w-4 h-4" />
+                <span>Categories</span>
+                <svg className={`w-3 h-3 transition-transform duration-200 ${showCategoryMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {showCategoryMenu && (
+                <CategoryDropdown 
+                  show={showCategoryMenu}
+                  categories={categoriesList}
+                  onClose={() => setShowCategoryMenu(false)}
+                  desktop={false}
+                  loading={loadingCategories}
+                  error={false}
+                />
+              )}
+            </div>
           </div>
 
           {/* Center Section - Categories and Search */}
           <div className="hidden lg:flex items-center flex-1 max-w-2xl mx-8">
             
             {/* Categories Dropdown - More Prominent */}
-            <div className="relative mr-4">
+            <div className="relative mr-4 category-menu">
               <button
                 onMouseEnter={handleCategoryMouseEnter}
                 onMouseLeave={handleCategoryMouseLeave}

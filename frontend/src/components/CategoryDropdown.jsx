@@ -234,18 +234,23 @@ const CategoryDropdown = ({
   };
 
   const renderMobileMenu = () => (
-    <div className='p-2'>
+    <div className='p-4 bg-gradient-to-br from-indigo-50 to-purple-50'>
       {(categories || []).map(cat => (
-        <div key={cat.id} className='mb-2'>
+        <div key={cat.id} className='mb-3'>
           {cat.subcategories && cat.subcategories.length > 0 ? (
             <button
-              className='flex justify-between items-center w-full text-left font-semibold text-gray-900 hover:text-blue-600 p-2 rounded-md hover:bg-gray-100 transition-colors duration-150'
+              className='flex justify-between items-center w-full text-left font-semibold text-indigo-900 hover:text-purple-700 p-3 rounded-lg hover:bg-gradient-to-r hover:from-indigo-100 hover:to-purple-100 transition-all duration-200 shadow-sm hover:shadow-md'
               onClick={() => handleToggleSubcategories(cat.id)}
               aria-expanded={openCategoryId === cat.id}
             >
-              <span>{cat.name}</span>
+              <div className='flex items-center gap-3'>
+                <div className='w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-sm font-bold'>
+                  {cat.name.charAt(0)}
+                </div>
+                <span>{cat.name}</span>
+              </div>
               <svg
-                className={`ml-2 h-5 w-5 text-gray-500 transition-transform ${openCategoryId === cat.id ? 'rotate-90' : ''}`}
+                className={`ml-2 h-5 w-5 text-indigo-600 transition-transform ${openCategoryId === cat.id ? 'rotate-90' : ''}`}
                 fill='none' stroke='currentColor' viewBox='0 0 24 24'
               >
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M9 5l7 7-7 7' />
@@ -253,20 +258,23 @@ const CategoryDropdown = ({
             </button>
           ) : (
             <Link
-              to={`/category/${cat.id}`}
+              to={`/products?category=${cat.name}`}
               onClick={onClose}
-              className='block w-full text-left font-semibold text-gray-900 hover:text-blue-600 p-2 rounded-md hover:bg-gray-100 transition-colors duration-150'
+              className='flex items-center gap-3 w-full text-left font-semibold text-indigo-900 hover:text-purple-700 p-3 rounded-lg hover:bg-gradient-to-r hover:from-indigo-100 hover:to-purple-100 transition-all duration-200 shadow-sm hover:shadow-md'
             >
-              {cat.name}
+              <div className='w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-sm font-bold'>
+                {cat.name.charAt(0)}
+              </div>
+              <span>{cat.name}</span>
             </Link>
           )}
           {openCategoryId === cat.id && cat.subcategories && (
-            <ul className='space-y-1.5 mt-2 pl-4 border-l-2 border-blue-200'>
+            <ul className='space-y-2 mt-3 ml-11 pl-4 border-l-2 border-indigo-200'>
               {cat.subcategories.map(sub => (
                 <li key={sub.id}>
                   <Link
-                    to={`/category/${cat.id}/${sub.id}`}
-                    className='block text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-md py-1.5 px-2 text-sm transition-colors duration-150'
+                    to={`/products?category=${cat.name}&subcategory=${sub.name}`}
+                    className='block text-indigo-700 hover:text-purple-700 hover:bg-indigo-50 rounded-md py-2 px-3 text-sm transition-all duration-200 font-medium'
                     onClick={onClose}
                   >
                     {sub.name}
@@ -284,7 +292,7 @@ const CategoryDropdown = ({
     <div
       className={`z-[9999] transition-all duration-300 ease-in-out ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'} ${desktop
         ? 'absolute left-0 top-full w-screen bg-white border-b border-gray-200 shadow-lg'
-        : 'absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto'}`}
+        : 'absolute right-0 mt-2 w-72 bg-white border border-indigo-200 rounded-xl shadow-xl max-h-96 overflow-y-auto backdrop-blur-sm'}`}
       role='menu'
       aria-label='Categories'
       tabIndex={-1}
