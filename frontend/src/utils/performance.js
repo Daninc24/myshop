@@ -47,6 +47,8 @@ export const lazyLoadImage = (img) => {
 
 // Preload critical resources
 export const preloadResource = (href, as = 'fetch') => {
+  if (typeof document === 'undefined') return;
+  
   const link = document.createElement('link');
   link.rel = 'preload';
   link.href = href;
@@ -107,19 +109,23 @@ export const loadChunk = async (chunkName) => {
 
 // Memory usage monitoring (development only)
 export const monitorMemory = () => {
-  if (process.env.NODE_ENV === 'development' && 'memory' in performance) {
-    const memInfo = performance.memory;
-    console.log('Memory Usage:', {
-      used: Math.round(memInfo.usedJSHeapSize / 1048576) + ' MB',
-      total: Math.round(memInfo.totalJSHeapSize / 1048576) + ' MB',
-      limit: Math.round(memInfo.jsHeapSizeLimit / 1048576) + ' MB'
-    });
+  if (process.env.NODE_ENV === 'development' && typeof performance !== 'undefined' && 'memory' in performance) {
+    try {
+      const memInfo = performance.memory;
+      console.log('Memory Usage:', {
+        used: Math.round(memInfo.usedJSHeapSize / 1048576) + ' MB',
+        total: Math.round(memInfo.totalJSHeapSize / 1048576) + ' MB',
+        limit: Math.round(memInfo.jsHeapSizeLimit / 1048576) + ' MB'
+      });
+    } catch (error) {
+      console.log('Memory monitoring not available');
+    }
   }
 };
 
 // Service Worker registration for caching
 export const registerServiceWorker = async () => {
-  if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+  if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && import.meta.env.PROD) {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
       console.log('Service Worker registered:', registration);
@@ -132,6 +138,8 @@ export const registerServiceWorker = async () => {
 
 // Critical CSS inlining helper
 export const inlineCriticalCSS = (css) => {
+  if (typeof document === 'undefined') return;
+  
   const style = document.createElement('style');
   style.textContent = css;
   document.head.appendChild(style);
@@ -139,6 +147,8 @@ export const inlineCriticalCSS = (css) => {
 
 // Resource hints for better loading
 export const addResourceHints = () => {
+  if (typeof document === 'undefined') return;
+  
   // DNS prefetch for external domains
   const domains = [
     'fonts.googleapis.com',
