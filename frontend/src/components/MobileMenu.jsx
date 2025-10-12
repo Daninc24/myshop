@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { renderCurrency, getCurrencyCode } from '../utils/renderSafe';
 import {
   ShoppingCartIcon,
   UserIcon,
@@ -137,9 +138,9 @@ const MobileMenu = ({
             onChange={(e) => handleCurrencyChange(e.target.value)}
             className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white transition-all duration-300"
           >
-            {currencies.map((curr) => (
-              <option key={curr.code} value={curr.code} className="bg-blue-800 text-white">
-                {curr.symbol} {curr.code} - {curr.name}
+            {Array.isArray(currencies) && currencies.map((curr) => (
+              <option key={getCurrencyCode(curr)} value={getCurrencyCode(curr)} className="bg-blue-800 text-white">
+                {renderCurrency(curr)}
               </option>
             ))}
           </select>
