@@ -13,30 +13,24 @@ import { AnalyticsProvider } from './contexts/AnalyticsContext.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import axios from 'axios';
+import { getApiBaseUrl, logApiConfig, testApiConnection } from './utils/apiConfig';
 import 'antd/dist/reset.css';
 import { ConfigProvider, theme as antdTheme } from 'antd';
 
 // Configure axios to work with Vite proxy
 (() => {
-  // In development, use the proxy (no base URL needed)
-  // In production, use the full API URL
-  if (import.meta.env.DEV) {
-    // Development: point to Vite proxy so calls like '/products' resolve to backend '/api/products'
-    axios.defaults.baseURL = '/api';
-  } else {
-    // Production: use the full API URL as provided by environment variable
-    let raw = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com';
-    
-    // If VITE_API_URL already includes /api, use it as is
-    // If not, add /api to the base URL
-    if (raw && !raw.includes('/api')) {
-      raw = raw.replace(/\/+$/, '') + '/api';
-    }
-    
-    const trimmed = raw.replace(/\/+$/, ''); // remove trailing slashes
-    axios.defaults.baseURL = trimmed;
-  }
+  // Configure axios with proper API base URL
+  const baseUrl = getApiBaseUrl();
+  axios.defaults.baseURL = baseUrl;
   axios.defaults.withCredentials = true;
+  
+  // Log configuration for debugging
+  logApiConfig();
+  
+  // Test API connection in production
+  if (!import.meta.env.DEV) {
+    testApiConnection();
+  }
 })();
 
 // Initialize error fixes for production

@@ -3,12 +3,11 @@ const CACHE_NAME = 'myshop-v1.0.0';
 const STATIC_CACHE = 'myshop-static-v1.0.0';
 const DYNAMIC_CACHE = 'myshop-dynamic-v1.0.0';
 
-// Assets to cache immediately
+// Assets to cache immediately - only cache assets that actually exist
 const STATIC_ASSETS = [
   '/',
-  '/manifest.json',
-  '/offline.html',
-  // Add critical CSS and JS files here
+  '/offline.html'
+  // Only cache assets that exist - manifest.json may not be present
 ];
 
 // API endpoints to cache
@@ -24,7 +23,15 @@ self.addEventListener('install', (event) => {
     caches.open(STATIC_CACHE)
       .then(cache => {
         console.log('Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
+        // Cache assets individually to avoid failure if one doesn't exist
+        return Promise.allSettled(
+          STATIC_ASSETS.map(asset => 
+            cache.add(asset).catch(err => {
+              console.warn(`Failed to cache ${asset}:`, err);
+              return null;
+            })
+          )
+        );
       })
       .then(() => self.skipWaiting())
   );
@@ -80,22 +87,28 @@ async function handleApiRequest(request) {
       const cache = await caches.open(DYNAMIC_CACHE);
       const cachedResponse = await cache.match(request);
       
-      if (cachedResponse) {
-        // Return cached response and update in background
-        fetchAndCache(request, cache);
-        return cachedResponse;
+      // Try network first, fallback to cache
+      try {
+        const networkResponse = await fetch(request);
+        if (networkResponse.ok) {
+          cache.put(request, networkResponse.clone());
+          return networkResponse;
+        } else if (cachedResponse) {
+          console.log('API request failed, using cache:', request.url);
+          return cachedResponse;
+        }
+        return networkResponse;
+      } catch (networkError) {
+        console.log('API request failed, trying cache:', networkError);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        throw networkError;
       }
-      
-      // No cache, fetch from network
-      const networkResponse = await fetch(request);
-      if (networkResponse.ok) {
-        cache.put(request, networkResponse.clone());
-      }
-      return networkResponse;
     } catch (error) {
       console.error('API request failed:', error);
       return new Response(
-        JSON.stringify({ error: 'Network error' }),
+        JSON.stringify({ error: 'Service temporarily unavailable', cached: false }),
         { 
           status: 503,
           headers: { 'Content-Type': 'application/json' }

@@ -14,9 +14,12 @@ const PerformanceOptimizer = () => {
     // Add resource hints for better loading
     addResourceHints();
     
-    // Preload critical resources
-    preloadResource('/api/categories', 'fetch');
-    preloadResource('/api/products?featured=true', 'fetch');
+    // Preload critical resources only in development or when API is available
+    if (import.meta.env.DEV) {
+      // Only preload in development where we know the API is available
+      preloadResource('/api/categories', 'fetch');
+      preloadResource('/api/products?featured=true', 'fetch');
+    }
     
     // Monitor memory usage in development
     if (import.meta.env.DEV) {
