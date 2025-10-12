@@ -150,6 +150,27 @@ myshop/
 - **Category Management** - Organize products by categories
 - **Order Management** - Process and track orders
 - **User Management** - Manage customer accounts
+- **Analytics Dashboard** - Sales and performance metrics
+
+## 📚 Complete Documentation
+
+For comprehensive setup instructions, deployment guides, security best practices, troubleshooting, and more, see:
+
+**[📖 PROJECT-DOCUMENTATION.md](PROJECT-DOCUMENTATION.md)**
+
+This includes:
+- 🚀 Detailed deployment guides for Vercel and Render
+- 🔒 Security setup and environment configuration
+- ⚡ Performance optimization techniques
+- 🛠️ Troubleshooting and maintenance
+- 🎨 UI/UX improvements and responsive design
+- 📊 Database management and optimization
+
+## License
+
+MIT License - see LICENSE file for details.
+- **Order Management** - Process and track orders
+- **User Management** - Manage customer accounts
 - **Analytics Dashboard** - Sales reports and insights
 - **Inventory Management** - Stock tracking and alerts
 

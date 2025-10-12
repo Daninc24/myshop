@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 import { Helmet } from 'react-helmet';
 import { useToast } from '../contexts/ToastContext';
@@ -183,7 +184,7 @@ const Home = () => {
   const fetchNewArrivals = useCallback(async () => {
     try {
       setLoadingNewArrivals(true);
-      const response = await axios.get('/products?sort=newest&limit=8');
+      const response = await axios.get('/products?sort=createdAt&order=desc&limit=8');
       setNewArrivals(response.data.products || response.data || []);
     } catch (error) {
       console.error('Error fetching new arrivals:', error);
@@ -290,7 +291,7 @@ const Home = () => {
   // Fetch trending products (fallback to new arrivals if endpoint doesn't exist)
   const fetchTrendingProducts = useCallback(async () => {
     try {
-      const response = await axios.get('/products?sort=newest&limit=6');
+      const response = await axios.get('/products?sort=createdAt&order=desc&limit=6');
       setTrendingProducts(response.data.products || response.data || []);
     } catch (error) {
       console.error('Error fetching trending products:', error);
@@ -492,41 +493,105 @@ const Home = () => {
 
       {/* Categories Section */}
       {safeCategoriesList.length > 0 && (
-        <section className="py-16 bg-gray-50">
+        <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Shop by Category</h2>
-              <p className="text-gray-600">Browse our wide range of categories</p>
+            <div className="text-center mb-16">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                  Shop by <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Category</span>
+                </h2>
+                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                  Discover amazing products across all our carefully curated categories
+                </p>
+              </motion.div>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {safeCategoriesList.slice(0, 8).map((category) => (
-                <Link
-                  key={category._id}
-                  to={`/products?category=${category._id}`}
-                  className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow"
-                >
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                    <ShoppingBagIcon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900">{category.name}</h3>
-                  {category.productCount && (
-                    <p className="text-sm text-gray-500 mt-1">{category.productCount} products</p>
-                  )}
-                </Link>
-              ))}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+              {safeCategoriesList.slice(0, 8).map((category, index) => {
+                // Category icons mapping
+                const getCategoryIcon = (categoryName) => {
+                  const icons = {
+                    'Electronics': '📱',
+                    'Fashion': '👕',
+                    'Home & Garden': '🏠',
+                    'Sports & Outdoors': '⚽',
+                    'Books & Media': '📚',
+                    'Health & Beauty': '💄',
+                    'Toys & Games': '🎮',
+                    'Automotive': '🚗',
+                    'Food & Beverages': '🍕',
+                    'Jewelry': '💎',
+                    'Pet Supplies': '🐕',
+                    'Office Supplies': '📝'
+                  };
+                  return icons[categoryName] || '🛍️';
+                };
+
+                return (
+                  <motion.div
+                    key={category._id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    className="group"
+                  >
+                    <Link
+                      to={`/products?category=${category.name}`}
+                      className="block bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center hover:shadow-2xl transition-all duration-300 border border-gray-100 group-hover:border-orange-200"
+                    >
+                      <div className="relative mb-6">
+                        <div className="w-20 h-20 md:w-24 md:h-24 mx-auto bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl flex items-center justify-center text-3xl md:text-4xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
+                          {getCategoryIcon(category.name)}
+                        </div>
+                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-0 group-hover:scale-100">
+                          {index + 1}
+                        </div>
+                      </div>
+                      
+                      <h3 className="font-bold text-lg md:text-xl text-gray-900 mb-2 group-hover:text-orange-600 transition-colors duration-300">
+                        {category.name}
+                      </h3>
+                      
+                      {category.productCount && (
+                        <p className="text-sm md:text-base text-gray-500 mb-4">
+                          {category.productCount} products
+                        </p>
+                      )}
+                      
+                      <div className="inline-flex items-center gap-2 text-orange-500 font-semibold text-sm group-hover:gap-3 transition-all duration-300">
+                        <span>Explore</span>
+                        <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
             
             {safeCategoriesList.length > 8 && (
-              <div className="text-center mt-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                viewport={{ once: true }}
+                className="text-center mt-12"
+              >
                 <Link
                   to="/products"
-                  className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors"
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-semibold text-lg"
                 >
+                  <ShoppingBagIcon className="w-6 h-6" />
                   View All Categories
                   <ArrowRightIcon className="w-5 h-5" />
                 </Link>
-              </div>
+              </motion.div>
             )}
           </div>
         </section>

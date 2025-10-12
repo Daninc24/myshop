@@ -45,60 +45,93 @@ const CategoryDropdown = ({
     return () => window.removeEventListener('keydown', handleKey);
   }, [show, onClose]);
 
+  // Category icons mapping
+  const getCategoryIcon = (categoryName) => {
+    const icons = {
+      'Electronics': '📱',
+      'Fashion': '👕',
+      'Home & Garden': '🏠',
+      'Sports & Outdoors': '⚽',
+      'Books & Media': '📚',
+      'Health & Beauty': '💄',
+      'Toys & Games': '🎮',
+      'Automotive': '🚗',
+      'Food & Beverages': '🍕',
+      'Jewelry': '💎',
+      'Pet Supplies': '🐕',
+      'Office Supplies': '📝'
+    };
+    return icons[categoryName] || '🛍️';
+  };
+
   const renderDesktopMenu = () => {
-    const effectiveCategories = (categories || []).filter(c => c && c.id !== 'all');
-    const activeCategory = effectiveCategories.find(c => c && c.id === openCategoryId) || effectiveCategories[0];
+    const effectiveCategories = (categories || []).filter(c => c && c.name && c.name !== 'all');
+    const activeCategory = effectiveCategories.find(c => c && c._id === openCategoryId) || effectiveCategories[0];
     
-    if (!activeCategory) {
+    if (!effectiveCategories.length) {
       return (
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20'>
-          <div className='text-center text-gray-500'>No categories available</div>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white/98 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20'>
+          <div className='text-center text-gray-500'>
+            <div className='text-4xl mb-4'>🛍️</div>
+            <p className='text-lg font-medium'>No categories available</p>
+            <p className='text-sm text-gray-400 mt-2'>Categories will appear here once they are added</p>
+          </div>
         </div>
       );
     }
     
     return (
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20'>
-        <div className='flex gap-8 h-96'>
-          {/* Left side - Categories list (scrollable) */}
-          <div className='w-72 flex-shrink-0 border-r border-gray-200 pr-4'>
-            <div className='mb-4'>
-              <h3 className='text-lg font-bold text-gray-900 mb-2'>Categories</h3>
-              <p className='text-sm text-gray-600'>Browse our product categories</p>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white/98 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20'>
+        <div className='flex gap-8 min-h-[400px]'>
+          {/* Left side - Categories list */}
+          <div className='w-80 flex-shrink-0 border-r border-gray-200 pr-6'>
+            <div className='mb-6'>
+              <h3 className='text-xl font-bold text-gray-900 mb-2 flex items-center gap-2'>
+                <Squares2X2Icon className='w-6 h-6 text-orange-500' />
+                Shop by Category
+              </h3>
+              <p className='text-sm text-gray-600'>Discover products in every category</p>
             </div>
-            <div className='overflow-y-auto h-80 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400'>
+            <div className='overflow-y-auto max-h-80 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400'>
               <ul className='space-y-2 pr-2'>
                 {effectiveCategories.map(cat => (
-                  <li key={cat.id}>
+                  <li key={cat._id || cat.id}>
                     <button
-                      onMouseEnter={() => setOpenCategoryId(cat.id)}
-                      onFocus={() => setOpenCategoryId(cat.id)}
+                      onMouseEnter={() => setOpenCategoryId(cat._id || cat.id)}
+                      onFocus={() => setOpenCategoryId(cat._id || cat.id)}
                       onClick={() => { onClose && onClose(); }}
-                      className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-between group ${
-                        ((openCategoryId || effectiveCategories[0]?.id) === cat.id) 
-                          ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg' 
-                          : 'hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 hover:shadow-md'
+                      className={`w-full text-left px-4 py-4 rounded-xl transition-all duration-300 flex items-center justify-between group ${
+                        ((openCategoryId || effectiveCategories[0]?._id || effectiveCategories[0]?.id) === (cat._id || cat.id)) 
+                          ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg transform scale-105' 
+                          : 'hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 hover:shadow-md hover:scale-102'
                       }`}
                     >
-                      <div className='flex items-center gap-3'>
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-200 ${
-                          ((openCategoryId || effectiveCategories[0]?.id) === cat.id)
-                            ? 'bg-white/20 text-white'
-                            : 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 group-hover:from-orange-100 group-hover:to-red-100'
+                      <div className='flex items-center gap-4'>
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg transition-all duration-300 ${
+                          ((openCategoryId || effectiveCategories[0]?._id || effectiveCategories[0]?.id) === (cat._id || cat.id))
+                            ? 'bg-white/20 text-white shadow-inner'
+                            : 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 group-hover:from-orange-100 group-hover:to-red-100 group-hover:shadow-md'
                         }`}>
-                          {cat.name.charAt(0)}
+                          {getCategoryIcon(cat.name)}
                         </div>
-                        <span className='font-medium'>{cat.name}</span>
+                        <div>
+                          <span className='font-semibold text-base'>{cat.name}</span>
+                          {cat.productCount && (
+                            <p className={`text-xs mt-1 ${
+                              ((openCategoryId || effectiveCategories[0]?._id || effectiveCategories[0]?.id) === (cat._id || cat.id))
+                                ? 'text-white/80'
+                                : 'text-gray-500'
+                            }`}>
+                              {cat.productCount} products
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      {cat.subcategories && cat.subcategories.length > 0 && (
-                        <div className={`text-xs px-2 py-1 rounded-full ${
-                          ((openCategoryId || effectiveCategories[0]?.id) === cat.id)
-                            ? 'bg-white/20 text-white'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          {cat.subcategories.length}
-                        </div>
-                      )}
+                      <ArrowRightIcon className={`w-5 h-5 transition-transform duration-300 ${
+                        ((openCategoryId || effectiveCategories[0]?._id || effectiveCategories[0]?.id) === (cat._id || cat.id))
+                          ? 'text-white transform rotate-90'
+                          : 'text-gray-400 group-hover:text-orange-500 group-hover:translate-x-1'
+                      }`} />
                     </button>
                   </li>
                 ))}
@@ -106,57 +139,94 @@ const CategoryDropdown = ({
             </div>
           </div>
           
-          {/* Right side - Subcategories (fixed, no scroll) */}
+          {/* Right side - Category details and subcategories */}
           <div className='flex-1 flex flex-col'>
-            <div className='mb-4 flex items-center justify-between'>
-              <div>
-                <Link
-                  to={`/products?category=${activeCategory.id}`}
-                  className='font-heading text-2xl font-bold text-gray-900 hover:text-orange-600 transition-colors'
-                  onClick={onClose}
-                >
-                  {activeCategory.name}
-                </Link>
-                <p className='text-sm text-gray-600 mt-1'>
-                  {activeCategory.subcategories ? `${activeCategory.subcategories.length} subcategories` : 'No subcategories'}
-                </p>
-              </div>
-              <Link
-                to={`/products?category=${activeCategory.id}`}
-                className='btn-primary text-sm px-4 py-2 rounded-lg flex items-center gap-2 hover:shadow-lg transition-all duration-200'
-                onClick={onClose}
-              >
-                View all
-                <ArrowRightIcon className='w-4 h-4' />
-              </Link>
-            </div>
-            
-            {/* Subcategories grid (fixed height, no scroll) */}
-            <div className='flex-1 overflow-hidden min-h-0'>
-              {activeCategory.subcategories && activeCategory.subcategories.length > 0 ? (
-                <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 h-full max-h-80'>
-                  {activeCategory.subcategories.map(sub => (
-                    <Link
-                      key={sub.id}
-                      to={`/products?category=${activeCategory.id}&subcategory=${sub.id}`}
-                      onClick={onClose}
-                      className='group block p-4 rounded-xl border-2 border-gray-200 hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50 hover:to-red-50 text-sm text-gray-700 hover:text-orange-700 transition-all duration-200 transform hover:scale-105 hover:shadow-md'
-                    >
-                      <div className='flex items-center gap-3'>
-                        <div className='w-8 h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-lg flex items-center justify-center text-xs font-bold text-orange-700 group-hover:from-orange-200 group-hover:to-red-200 transition-all duration-200'>
-                          {sub.name.charAt(0)}
-                        </div>
-                        <span className='font-medium'>{sub.name}</span>
+            {activeCategory ? (
+              <>
+                <div className='mb-6 flex items-center justify-between'>
+                  <div className='flex items-center gap-4'>
+                    <div className='w-16 h-16 bg-gradient-to-br from-orange-100 to-red-100 rounded-2xl flex items-center justify-center text-2xl shadow-lg'>
+                      {getCategoryIcon(activeCategory.name)}
+                    </div>
+                    <div>
+                      <Link
+                        to={`/products?category=${activeCategory.name}`}
+                        className='text-3xl font-bold text-gray-900 hover:text-orange-600 transition-colors duration-300'
+                        onClick={onClose}
+                      >
+                        {activeCategory.name}
+                      </Link>
+                      <p className='text-sm text-gray-600 mt-1 flex items-center gap-2'>
+                        <span>{activeCategory.productCount || 0} products available</span>
+                        {activeCategory.subcategories && activeCategory.subcategories.length > 0 && (
+                          <span>• {activeCategory.subcategories.length} subcategories</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    to={`/products?category=${activeCategory.name}`}
+                    className='bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold'
+                    onClick={onClose}
+                  >
+                    Explore All
+                    <ArrowRightIcon className='w-5 h-5' />
+                  </Link>
+                </div>
+                
+                {/* Subcategories or featured products */}
+                <div className='flex-1 overflow-hidden'>
+                  {activeCategory.subcategories && activeCategory.subcategories.length > 0 ? (
+                    <div>
+                      <h4 className='text-lg font-semibold text-gray-900 mb-4'>Subcategories</h4>
+                      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-72 overflow-y-auto'>
+                        {activeCategory.subcategories.map(sub => (
+                          <Link
+                            key={sub._id || sub.id}
+                            to={`/products?category=${activeCategory.name}&subcategory=${sub.name}`}
+                            onClick={onClose}
+                            className='group block p-4 rounded-xl border-2 border-gray-200 hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50 hover:to-red-50 text-sm text-gray-700 hover:text-orange-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg'
+                          >
+                            <div className='flex flex-col items-center text-center gap-3'>
+                              <div className='w-12 h-12 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center text-lg font-bold text-orange-700 group-hover:from-orange-200 group-hover:to-red-200 transition-all duration-300 shadow-md'>
+                                {sub.name.charAt(0)}
+                              </div>
+                              <div>
+                                <span className='font-semibold block'>{sub.name}</span>
+                                {sub.productCount && (
+                                  <span className='text-xs text-gray-500 mt-1 block'>{sub.productCount} items</span>
+                                )}
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
                       </div>
-                    </Link>
-                  ))}
+                    </div>
+                  ) : (
+                    <div className='text-center py-12'>
+                      <div className='text-6xl mb-4'>{getCategoryIcon(activeCategory.name)}</div>
+                      <h4 className='text-xl font-semibold text-gray-900 mb-2'>Explore {activeCategory.name}</h4>
+                      <p className='text-gray-600 mb-6'>Discover amazing products in this category</p>
+                      <Link
+                        to={`/products?category=${activeCategory.name}`}
+                        className='inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold'
+                        onClick={onClose}
+                      >
+                        Start Shopping
+                        <ArrowRightIcon className='w-5 h-5' />
+                      </Link>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className='text-gray-500 text-sm flex items-center justify-center h-full'>
-                  No subcategories
+              </>
+            ) : (
+              <div className='flex-1 flex items-center justify-center'>
+                <div className='text-center'>
+                  <div className='text-6xl mb-4'>🛍️</div>
+                  <p className='text-gray-500'>Select a category to explore</p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

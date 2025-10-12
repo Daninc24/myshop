@@ -13,6 +13,7 @@
     "optimize": "node src/optimizePerformance.js",
     "production-ready": "npm run production-cleanup && npm run optimize",
     "verify": "node src/verifyProduction.js",
+    "fix-indexes": "node src/fixDatabaseIndexes.js",
     "build": "echo 'No build step required for Node.js'",
     "test": "echo 'No tests specified'",
     "lint": "echo 'No linter configured'"

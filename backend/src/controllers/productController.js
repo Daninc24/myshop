@@ -52,7 +52,26 @@ const LIST_TTL_MS = 60 * 1000; // 60 seconds
 // Get all products
 const getAllProducts = async (req, res) => {
   try {
-    const { search, category, subcategory, page = 1, limit = 12, sort = 'createdAt', order = 'desc', minPrice, maxPrice, inStock } = req.query;
+    let { search, category, subcategory, page = 1, limit = 12, sort = 'createdAt', order = 'desc', minPrice, maxPrice, inStock } = req.query;
+    
+    // Handle legacy sort parameters
+    const sortMapping = {
+      'newest': 'createdAt',
+      'oldest': 'createdAt',
+      'price_low': 'price',
+      'price_high': 'price',
+      'rating': 'rating',
+      'popular': 'reviewCount',
+      'name': 'title'
+    };
+    
+    // Map sort parameter and adjust order if needed
+    if (sortMapping[sort]) {
+      if (sort === 'oldest') order = 'asc';
+      if (sort === 'price_low') order = 'asc';
+      if (sort === 'price_high') order = 'desc';
+      sort = sortMapping[sort];
+    }
     // Extract option filters: any query param starting with opt_ maps to an option name
     const optionFilters = Object.entries(req.query)
       .filter(([k, v]) => k.startsWith('opt_') && v !== undefined && v !== '')
@@ -108,9 +127,11 @@ const getAllProducts = async (req, res) => {
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
     
-    // Prepare sort options
+    // Prepare sort options with validation
+    const validSortFields = ['createdAt', 'updatedAt', 'price', 'title', 'rating', 'reviewCount'];
+    const sortField = validSortFields.includes(sort) ? sort : 'createdAt';
     const sortOptions = {};
-    sortOptions[sort] = order === 'desc' ? -1 : 1;
+    sortOptions[sortField] = order === 'desc' ? -1 : 1;
     
     // Execute query with pagination and sorting (optimized with lean)
     const products = await Product.find(query)
@@ -118,8 +139,7 @@ const getAllProducts = async (req, res) => {
       .sort(sortOptions)
       .skip(skip)
       .limit(limitNum)
-      .lean() // Use lean for better performance
-      .hint({ [sort]: order === 'desc' ? -1 : 1 }); // Use index hint for better performance
+      .lean(); // Use lean for better performance
     
     // Get total count for pagination info
     const total = await Product.countDocuments(query);

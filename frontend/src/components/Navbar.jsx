@@ -15,7 +15,7 @@ import {
   BellIcon,
   Bars3Icon,
   XMarkIcon,
-
+  Squares2X2Icon,
   SparklesIcon,
   ShoppingBagIcon,
   Cog6ToothIcon,
@@ -257,10 +257,11 @@ const Navbar = () => {
               <button
                 onMouseEnter={handleCategoryMouseEnter}
                 onMouseLeave={handleCategoryMouseLeave}
-                className="flex items-center space-x-1 text-text-secondary hover:text-primary transition-colors duration-200 font-medium"
+                className="flex items-center space-x-2 text-text-secondary hover:text-primary transition-all duration-200 font-medium px-3 py-2 rounded-lg hover:bg-surface-hover"
               >
+                <Squares2X2Icon className="w-5 h-5" />
                 <span>Categories</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 transition-transform duration-200 ${showCategoryMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -274,7 +275,7 @@ const Navbar = () => {
                     categories={categoriesList}
                     onClose={() => setShowCategoryMenu(false)}
                     desktop={true}
-                    loading={false}
+                    loading={loadingCategories}
                     error={false}
                   />
                 </div>
