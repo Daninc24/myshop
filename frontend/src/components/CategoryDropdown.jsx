@@ -70,7 +70,7 @@ const CategoryDropdown = ({
     
     if (!effectiveCategories.length) {
       return (
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-white via-slate-50 to-indigo-50/30 backdrop-blur-sm rounded-2xl shadow-2xl border border-indigo-100/50'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white rounded-2xl shadow-2xl border border-indigo-200'>
           <div className='text-center text-gray-500'>
             <div className='text-4xl mb-4'>🛍️</div>
             <p className='text-lg font-medium'>No categories available</p>
@@ -81,7 +81,7 @@ const CategoryDropdown = ({
     }
     
     return (
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-white via-slate-50 to-indigo-50/30 backdrop-blur-sm rounded-2xl shadow-2xl border border-indigo-100/50'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white rounded-2xl shadow-2xl border border-indigo-200'>
         <div className='flex gap-8 min-h-[400px]'>
           {/* Left side - Categories list */}
           <div className='w-80 flex-shrink-0 border-r border-gray-200 pr-6'>
@@ -234,7 +234,7 @@ const CategoryDropdown = ({
   };
 
   const renderMobileMenu = () => (
-    <div className='p-4 bg-gradient-to-br from-indigo-50 to-purple-50'>
+    <div className='p-4 bg-indigo-50'>
       {(categories || []).map(cat => (
         <div key={cat.id} className='mb-3'>
           {cat.subcategories && cat.subcategories.length > 0 ? (
@@ -292,11 +292,11 @@ const CategoryDropdown = ({
     <div
       className={`z-[9999] transition-all duration-300 ease-in-out ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'} ${desktop
         ? 'absolute left-0 top-full w-screen bg-white border-b border-gray-200 shadow-lg'
-        : 'absolute right-0 mt-2 w-72 bg-white border border-indigo-200 rounded-xl shadow-xl max-h-96 overflow-y-auto backdrop-blur-sm'}`}
+        : 'absolute right-0 mt-2 w-72 bg-white border-2 border-indigo-300 rounded-xl shadow-2xl max-h-96 overflow-y-auto'}`}
       role='menu'
       aria-label='Categories'
       tabIndex={-1}
-      style={desktop ? { maxHeight: '50vh', overflowY: 'auto' } : {}}
+      style={desktop ? { maxHeight: '50vh', overflowY: 'auto', backgroundColor: '#ffffff' } : { backgroundColor: '#ffffff' }}
     >
       {categories.length === 0 && (
         <div className='px-4 py-3 text-gray-500'>No categories</div>
