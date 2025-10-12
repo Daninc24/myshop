@@ -27,10 +27,19 @@ export const logApiConfig = () => {
 export const testApiConnection = async () => {
   const baseUrl = getApiBaseUrl();
   try {
-    const response = await fetch(`${baseUrl}/health`, {
+    // Try the main health endpoint first, fallback to categories if not available
+    let response = await fetch(`${baseUrl}/health`, {
       method: 'GET',
       credentials: 'include'
     });
+    
+    if (!response.ok && response.status === 404) {
+      // Health endpoint doesn't exist, try categories endpoint
+      response = await fetch(`${baseUrl}/categories`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+    }
     
     if (response.ok) {
       console.log('✅ API connection successful');

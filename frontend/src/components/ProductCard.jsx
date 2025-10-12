@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
@@ -54,6 +54,21 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
   const displayOriginalPrice = originalPrice ? convertPrice(originalPrice) : null;
   const discountPercentage = discount || (originalPrice && originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0);
 
+  // Check if item is in wishlist on component mount
+  useEffect(() => {
+    if (user) {
+      try {
+        const wishlistKey = `wishlist_${user._id}`;
+        const stored = localStorage.getItem(wishlistKey);
+        const wishlistItems = stored ? JSON.parse(stored) : [];
+        const isInList = wishlistItems.some(item => item._id === _id);
+        setIsInWishlist(isInList);
+      } catch (err) {
+        console.error('Error checking wishlist:', err);
+      }
+    }
+  }, [user, _id]);
+
   const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -92,11 +107,29 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
       return;
     }
 
-    setIsInWishlist(!isInWishlist);
-    if (!isInWishlist) {
-      success('Added to wishlist!');
-    } else {
-      success('Removed from wishlist');
+    try {
+      const wishlistKey = `wishlist_${user._id}`;
+      const stored = localStorage.getItem(wishlistKey);
+      let wishlistItems = stored ? JSON.parse(stored) : [];
+      
+      const productExists = wishlistItems.find(item => item._id === _id);
+      
+      if (!productExists) {
+        // Add to wishlist
+        wishlistItems.push(product);
+        localStorage.setItem(wishlistKey, JSON.stringify(wishlistItems));
+        setIsInWishlist(true);
+        success('Added to wishlist!');
+      } else {
+        // Remove from wishlist
+        wishlistItems = wishlistItems.filter(item => item._id !== _id);
+        localStorage.setItem(wishlistKey, JSON.stringify(wishlistItems));
+        setIsInWishlist(false);
+        success('Removed from wishlist');
+      }
+    } catch (err) {
+      console.error('Wishlist error:', err);
+      error('Failed to update wishlist');
     }
   };
 
