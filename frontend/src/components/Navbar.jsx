@@ -337,14 +337,11 @@ const Navbar = () => {
                 onChange={(e) => setCurrency(e.target.value)}
                 className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-slate-300"
               >
-                <option value="USD">$ USD</option>
-                <option value="EUR">€ EUR</option>
-                <option value="GBP">£ GBP</option>
-                <option value="GMD">D GMD</option>
-                <option value="CAD">C$ CAD</option>
-                <option value="AUD">A$ AUD</option>
-                <option value="JPY">¥ JPY</option>
-                <option value="INR">₹ INR</option>
+                {currencies.map((curr) => (
+                  <option key={curr.code} value={curr.code}>
+                    {curr.symbol} {curr.code}
+                  </option>
+                ))}
               </select>
             </div>
 
