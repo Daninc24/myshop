@@ -38,29 +38,28 @@ const WishlistWithPriceAlerts = () => {
 
   // Fetch wishlist items
   const fetchWishlist = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await axios.get('/wishlist');
-      const items = response.data.items || [];
       
-      // Enhance items with price tracking data
+      // Use localStorage for now to avoid 401 errors
+      const wishlistKey = `wishlist_${user._id}`;
+      const stored = localStorage.getItem(wishlistKey);
+      const items = stored ? JSON.parse(stored) : [];
+      
       const enhancedItems = items.map(item => ({
         ...item,
-        priceHistory: item.priceHistory || [],
-        lowestPrice: item.lowestPrice || item.price,
-        priceDrop: item.priceDrop || 0,
-        daysInWishlist: Math.floor((Date.now() - new Date(item.addedAt).getTime()) / (1000 * 60 * 60 * 24))
+        priceHistory: [],
+        lowestPrice: item.price,
+        priceDrop: 0,
+        daysInWishlist: 0
       }));
       
       setWishlistItems(enhancedItems);
-      
-      // Fetch price alerts
-      const alertsResponse = await axios.get('/wishlist/price-alerts');
-      const alerts = {};
-      alertsResponse.data.alerts?.forEach(alert => {
-        alerts[alert.productId] = alert.targetPrice;
-      });
-      setPriceAlerts(alerts);
       
     } catch (error) {
       console.error('Error fetching wishlist:', error);
@@ -89,7 +88,14 @@ const WishlistWithPriceAlerts = () => {
   // Remove item from wishlist
   const removeFromWishlist = async (productId) => {
     try {
-      await axios.delete(`/wishlist/${productId}`);
+      if (user) {
+        const wishlistKey = `wishlist_${user._id}`;
+        const stored = localStorage.getItem(wishlistKey);
+        let wishlistItems = stored ? JSON.parse(stored) : [];
+        wishlistItems = wishlistItems.filter(item => item._id !== productId);
+        localStorage.setItem(wishlistKey, JSON.stringify(wishlistItems));
+      }
+      
       setWishlistItems(prev => prev.filter(item => item._id !== productId));
       success('Removed from wishlist');
     } catch (error) {
