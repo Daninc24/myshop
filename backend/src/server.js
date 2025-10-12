@@ -87,6 +87,8 @@ const io = new Server(server, {
         'https://*.vercel.app',
         'https://myshop-hhfv.vercel.app',
         'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app',
+        'https://myshop-tau-five.vercel.app',
+        'https://myshop-tau-five-git-main-daniel-mailus-projects.vercel.app',
       'https://myshop-git-main-daniel-mailus-projects.vercel.app',
       'https://*.vercel.app',
         'https://myshop-git-main-daniel-mailus-projects.vercel.app'
@@ -261,8 +263,19 @@ try {
   const helmet = require('helmet');
   app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://maps.googleapis.com", "https://maps.gstatic.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "https:", "blob:"],
+        connectSrc: ["'self'", "https://maps.googleapis.com"],
+        frameSrc: ["'self'", "https://maps.google.com"],
+      },
+    },
   }));
-  console.log('✅ Helmet enabled');
+  console.log('✅ Helmet enabled with CSP for Google Maps');
 } catch (e) {
   console.log('ℹ️ helmet package not installed; skipping security headers');
 }
@@ -293,6 +306,8 @@ const allowedOrigins = [
   'https://myshop-git-main-daniel-mailus-projects.vercel.app',
   'https://myshop-hhfv.vercel.app',
   'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app',
+  'https://myshop-tau-five.vercel.app',
+  'https://myshop-tau-five-git-main-daniel-mailus-projects.vercel.app',
   // Production URLs - Add your actual production domains here
         'https://myshop.com',
       'https://www.myshop.com',

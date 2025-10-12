@@ -308,23 +308,7 @@ const MobileMenu = ({
           )}
         </div>
 
-        {/* Currency Selector */}
-        <div className="border-t border-blue-700 pt-4">
-          <div className="flex items-center gap-3 px-4 py-2 mb-3">
-            <span className="text-yellow-400 font-semibold text-lg">Currency</span>
-          </div>
-          <select
-            value={currency}
-            onChange={handleCurrencyChange}
-            className="block w-full border border-blue-600 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-blue-800 text-white"
-            style={{ minWidth: 100 }}
-            title="Select currency"
-          >
-            {currencies.map(cur => (
-              <option key={cur} value={cur}>{cur}</option>
-            ))}
-          </select>
-        </div>
+        {/* Currency Selector - Removed duplicate */}
 
         {/* User Actions */}
         <div className="border-t border-blue-700 pt-4">
