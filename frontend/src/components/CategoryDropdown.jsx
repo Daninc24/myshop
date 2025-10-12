@@ -70,7 +70,7 @@ const CategoryDropdown = ({
     
     if (!effectiveCategories.length) {
       return (
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white/98 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-white via-slate-50 to-indigo-50/30 backdrop-blur-sm rounded-2xl shadow-2xl border border-indigo-100/50'>
           <div className='text-center text-gray-500'>
             <div className='text-4xl mb-4'>🛍️</div>
             <p className='text-lg font-medium'>No categories available</p>
@@ -81,7 +81,7 @@ const CategoryDropdown = ({
     }
     
     return (
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white/98 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-white via-slate-50 to-indigo-50/30 backdrop-blur-sm rounded-2xl shadow-2xl border border-indigo-100/50'>
         <div className='flex gap-8 min-h-[400px]'>
           {/* Left side - Categories list */}
           <div className='w-80 flex-shrink-0 border-r border-gray-200 pr-6'>

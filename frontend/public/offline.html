@@ -3,279 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline - MyShopping Center</title>
+    <title>Offline - MyShop</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #333;
-        }
-
-        .offline-container {
-            background: white;
-            border-radius: 20px;
-            padding: 3rem;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            margin: 2rem;
-        }
-
-        .offline-icon {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 2rem;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
             color: white;
         }
-
+        
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 500px;
+        }
+        
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        
         h1 {
             font-size: 2rem;
-            font-weight: 700;
             margin-bottom: 1rem;
-            color: #2d3748;
+            font-weight: 600;
         }
-
-        .subtitle {
+        
+        p {
             font-size: 1.1rem;
-            color: #718096;
             margin-bottom: 2rem;
+            opacity: 0.9;
             line-height: 1.6;
         }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .feature {
-            padding: 1.5rem;
-            background: #f7fafc;
-            border-radius: 12px;
-            border-left: 4px solid #4299e1;
-        }
-
-        .feature h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #2d3748;
-        }
-
-        .feature p {
-            font-size: 0.9rem;
-            color: #718096;
-            line-height: 1.5;
-        }
-
-        .actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s;
-            cursor: pointer;
-            border: none;
-            font-size: 0.9rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4299e1, #3182ce);
+        
+        .retry-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(66, 153, 225, 0.3);
-        }
-
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #4a5568;
-        }
-
-        .btn-secondary:hover {
-            background: #cbd5e0;
-        }
-
-        .status {
-            margin-top: 2rem;
-            padding: 1rem;
-            background: #f0fff4;
-            border: 1px solid #9ae6b4;
+            padding: 12px 24px;
             border-radius: 8px;
-            color: #22543d;
-        }
-
-        .retry-button {
-            background: none;
-            border: none;
-            color: #4299e1;
-            text-decoration: underline;
+            font-size: 1rem;
             cursor: pointer;
-            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
-
-        .retry-button:hover {
-            color: #3182ce;
+        
+        .retry-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
         }
-
-        @media (max-width: 640px) {
-            .offline-container {
-                padding: 2rem;
-                margin: 1rem;
-            }
-
-            .features {
-                grid-template-columns: 1fr;
-            }
-
-            .actions {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
+        
+        .features {
+            margin-top: 2rem;
+            text-align: left;
         }
-
-        .pulse {
-            animation: pulse 2s infinite;
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
         }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        
+        .feature-icon {
+            margin-right: 0.5rem;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            p {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="offline-container">
-        <div class="offline-icon pulse">
-            📶
-        </div>
-        
+    <div class="container">
+        <div class="icon">📱</div>
         <h1>You're Offline</h1>
-        <p class="subtitle">
-            Don't worry! You can still browse previously viewed products and access your saved information.
-        </p>
-
+        <p>It looks like you've lost your internet connection. Don't worry, you can still browse some cached content!</p>
+        
+        <button class="retry-btn" onclick="window.location.reload()">
+            Try Again
+        </button>
+        
         <div class="features">
             <div class="feature">
-                <h3>📱 Browse Products</h3>
-                <p>View cached product pages and images you've visited before</p>
+                <span class="feature-icon">✨</span>
+                <span>Some pages are cached for offline viewing</span>
             </div>
-            
             <div class="feature">
-                <h3>🛒 Offline Cart</h3>
-                <p>Your cart items are saved locally and will sync when you're back online</p>
+                <span class="feature-icon">🔄</span>
+                <span>Your actions will sync when you're back online</span>
             </div>
-            
             <div class="feature">
-                <h3>⭐ Saved Items</h3>
-                <p>Access your wishlist and saved products even without internet</p>
+                <span class="feature-icon">💾</span>
+                <span>Your cart and preferences are saved locally</span>
             </div>
-        </div>
-
-        <div class="actions">
-            <button class="btn btn-primary" onclick="retryConnection()">
-                🔄 Try Again
-            </button>
-            <button class="btn btn-secondary" onclick="goHome()">
-                🏠 Go Home
-            </button>
-        </div>
-
-        <div class="status" id="status">
-            <p>We'll automatically reconnect when your internet is restored.</p>
-            <button class="retry-button" onclick="retryConnection()">
-                Click here to retry now
-            </button>
         </div>
     </div>
 
     <script>
-        let retryCount = 0;
-        const maxRetries = 5;
-
-        function retryConnection() {
-            retryCount++;
-            const status = document.getElementById('status');
-            
-            if (retryCount > maxRetries) {
-                status.innerHTML = `
-                    <p>We're having trouble connecting. Please check your internet connection and try again later.</p>
-                `;
-                return;
-            }
-
-            status.innerHTML = `
-                <p>Checking connection... (Attempt ${retryCount}/${maxRetries})</p>
-            `;
-
-            // Check if we're back online
-            if (navigator.onLine) {
-                window.location.reload();
-            } else {
-                setTimeout(() => {
-                    status.innerHTML = `
-                        <p>Still offline. We'll keep trying...</p>
-                        <button class="retry-button" onclick="retryConnection()">
-                            Try again
-                        </button>
-                    `;
-                }, 2000);
-            }
-        }
-
-        function goHome() {
-            window.location.href = '/';
-        }
-
-        // Listen for online/offline events
+        // Check for connection and auto-reload when back online
         window.addEventListener('online', () => {
             window.location.reload();
         });
-
-        // Auto-retry every 30 seconds
-        setInterval(() => {
-            if (navigator.onLine) {
-                window.location.reload();
-            }
-        }, 30000);
-
+        
         // Show connection status
-        window.addEventListener('load', () => {
-            if (navigator.onLine) {
-                window.location.reload();
-            }
-        });
+        if (navigator.onLine) {
+            document.querySelector('p').textContent = 'Connection restored! Refreshing...';
+            setTimeout(() => window.location.reload(), 1000);
+        }
     </script>
 </body>
 </html>

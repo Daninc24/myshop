@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { debounce, throttle } from '../utils/performance';
 
 import CategoryDropdown from './CategoryDropdown';
 import MobileMenu from './MobileMenu';
@@ -94,12 +95,13 @@ const Navbar = () => {
     }, 150);
   };
 
-  // Scroll effect
+  // Scroll effect with throttling
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = throttle(() => {
       setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
+    }, 16); // ~60fps
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -119,6 +121,18 @@ const Navbar = () => {
     setShowCategoryMenu(false);
     setShowMobileMenu(false);
   }, [location.pathname]);
+
+  // Close mobile menu when screen size changes to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) { // lg breakpoint
+        setShowMobileMenu(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Close menus with Escape key
   useEffect(() => {
@@ -171,22 +185,29 @@ const Navbar = () => {
 
   // Currencies are now static to avoid API issues
 
-  // Search functionality
-  const handleSearch = async (term) => {
-    if (term.length < 2) {
-      setSearchResults([]);
-      setShowSearchResults(false);
-      return;
-    }
+  // Search functionality with debouncing
+  const debouncedSearch = useCallback(
+    debounce(async (term) => {
+      if (term.length < 2) {
+        setSearchResults([]);
+        setShowSearchResults(false);
+        return;
+      }
 
-    try {
-              const response = await axios.get(`/products/search?q=${encodeURIComponent(term)}&limit=5`);
-      setSearchResults(response.data || []);
-      setShowSearchResults(true);
-    } catch (error) {
-      console.error('Search error:', error);
-      setSearchResults([]);
-    }
+      try {
+        const response = await axios.get(`/products/search?q=${encodeURIComponent(term)}&limit=5`);
+        setSearchResults(response.data || []);
+        setShowSearchResults(true);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+      }
+    }, 300),
+    []
+  );
+
+  const handleSearch = (term) => {
+    debouncedSearch(term);
   };
 
   const handleSearchSubmit = (e) => {
@@ -284,7 +305,10 @@ const Navbar = () => {
                   type="text"
                   placeholder="Search products..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    handleSearch(e.target.value);
+                  }}
                   className="w-full px-4 py-2 pl-10 pr-4 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white text-slate-700 placeholder-slate-400"
                 />
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
