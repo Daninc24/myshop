@@ -279,30 +279,39 @@ const PremiumHero = ({
                   transition={{ delay: 0.7, duration: 0.8 }}
                   className="mt-8 md:mt-12"
                 >
-                                     <p className="text-white/80 mb-4 text-xs md:text-sm">🔥 Trending Now</p>
+                  <p className="text-white/80 mb-4 text-xs md:text-sm">🔥 Trending Now</p>
                   <div className="flex justify-center gap-2 md:gap-4">
                     {(Array.isArray(trendingProducts) ? trendingProducts : []).slice(0, 3).map((product, index) => (
-                      <motion.div
+                      <Link
                         key={product._id}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
-                        className="relative group"
+                        to={`/product/${product._id}`}
+                        className="block"
                       >
-                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-yellow-400 transition-colors">
-                                                     <img
-                             src={getOptimizedImageUrl(product.images?.[0]) || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=64&h=64&fit=crop'}
-                             alt={product.title}
-                             className="w-full h-full object-cover"
-                             onError={(e) => {
-                               e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=64&h=64&fit=crop';
-                             }}
-                           />
-                        </div>
-                        <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
-                          {index + 1}
-                        </div>
-                      </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
+                          className="relative group cursor-pointer"
+                        >
+                          <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden border-2 border-white/20 group-hover:border-yellow-400 transition-all duration-300 group-hover:scale-110">
+                            <img
+                              src={getOptimizedImageUrl(product.images?.[0]) || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=64&h=64&fit=crop'}
+                              alt={product.name || product.title}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=64&h=64&fit=crop';
+                              }}
+                            />
+                          </div>
+                          <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center font-bold shadow-lg">
+                            {index + 1}
+                          </div>
+                          {/* Tooltip on hover */}
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                            {product.name || product.title}
+                          </div>
+                        </motion.div>
+                      </Link>
                     ))}
                   </div>
                 </motion.div>

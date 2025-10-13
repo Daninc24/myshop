@@ -485,18 +485,11 @@ const Home = () => {
         </Suspense>
       </ErrorBoundary>
 
-      {/* Advertisement Section - Features */}
-      <ErrorBoundary>
-        <Suspense fallback={null}>
-          <AdvertisementSection 
-            sectionName="features-bottom"
-            className="my-8"
-          />
-        </Suspense>
-      </ErrorBoundary>
-
-      {/* Categories Section */}
-      {safeCategoriesList.length > 0 && (
+      {/* Categories Section - Removed since we now have CategoryBar above hero */}
+      {/* Advertisement sections reduced for cleaner homepage */}
+      
+      {/* Categories grid removed - users can access via CategoryBar */}
+      {false && safeCategoriesList.length > 0 && (
         <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
@@ -601,13 +594,7 @@ const Home = () => {
         </section>
       )}
 
-      {/* Advertisement Section - Categories */}
-      <ErrorBoundary>
-        <AdvertisementSection 
-          sectionName="categories-bottom"
-          className="my-8"
-        />
-      </ErrorBoundary>
+      {/* Advertisement Section - Categories - Removed for cleaner homepage */}
 
       {/* Featured Products */}
       {safeProducts.length > 0 && (
@@ -673,15 +660,7 @@ const Home = () => {
         </section>
       )}
 
-      {/* Advertisement Section - New Arrivals */}
-      <ErrorBoundary>
-        <Suspense fallback={null}>
-          <AdvertisementSection 
-            sectionName="new-arrivals-bottom"
-            className="my-8"
-          />
-        </Suspense>
-      </ErrorBoundary>
+      {/* Advertisement Section - New Arrivals - Removed for cleaner homepage */}
 
       {/* Best Selling */}
       {safeBestSelling.length > 0 && (
