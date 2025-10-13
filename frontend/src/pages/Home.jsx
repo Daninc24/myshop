@@ -23,6 +23,7 @@ const WishlistWithPriceAlerts = lazy(() => import('../components/WishlistWithPri
 const SocialMediaSharing = lazy(() => import('../components/SocialMediaSharing'));
 const ReferralSystem = lazy(() => import('../components/ReferralSystem'));
 import ErrorBoundary from '../components/ErrorBoundary';
+import CategoryBar from '../components/CategoryBar';
 
 // Icons
 import {
@@ -450,6 +451,9 @@ const Home = () => {
           }
         `}</script>
       </Helmet>
+
+      {/* Category Bar - Above Hero */}
+      <CategoryBar />
 
       {/* Premium Hero Section */}
       <ErrorBoundary>
