@@ -94,7 +94,9 @@ export const CartProvider = ({ children }) => {
       const response = await axios.get('/cart');
       setCart(response.data.cart || []);
     } catch (error) {
-      setCart([]);
+      console.warn('Failed to load cart from server, using localStorage fallback:', error.message);
+      // Fallback to localStorage if server fails
+      loadGuestCart();
     } finally {
       setLoading(false);
     }
@@ -151,14 +153,41 @@ export const CartProvider = ({ children }) => {
         return { success: true, message: 'Added to cart successfully!' };
       }
 
-      // For authenticated users, save to server
-      const response = await axios.post('/cart', { productId, quantity, variantSku });
-      setCart(response.data.cart);
-      return { success: true, message: 'Added to cart successfully!' };
+      // For authenticated users, try to save to server, fallback to localStorage
+      try {
+        const response = await axios.post('/cart', { productId, quantity, variantSku });
+        setCart(response.data.cart || []);
+        return { success: true, message: 'Added to cart successfully!' };
+      } catch (serverError) {
+        console.warn('Server cart failed, using localStorage fallback:', serverError.message);
+        
+        // Fallback to localStorage for authenticated users if server fails
+        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const existingItem = localCart.find(item => 
+          item.productId === productId && 
+          (item.variantSku || null) === (variantSku || null)
+        );
+        
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          localCart.push({ 
+            productId, 
+            quantity, 
+            variantSku: variantSku || null,
+            addedAt: new Date().toISOString()
+          });
+        }
+        
+        localStorage.setItem('cart', JSON.stringify(localCart));
+        setCart(localCart);
+        return { success: true, message: 'Added to cart successfully! (Saved locally)' };
+      }
     } catch (error) {
+      console.error('Add to cart error:', error);
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Failed to add to cart' 
+        error: error.response?.data?.message || error.message || 'Failed to add to cart' 
       };
     }
   };

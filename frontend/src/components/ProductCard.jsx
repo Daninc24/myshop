@@ -80,11 +80,8 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
     e.preventDefault();
     e.stopPropagation();
     
-    if (!user) {
-      error('Please login to add items to cart');
-      return;
-    }
-
+    console.log('Adding to cart:', { productId: _id, title, stock, user: !!user });
+    
     if (stock <= 0) {
       error('Product is out of stock');
       return;
@@ -93,12 +90,16 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
     setIsAddingToCart(true);
     try {
       const result = await addToCart(_id, 1);
+      console.log('Add to cart result:', result);
+      
       if (result.success) {
-        success('Added to cart successfully!');
+        success(result.message || 'Added to cart successfully!');
       } else {
+        console.error('Add to cart failed:', result.error);
         error(result.error || 'Failed to add to cart');
       }
     } catch (err) {
+      console.error('Add to cart error:', err);
       error('Failed to add to cart');
     } finally {
       setIsAddingToCart(false);
