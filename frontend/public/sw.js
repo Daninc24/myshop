@@ -22,12 +22,16 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then(cache => {
-        console.log('Caching static assets');
+        console.log('Service Worker: Caching static assets');
         // Cache assets individually to avoid failure if one doesn't exist
         return Promise.allSettled(
           STATIC_ASSETS.map(asset => 
             cache.add(asset).catch(err => {
-              console.warn(`Failed to cache ${asset}:`, err);
+              // Silently handle expected failures
+              if (!err.message.includes('manifest.json') && 
+                  !err.message.includes('.woff2')) {
+                console.warn(`Failed to cache ${asset}:`, err.message);
+              }
               return null;
             })
           )
@@ -158,12 +162,27 @@ async function handleResourceRequest(request) {
     
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      cache.put(request, networkResponse.clone());
+      // Only cache successful responses and avoid caching certain types
+      const contentType = networkResponse.headers.get('content-type');
+      const url = new URL(request.url);
+      
+      // Skip caching for certain file types that might cause issues
+      if (!url.pathname.includes('.woff2') && 
+          !url.pathname.includes('manifest.json') &&
+          contentType && 
+          !contentType.includes('application/octet-stream')) {
+        try {
+          await cache.put(request, networkResponse.clone());
+        } catch (cacheError) {
+          console.warn('Failed to cache resource:', request.url, cacheError.message);
+          // Continue without caching
+        }
+      }
     }
     
     return networkResponse;
   } catch (error) {
-    console.error('Resource request failed:', error);
+    console.warn('Resource request failed:', error.message);
     return new Response('', { status: 404 });
   }
 }

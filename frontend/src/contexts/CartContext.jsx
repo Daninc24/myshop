@@ -94,7 +94,10 @@ export const CartProvider = ({ children }) => {
       const response = await axios.get('/cart');
       setCart(response.data.cart || []);
     } catch (error) {
-      console.warn('Failed to load cart from server, using localStorage fallback:', error.message);
+      // Only log unexpected errors, not 401s for guests
+      if (error.response?.status !== 401) {
+        console.warn('Failed to load cart from server, using localStorage fallback:', error.message);
+      }
       // Fallback to localStorage if server fails
       loadGuestCart();
     } finally {
@@ -159,7 +162,10 @@ export const CartProvider = ({ children }) => {
         setCart(response.data.cart || []);
         return { success: true, message: 'Added to cart successfully!' };
       } catch (serverError) {
-        console.warn('Server cart failed, using localStorage fallback:', serverError.message);
+        // Only log unexpected server errors, not 401s for guests
+        if (serverError.response?.status !== 401) {
+          console.warn('Server cart failed, using localStorage fallback:', serverError.message);
+        }
         
         // Fallback to localStorage for authenticated users if server fails
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');

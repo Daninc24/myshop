@@ -7,6 +7,19 @@ const SILENT_ERRORS = [
   { pattern: /401/, message: 'Unauthorized - expected for non-authenticated users' },
   { pattern: /503/, message: 'Service Unavailable - temporary server issue' },
   
+  // Cart errors (expected for non-authenticated users)
+  { pattern: /api\/cart.*401/, message: 'Cart API unauthorized - expected for guests' },
+  { pattern: /api\/auth\/profile.*401/, message: 'Auth profile unauthorized - expected for guests' },
+  
+  // PWA/Manifest errors (expected in some deployments)
+  { pattern: /manifest\.json.*404/, message: 'Manifest not found - expected in some deployments' },
+  { pattern: /\.woff2.*404/, message: 'Font file not found - using Google Fonts fallback' },
+  { pattern: /api\/health.*404/, message: 'Health endpoint not available - using fallback' },
+  
+  // Service Worker cache errors (expected)
+  { pattern: /Cache\.put.*network error/, message: 'Cache put failed - expected for some resources' },
+  { pattern: /Failed to cache resource/, message: 'Resource caching failed - expected' },
+  
   // Analytics errors (expected when endpoints don't exist)
   { pattern: /analytics\/ad-impression.*404/, message: 'Analytics endpoint not available - expected' },
   { pattern: /analytics\/ad-click.*404/, message: 'Analytics endpoint not available - expected' },

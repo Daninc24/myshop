@@ -17,9 +17,11 @@ export const getApiBaseUrl = () => {
 
 export const logApiConfig = () => {
   const baseUrl = getApiBaseUrl();
-  console.log('Environment:', import.meta.env.MODE);
-  console.log('API Base URL:', baseUrl);
-  console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+  if (import.meta.env.DEV) {
+    console.log('Environment:', import.meta.env.MODE);
+    console.log('API Base URL:', baseUrl);
+    console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+  }
   return baseUrl;
 };
 
