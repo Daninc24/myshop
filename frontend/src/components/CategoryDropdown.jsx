@@ -70,7 +70,7 @@ const CategoryDropdown = ({
     
     if (!effectiveCategories.length) {
       return (
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white rounded-2xl shadow-2xl border border-indigo-200'>
+        <div className='max-w-7xl mx-auto px-6 py-8 bg-white'>
           <div className='text-center text-gray-500'>
             <div className='text-4xl mb-4'>🛍️</div>
             <p className='text-lg font-medium'>No categories available</p>
@@ -81,45 +81,35 @@ const CategoryDropdown = ({
     }
     
     return (
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-2xl border-2 border-orange-200'>
-        <div className='flex gap-8 min-h-[400px]'>
-          {/* Left side - Categories list */}
-          <div className='w-80 flex-shrink-0 border-r-2 border-orange-100 pr-6'>
-            <div className='mb-6'>
-              <h3 className='text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3'>
-                <div className='p-2 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg'>
-                  <Squares2X2Icon className='w-6 h-6 text-white' />
-                </div>
-                Shop by Category
-              </h3>
-              <p className='text-sm text-gray-600 font-medium'>Discover products in every category</p>
-            </div>
-            <div className='overflow-y-auto max-h-80 scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100 hover:scrollbar-thumb-orange-400'>
-              <ul className='space-y-2 pr-2'>
-                {effectiveCategories.map(cat => (
-                  <li key={cat._id || cat.id}>
-                    <button
-                      onMouseEnter={() => setOpenCategoryId(cat._id || cat.id)}
-                      onFocus={() => setOpenCategoryId(cat._id || cat.id)}
-                      onClick={() => { onClose && onClose(); }}
-                      className={`w-full text-left px-4 py-4 rounded-xl transition-all duration-300 flex items-center justify-between group ${
-                        (openCategoryId || effectiveCategories[0]?._id) === (cat._id || cat.id)
-                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-xl scale-105 border-2 border-orange-400'
-                          : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-100 hover:shadow-lg hover:scale-102 border-2 border-transparent'
-                      }`}
-                    >
-                      <div className='flex items-center gap-3'>
-                        <span className='text-2xl'>{getCategoryIcon(cat.name)}</span>
-                        <span className='font-semibold text-sm'>{cat.name}</span>
-                      </div>
-                      <ArrowRightIcon className={`w-5 h-5 transition-transform ${
-                        (openCategoryId || effectiveCategories[0]?._id) === (cat._id || cat.id) ? 'translate-x-1' : ''
-                      }`} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+      <div className='max-w-7xl mx-auto bg-white'>
+        <div className='flex'>
+          {/* Left side - Categories list (Alibaba style) */}
+          <div className='w-64 bg-gray-50 border-r border-gray-200'>
+            <ul className='py-2'>
+              {effectiveCategories.map(cat => (
+                <li key={cat._id || cat.id}>
+                  <Link
+                    to={`/products?category=${cat.name}`}
+                    onMouseEnter={() => setOpenCategoryId(cat._id || cat.id)}
+                    onFocus={() => setOpenCategoryId(cat._id || cat.id)}
+                    onClick={() => { onClose && onClose(); }}
+                    className={`flex items-center justify-between px-4 py-3 text-sm transition-colors ${
+                      (openCategoryId || effectiveCategories[0]?._id) === (cat._id || cat.id)
+                        ? 'bg-orange-50 text-orange-600 border-l-4 border-orange-500'
+                        : 'text-gray-700 hover:bg-gray-100 border-l-4 border-transparent'
+                    }`}
+                  >
+                    <div className='flex items-center gap-3'>
+                      <span className='text-xl'>{getCategoryIcon(cat.name)}</span>
+                      <span className='font-medium'>{cat.name}</span>
+                    </div>
+                    {cat.subcategories && cat.subcategories.length > 0 && (
+                      <ArrowRightIcon className='w-4 h-4 text-gray-400' />
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
           
           {/* Right side - Category details and subcategories */}
@@ -160,29 +150,38 @@ const CategoryDropdown = ({
                 {/* Subcategories or featured products */}
                 <div className='flex-1 overflow-hidden'>
                   {activeCategory.subcategories && activeCategory.subcategories.length > 0 ? (
-                    <div>
-                      <h4 className='text-lg font-semibold text-gray-900 mb-4'>Subcategories</h4>
-                      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-72 overflow-y-auto'>
-                        {activeCategory.subcategories.map(sub => (
+                    <div className='flex-1 p-6'>
+                      <div>
+                        {/* Category Header */}
+                        <div className='mb-6'>
+                          <div className='flex items-center gap-3 mb-2'>
+                            <span className='text-3xl'>{getCategoryIcon(activeCategory.name)}</span>
+                            <h4 className='text-xl font-bold text-gray-900'>{activeCategory.name}</h4>
+                          </div>
                           <Link
-                            key={sub._id || sub.id}
-                            to={`/products?category=${activeCategory.name}&subcategory=${sub.name}`}
-                            onClick={onClose}
-                            className='group block p-4 rounded-xl border-2 border-gray-200 hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50 hover:to-red-50 text-sm text-gray-700 hover:text-orange-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg'
+                            to={`/products?category=${activeCategory.name}`}
+                            onClick={() => onClose && onClose()}
+                            className='text-sm text-orange-600 hover:text-orange-700 font-medium inline-flex items-center gap-1'
                           >
-                            <div className='flex flex-col items-center text-center gap-3'>
-                              <div className='w-12 h-12 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center text-lg font-bold text-orange-700 group-hover:from-orange-200 group-hover:to-red-200 transition-all duration-300 shadow-md'>
-                                {sub.name.charAt(0)}
-                              </div>
-                              <div>
-                                <span className='font-semibold block'>{sub.name}</span>
-                                {sub.productCount && (
-                                  <span className='text-xs text-gray-500 mt-1 block'>{sub.productCount} items</span>
-                                )}
-                              </div>
-                            </div>
+                            View all in {activeCategory.name}
+                            <ArrowRightIcon className='w-3 h-3' />
                           </Link>
-                        ))}
+                        </div>
+
+                        {/* Subcategories Grid */}
+                        <div className='grid grid-cols-4 gap-x-8 gap-y-4'>
+                          {activeCategory.subcategories.map(sub => (
+                            <Link
+                              key={sub._id || sub.id}
+                              to={`/products?category=${activeCategory.name}&subcategory=${sub.name}`}
+                              onClick={() => onClose && onClose()}
+                              className='group flex items-center gap-2 text-sm text-gray-700 hover:text-orange-600 transition-colors'
+                            >
+                              <span className='w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-orange-500 transition-colors'></span>
+                              <span className='truncate'>{sub.name}</span>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   ) : (

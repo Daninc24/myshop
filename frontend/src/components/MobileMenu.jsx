@@ -265,38 +265,38 @@ const MobileMenu = ({
           ))}
         </div>
 
-        {/* Admin/Staff Links */}
-        <div className="border-t border-blue-700 pt-4">
-          <div className="flex items-center gap-3 px-4 py-2 mb-3">
-            <Cog6ToothIcon className="h-6 w-6 text-yellow-400" />
-            <span className="text-yellow-400 font-semibold text-lg">Admin Tools</span>
-          </div>
-          
-          {user?.role === 'admin' && (
-            <Link
-              to="/messages"
-              className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
-              onClick={onClose}
-              title="Messages"
-            >
-              <ChatBubbleLeftRightIcon className="h-6 w-6" />
-              <span className="font-medium">Messages</span>
-            </Link>
-          )}
-          
-          {(user?.role === 'shopkeeper' || user?.role === 'warehouse_manager' || user?.role === 'admin') && (
-            <Link
-              to="/pos"
-              className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
-              onClick={onClose}
-              title="POS System"
-            >
-              <CreditCardIcon className="h-6 w-6" />
-              <span className="font-medium">POS System</span>
-            </Link>
-          )}
-          
-          {(user?.role === 'admin' || user?.role === 'shopkeeper' || user?.role === 'manager' || user?.role === 'warehouse_manager' || user?.role === 'store_manager') && (
+        {/* Admin/Staff Links - Only show for admin users */}
+        {(user?.role === 'admin' || user?.role === 'shopkeeper' || user?.role === 'manager' || user?.role === 'warehouse_manager' || user?.role === 'store_manager') && (
+          <div className="border-t border-blue-700 pt-4">
+            <div className="flex items-center gap-3 px-4 py-2 mb-3">
+              <Cog6ToothIcon className="h-6 w-6 text-yellow-400" />
+              <span className="text-yellow-400 font-semibold text-lg">Admin Tools</span>
+            </div>
+            
+            {user?.role === 'admin' && (
+              <Link
+                to="/messages"
+                className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
+                onClick={onClose}
+                title="Messages"
+              >
+                <ChatBubbleLeftRightIcon className="h-6 w-6" />
+                <span className="font-medium">Messages</span>
+              </Link>
+            )}
+            
+            {(user?.role === 'shopkeeper' || user?.role === 'warehouse_manager' || user?.role === 'admin') && (
+              <Link
+                to="/pos"
+                className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
+                onClick={onClose}
+                title="POS System"
+              >
+                <CreditCardIcon className="h-6 w-6" />
+                <span className="font-medium">POS System</span>
+              </Link>
+            )}
+            
             <Link
               to="/admin"
               className="block px-4 py-3 rounded-xl text-white hover:bg-blue-700/50 flex items-center gap-3 transition-all duration-200"
@@ -306,8 +306,8 @@ const MobileMenu = ({
               <Cog6ToothIcon className="h-6 w-6" />
               <span className="font-medium">Admin Dashboard</span>
             </Link>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Currency Selector - Removed duplicate */}
 
