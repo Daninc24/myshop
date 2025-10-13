@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Squares2X2Icon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { Squares2X2Icon, ChevronDownIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 
 const CategoryBar = () => {
@@ -67,15 +67,68 @@ const CategoryBar = () => {
     <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3">
-          {/* All Categories Button */}
-          <Link
-            to="/products"
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
-          >
-            <Squares2X2Icon className="w-5 h-5" />
-            <span className="hidden sm:inline">All Categories</span>
-            <span className="sm:hidden">All</span>
-          </Link>
+          {/* All Categories Button with Dropdown */}
+          <div className="relative group">
+            <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg">
+              <Squares2X2Icon className="w-5 h-5" />
+              <span className="hidden sm:inline">All Categories</span>
+              <span className="sm:hidden">All</span>
+              <ChevronDownIcon className="w-4 h-4" />
+            </button>
+
+            {/* Mega Menu Dropdown */}
+            <div className="absolute left-0 mt-2 w-screen max-w-4xl bg-white rounded-lg shadow-2xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {categories.map((category) => (
+                    <div key={category._id} className="space-y-2">
+                      <Link
+                        to={`/products?category=${category.name}`}
+                        className="flex items-center gap-2 text-base font-bold text-gray-900 hover:text-orange-600 transition-colors"
+                      >
+                        <span className="text-2xl">{getCategoryIcon(category.name)}</span>
+                        <span>{category.name}</span>
+                      </Link>
+                      {category.subcategories && category.subcategories.length > 0 && (
+                        <ul className="ml-8 space-y-1">
+                          {category.subcategories.slice(0, 5).map((sub) => (
+                            <li key={sub._id || sub.id}>
+                              <Link
+                                to={`/products?category=${category.name}&subcategory=${sub.name}`}
+                                className="text-sm text-gray-600 hover:text-orange-600 transition-colors flex items-center gap-2"
+                              >
+                                <span className="w-1 h-1 rounded-full bg-gray-400"></span>
+                                {sub.name}
+                              </Link>
+                            </li>
+                          ))}
+                          {category.subcategories.length > 5 && (
+                            <li>
+                              <Link
+                                to={`/products?category=${category.name}`}
+                                className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                              >
+                                View all ({category.subcategories.length})
+                              </Link>
+                            </li>
+                          )}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+                  <Link
+                    to="/products"
+                    className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-semibold"
+                  >
+                    Browse All Products
+                    <ArrowRightIcon className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Category Links */}
           <div className="hidden md:flex items-center gap-1 flex-1 ml-4 overflow-x-auto scrollbar-hide">
