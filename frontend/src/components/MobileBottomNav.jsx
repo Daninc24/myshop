@@ -55,11 +55,12 @@ const MobileBottomNav = () => {
       exact: false
     },
     {
-      path: '/categories',
+      path: '/products',
       label: 'Categories',
       icon: Squares2X2Icon,
       activeIcon: Squares2X2Solid,
-      exact: false
+      exact: false,
+      isCategory: true
     },
     {
       path: '/wishlist',

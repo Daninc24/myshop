@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
+import { getProductImage } from '../utils/imageUtils';
 import {
   CheckIcon,
   CreditCardIcon,
@@ -12,7 +14,8 @@ import {
   MapPinIcon,
   PhoneIcon,
   EnvelopeIcon,
-  UserIcon
+  UserIcon,
+  ShoppingCartIcon
 } from '@heroicons/react/24/outline';
 
 const CheckoutProgress = ({ currentStep }) => {

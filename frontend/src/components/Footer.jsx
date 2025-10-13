@@ -50,7 +50,7 @@ const EventsPreview = () => {
         </li>
       ))}
       <li>
-        <a href="/events" className="underline hover:text-primary text-xs">See all events &rarr;</a>
+        <Link to="/events" className="underline hover:text-primary text-xs">See all events &rarr;</Link>
       </li>
     </ul>
   );
@@ -195,8 +195,8 @@ const Footer = () => {
         {/* Quick Links */}
         <div className="flex flex-col gap-2">
           <h3 className="text-lg font-heading font-bold mb-2">Quick Links</h3>
-                   <a href="/" className="hover:text-white/80 transition-colors">Home</a>
-         <a href="/products" className="hover:text-white/80 transition-colors">Products</a>
+         <Link to="/" className="hover:text-white/80 transition-colors">Home</Link>
+         <Link to="/products" className="hover:text-white/80 transition-colors">Products</Link>
          <Link to="/about" className="hover:text-white/80 transition-colors">About Us</Link>
          <Link to="/contact" className="hover:text-white/80 transition-colors">Contact</Link>
          <Link to="/faq" className="hover:text-white/80 transition-colors">FAQ</Link>

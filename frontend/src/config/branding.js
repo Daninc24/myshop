@@ -1,48 +1,48 @@
 // Dynamic Branding Configuration
 export const BRAND_CONFIG = {
   // Brand Identity
-  name: 'MyShop',
-  tagline: 'Your Premium Shopping Destination',
-  description: 'Discover amazing products with confidence',
+  name: 'LuxeCart',
+  tagline: 'Premium Shopping',
+  description: 'Where Quality Meets Convenience - Premium shopping experience, delivered',
   
   // Contact Information
-  email: 'info@myshop.com',
-  phone: '+1234567890',
-  whatsapp: '+1234567890',
+  email: 'info@luxecart.com',
+  phone: '+254791991154',
+  whatsapp: '+254791991154',
   
   // Social Media
   social: {
-    facebook: 'https://facebook.com/myshop',
-    twitter: 'https://twitter.com/myshop',
-    instagram: 'https://instagram.com/myshop',
-    linkedin: 'https://linkedin.com/company/myshop'
+    facebook: 'https://facebook.com/luxecart',
+    twitter: 'https://twitter.com/luxecart',
+    instagram: 'https://instagram.com/luxecart',
+    linkedin: 'https://linkedin.com/company/luxecart'
   },
   
   // Website URLs
   website: {
-    base: 'https://myshop.com',
-    logo: 'https://myshop.com/logo.png',
-    favicon: 'https://myshop.com/favicon.ico'
+    base: 'https://luxecart.com',
+    logo: 'https://luxecart.com/logo.png',
+    favicon: 'https://luxecart.com/favicon.ico'
   },
   
   // SEO Defaults
   seo: {
-    defaultTitle: 'MyShop - Your Premium Shopping Destination',
-    defaultDescription: 'Discover premium products, exclusive deals, and excellent shopping experience at MyShop. Fast delivery, secure payments, and exceptional customer service.',
-    defaultKeywords: 'online shopping, premium products, exclusive deals, fast delivery, secure payments, ecommerce, myshop',
-    defaultImage: 'https://myshop.com/logo.png',
-    defaultUrl: 'https://myshop.com'
+    defaultTitle: 'LuxeCart - Premium Shopping',
+    defaultDescription: 'Where Quality Meets Convenience - Discover premium products, exclusive deals, and excellent shopping experience at LuxeCart. Fast delivery, secure payments, and exceptional customer service.',
+    defaultKeywords: 'online shopping, premium products, exclusive deals, fast delivery, secure payments, ecommerce, luxecart, luxury shopping',
+    defaultImage: 'https://luxecart.com/logo.png',
+    defaultUrl: 'https://luxecart.com'
   },
   
-  // Colors (matching Tailwind config)
+  // Colors (Enhanced Brand Colors)
   colors: {
-    primary: '#ff6600',
-    secondary: '#3b82f6',
-    accent: '#a855f7',
-    success: '#22c55e',
-    warning: '#f59e0b',
-    error: '#ef4444',
-    info: '#06b6d4'
+    primary: '#4f46e5',      // Indigo - Trust, Premium
+    secondary: '#9333ea',    // Purple - Innovation, Luxury
+    accent: '#06b6d4',       // Cyan - Fresh, Modern
+    success: '#10b981',      // Emerald - Growth, Success
+    warning: '#f59e0b',      // Amber - Attention, Energy
+    error: '#ef4444',        // Red - Urgency, Important
+    info: '#06b6d4'          // Cyan - Information
   },
   
   // Features
@@ -58,9 +58,9 @@ export const BRAND_CONFIG = {
   // Business Info
   business: {
     founded: '2024',
-    location: 'Your Location',
+    location: 'Nairobi, Kenya',
     currency: 'USD',
-    timezone: 'UTC',
+    timezone: 'EAT',
     languages: ['English']
   },
   
