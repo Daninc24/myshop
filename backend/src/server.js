@@ -72,40 +72,43 @@ if (process.env.NODE_ENV === 'production') {
 
 const server = http.createServer(app);
 
+// ========================================
+// CONSOLIDATED CORS CONFIGURATION
+// ========================================
+// Single source of truth for all CORS settings
+const ALLOWED_ORIGINS = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  // Add your actual production frontend URL here
+  // Example: 'https://myshop-production.vercel.app'
+];
+
+// Reusable CORS origin checker
+const corsOriginChecker = (origin, callback) => {
+  // Allow requests with no origin (mobile apps, Postman, etc.)
+  if (!origin) return callback(null, true);
+  
+  // Check if origin is in allowed list or ends with .vercel.app
+  if (ALLOWED_ORIGINS.includes(origin) || origin.endsWith('.vercel.app')) {
+    return callback(null, true);
+  }
+  
+  return callback(new Error('Not allowed by CORS'));
+};
+
+// Consolidated CORS options object
+const corsOptions = {
+  origin: corsOriginChecker,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Length', 'Content-Type'],
+};
+
+// Socket.IO with consolidated CORS
 const io = new Server(server, {
-  cors: {
-    origin: function (origin, callback) {
-      const allowedOrigins = [
-        process.env.FRONTEND_URL || 'http://localhost:5173',
-        'http://localhost:5173/',
-        'http://localhost:5174',
-        'https://myshoppingcenters-8knn.vercel.app',
-        'https://myshoppingcenters.vercel.app',
-        'https://myshoppingcenter.vercel.app',
-        'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
-        'https://myshop-git-main-daniel-mailus-projects.vercel.app',
-        'https://*.vercel.app',
-        'https://myshop-hhfv.vercel.app',
-        'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app',
-        'https://myshop-tau-five.vercel.app',
-        'https://myshop-tau-five-git-main-daniel-mailus-projects.vercel.app',
-      'https://myshop-git-main-daniel-mailus-projects.vercel.app',
-      'https://*.vercel.app',
-        'https://myshop-git-main-daniel-mailus-projects.vercel.app'
-      ];
-      
-      // Allow requests with no origin
-      if (!origin) return callback(null, true);
-      
-      // Check if origin is in allowed list or ends with .vercel.app
-      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-        return callback(null, true);
-      }
-      
-      return callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true,
-  },
+  cors: corsOptions,
 });
 
 // Set the Socket.IO instance for use in other modules
@@ -295,38 +298,7 @@ try {
   console.log('ℹ️ express-rate-limit not installed; skipping rate limit');
 }
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
-  'http://localhost:5173/',
-  'http://localhost:5174',
-  'https://myshoppingcenters-8knn.vercel.app',
-  'https://myshoppingcenters.vercel.app',
-  'https://myshoppingcenter.vercel.app',
-  'https://myshopcenter-git-main-daniel-mailus-projects.vercel.app',
-  'https://myshop-git-main-daniel-mailus-projects.vercel.app',
-  'https://myshop-hhfv.vercel.app',
-  'https://myshop-hhfv-git-main-daniel-mailus-projects.vercel.app',
-  'https://myshop-tau-five.vercel.app',
-  'https://myshop-tau-five-git-main-daniel-mailus-projects.vercel.app',
-  // Production URLs - Add your actual production domains here
-        'https://myshop.com',
-      'https://www.myshop.com',
-  'https://your-frontend-domain.com',
-  'https://your-production-domain.com'
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-};
-
+// Use the consolidated CORS configuration defined at the top
 app.use(cors(corsOptions));
 
 // === ROUTES ===
@@ -350,33 +322,8 @@ app.use('/api/site', siteRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 
-// Handle OPTIONS requests for image uploads
-app.options('/uploads/:filename', (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
-  res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
-  res.status(200).end();
-});
-
-// Add CORS headers for /uploads before static middleware
-app.use('/uploads', cors({
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      process.env.FRONTEND_URL || 'http://localhost:5173',
-      'https://myshop-hhfv.onrender.com',
-      'https://myshop-hhfv.vercel.app'
-    ];
-    
-    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
-  },
-  methods: 'GET',
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Content-Length', 'Content-Type']
-}), express.static(path.join(__dirname, '../uploads'), {
+// Static file serving for uploads with consolidated CORS
+app.use('/uploads', cors(corsOptions), express.static(path.join(__dirname, '../uploads'), {
   maxAge: '30d',
   setHeaders: (res, filePath) => {
     // Strong caching for immutable uploads; adjust if files can change in place

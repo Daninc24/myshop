@@ -4,7 +4,13 @@ export const getApiBaseUrl = () => {
     return '/api';
   }
   
-  let raw = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com';
+  let raw = import.meta.env.VITE_API_URL;
+  
+  if (!raw) {
+    console.error('⚠️ VITE_API_URL is not set! Please configure it in your environment variables.');
+    // Fallback to relative URL in production
+    return '/api';
+  }
   
   // If VITE_API_URL already includes /api, use it as is
   // If not, add /api to the base URL

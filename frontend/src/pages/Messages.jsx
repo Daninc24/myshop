@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { io } from 'socket.io-client';
 import { UserIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
+import { getSocketUrl, getSocketOptions } from '../utils/socketConfig';
 
 // Socket.io connection singleton to prevent multiple connections
 let socketInstance = null;
@@ -170,15 +171,7 @@ const Messages = () => {
     
     // Use singleton pattern for socket connection
     if (!socketInstance) {
-              socketInstance = io(import.meta.env.VITE_API_URL || 'http://localhost:5002', {
-        withCredentials: true,
-        transports: ['websocket'],
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        timeout: 20000,
-      });
+              socketInstance = io(getSocketUrl(), getSocketOptions());
     }
     
     socketRef.current = socketInstance;

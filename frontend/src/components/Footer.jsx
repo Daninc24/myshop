@@ -108,76 +108,32 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-r from-primary to-secondary border-t border-primary mt-12 py-4 sm:py-6 px-2 sm:px-4 text-white transition-colors duration-300">
-  {/* Responsive grid: 1col xs, 2col sm, 3col md, 5col lg */}
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
+    <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-t-4 border-orange-500 mt-12 py-8 sm:py-10 px-4 sm:px-6 text-white transition-colors duration-300">
+      {/* Responsive grid: 1col xs, 2col sm, 3col md, 5col lg */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 sm:gap-8 md:gap-10">
+        
         {/* Brand & Newsletter */}
-        {/* Latest Events & Promotions */}
-        <div className="flex flex-col gap-2 md:col-span-1 items-center sm:items-start">
-  <h3 className="text-lg font-heading font-bold mb-2">Rate Our Service</h3>
-  <div className="flex items-center gap-2 mb-2">
-    {[1,2,3,4,5].map(star => (
-      <button
-        key={star}
-        onClick={() => handleRate(star)}
-                        className={`text-2xl ${userRating >= star ? 'text-primary' : 'text-text-muted'} focus:outline-none transition-colors`}
-        aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
-      >
-        ★
-      </button>
-    ))}
-  </div>
-  <input
-    type="text"
-    placeholder="Your name (optional)"
-    value={userName}
-    onChange={e => setUserName(e.target.value)}
-    className="input-field max-w-xs w-full mb-2"
-  />
-  <textarea
-    placeholder="Leave a message..."
-    value={userMessage}
-    onChange={e => setUserMessage(e.target.value)}
-    className="input-field max-w-xs w-full mb-2"
-    rows={2}
-  />
-  <button onClick={handleSubmit} className="btn-primary w-full max-w-xs">Submit Rating</button>
-  {submitted && <div className="text-success font-medium mt-2">Thank you for your feedback!</div>}
-  <div className="text-sm text-gray-500 mt-2">Average rating: <span className="font-bold text-primary">{averageRating.toFixed(1)}</span> ({ratingCount} ratings)</div>
-</div>
-        {/* Store Location Map */}
-        <div className="flex flex-col gap-3 md:col-span-1">
-          <h3 className="text-lg font-heading font-bold mb-2">Our Location</h3>
-          <div className="rounded-xl overflow-hidden shadow-lg border border-gray-200">
-            <iframe
-              src={mapEmbedUrl}
-              width="100%"
-              height="150"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Store Location"
-              className="w-full h-40 md:h-32"
-            ></iframe>
-          </div>
-          <span className="text-xs text-gray-500">Nairobi, Kenya</span>
-        </div>
-        <div className="flex flex-col gap-2 col-span-1 items-center sm:items-start">
+        <div className="flex flex-col gap-3 col-span-1 items-center sm:items-start">
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-2 w-full">
-            <div className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center mx-auto sm:mx-0">
-              <span className="font-heading text-lg font-bold text-primary">LC</span>
+            <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg flex items-center justify-center mx-auto sm:mx-0">
+              <span className="font-heading text-xl font-bold text-white">LC</span>
             </div>
-            <span className="font-heading text-xl sm:text-2xl font-bold text-white drop-shadow text-center sm:text-left">{getBrandName()}</span>
+            <span className="font-heading text-2xl sm:text-3xl font-bold text-white drop-shadow-lg text-center sm:text-left">{getBrandName()}</span>
           </div>
-          <p className="text-text-secondary mb-2">Your one-stop shop for everything awesome. Enjoy seamless shopping, fast delivery, and great deals!</p>
+          <p className="text-gray-300 mb-3 text-sm leading-relaxed">Your one-stop shop for everything awesome. Enjoy seamless shopping, fast delivery, and great deals!</p>
           <form className="flex flex-col gap-2 w-full" onSubmit={e => { e.preventDefault(); alert('Subscribed!'); }}>
-  <label htmlFor="newsletter" className="font-medium">Subscribe to our newsletter</label>
-  <div className="flex flex-col xs:flex-row gap-2 w-full">
-    <input id="newsletter" type="email" required placeholder="Your email" className="input-field flex-1 min-w-0" />
-    <button type="submit" className="btn-primary w-full xs:w-auto">Subscribe</button>
-  </div>
-</form>
+            <label htmlFor="newsletter" className="font-semibold text-white">Subscribe to our newsletter</label>
+            <div className="flex flex-col xs:flex-row gap-2 w-full">
+              <input 
+                id="newsletter" 
+                type="email" 
+                required 
+                placeholder="Your email" 
+                className="flex-1 min-w-0 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent" 
+              />
+              <button type="submit" className="px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl w-full xs:w-auto">Subscribe</button>
+            </div>
+          </form>
           <div className="flex gap-3 mt-4 justify-center sm:justify-start">
             <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform hover:bg-white/20 rounded-full p-2">
               <GlobeAltIcon className="w-6 h-6 text-white" />
@@ -192,41 +148,122 @@ const Footer = () => {
           
         </div>
         {/* Quick Links */}
-        {/* Quick Links */}
-        <div className="flex flex-col gap-2">
-          <h3 className="text-lg font-heading font-bold mb-2">Quick Links</h3>
-         <Link to="/" className="hover:text-white/80 transition-colors">Home</Link>
-         <Link to="/products" className="hover:text-white/80 transition-colors">Products</Link>
-         <Link to="/about" className="hover:text-white/80 transition-colors">About Us</Link>
-         <Link to="/contact" className="hover:text-white/80 transition-colors">Contact</Link>
-         <Link to="/faq" className="hover:text-white/80 transition-colors">FAQ</Link>
-         <Link to="/events" className="hover:text-white/80 transition-colors">Events</Link>
+        <div className="flex flex-col gap-3">
+          <h3 className="text-xl font-heading font-bold mb-2 text-white">Quick Links</h3>
+          <Link to="/" className="text-gray-300 hover:text-orange-400 transition-colors text-sm font-medium">Home</Link>
+          <Link to="/products" className="text-gray-300 hover:text-orange-400 transition-colors text-sm font-medium">Products</Link>
+          <Link to="/about" className="text-gray-300 hover:text-orange-400 transition-colors text-sm font-medium">About Us</Link>
+          <Link to="/contact" className="text-gray-300 hover:text-orange-400 transition-colors text-sm font-medium">Contact</Link>
+          <Link to="/faq" className="text-gray-300 hover:text-orange-400 transition-colors text-sm font-medium">FAQ</Link>
+          <Link to="/events" className="text-gray-300 hover:text-orange-400 transition-colors text-sm font-medium">Events</Link>
         </div>
+        
         {/* Contact Info */}
-        <div className="flex flex-col gap-2">
-          <h3 className="text-lg font-heading font-bold mb-2">Contact Us</h3>
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Phone:</span>
-            <a href={`tel:${phoneNumber}`} className="text-primary hover:underline">{phoneNumber}</a>
+        <div className="flex flex-col gap-3">
+          <h3 className="text-xl font-heading font-bold mb-2 text-white">Contact Us</h3>
+          <div className="flex items-start gap-2">
+            <PhoneIcon className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+            <div className="flex flex-col">
+              <span className="text-gray-400 text-xs">Phone</span>
+              <a href={`tel:${phoneNumber}`} className="text-white hover:text-orange-400 transition-colors font-medium">{phoneNumber}</a>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Email:</span>
-            <a href={`mailto:${email}`} className="text-primary hover:underline">{email}</a>
+          <div className="flex items-start gap-2">
+            <EnvelopeIcon className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+            <div className="flex flex-col">
+              <span className="text-gray-400 text-xs">Email</span>
+              <a href={`mailto:${email}`} className="text-white hover:text-orange-400 transition-colors font-medium break-all">{email}</a>
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 mt-2">
-            <span className="font-medium">Location:</span>
-            <span>Nairobi, Kenya</span>
+          <div className="flex items-start gap-2">
+            <MapPinIcon className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+            <div className="flex flex-col">
+              <span className="text-gray-400 text-xs">Location</span>
+              <span className="text-white font-medium">Nairobi, Kenya</span>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
-            <span className="bg-white rounded shadow p-1 text-xs font-bold text-gray-700 px-2 py-1">VISA</span>
-            <span className="bg-white rounded shadow p-1 text-xs font-bold text-gray-700 px-2 py-1">MC</span>
-            <span className="bg-white rounded shadow p-1 text-xs font-bold text-gray-700 px-2 py-1">PP</span>
+            <span className="bg-white rounded-lg shadow-md px-3 py-1.5 text-xs font-bold text-gray-800">VISA</span>
+            <span className="bg-white rounded-lg shadow-md px-3 py-1.5 text-xs font-bold text-gray-800">MC</span>
+            <span className="bg-white rounded-lg shadow-md px-3 py-1.5 text-xs font-bold text-gray-800">PayPal</span>
+          </div>
+        </div>
+        
+        {/* Rate Our Service */}
+        <div className="flex flex-col gap-3 md:col-span-1 items-center sm:items-start">
+          <h3 className="text-xl font-heading font-bold mb-2 text-white">Rate Our Service</h3>
+          <div className="flex items-center gap-2 mb-2">
+            {[1,2,3,4,5].map(star => (
+              <button
+                key={star}
+                onClick={() => handleRate(star)}
+                onMouseEnter={() => setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+                className={`text-3xl ${(hoverRating || userRating) >= star ? 'text-yellow-400' : 'text-gray-600'} focus:outline-none transition-all duration-200 hover:scale-110`}
+                aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+          <input
+            type="text"
+            placeholder="Your name (optional)"
+            value={userName}
+            onChange={e => setUserName(e.target.value)}
+            className="w-full max-w-xs px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+          />
+          <textarea
+            placeholder="Leave a message..."
+            value={userMessage}
+            onChange={e => setUserMessage(e.target.value)}
+            className="w-full max-w-xs px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+            rows={3}
+          />
+          <button 
+            onClick={handleSubmit} 
+            disabled={!userRating}
+            className="w-full max-w-xs px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
+            Submit Rating
+          </button>
+          {submitted && <div className="text-green-400 font-medium mt-2 text-sm">✓ Thank you for your feedback!</div>}
+          {averageRating > 0 && (
+            <div className="text-sm text-gray-300 mt-2">
+              Average: <span className="font-bold text-yellow-400">{averageRating.toFixed(1)}★</span> ({ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'})
+            </div>
+          )}
+        </div>
+        
+        {/* Store Location Map */}
+        <div className="flex flex-col gap-3 md:col-span-1">
+          <h3 className="text-xl font-heading font-bold mb-2 text-white">Our Location</h3>
+          <div className="rounded-xl overflow-hidden shadow-2xl border-2 border-white/10">
+            <iframe
+              src={mapEmbedUrl}
+              width="100%"
+              height="200"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Store Location"
+              className="w-full h-48"
+            ></iframe>
+          </div>
+          <div className="flex items-center gap-2">
+            <MapPinIcon className="w-4 h-4 text-orange-400" />
+            <span className="text-sm text-gray-300">Nairobi, Kenya</span>
           </div>
         </div>
       </div>
-      <div className="border-t border-white/20 mt-6 pt-2 text-center text-xs text-white/80 flex flex-col sm:flex-row justify-between items-center gap-2">
+      <div className="border-t border-white/10 mt-8 pt-6 text-center text-sm text-gray-400 flex flex-col sm:flex-row justify-between items-center gap-3">
         <span>&copy; {new Date().getFullYear()} {getBrandName()}. All rights reserved.</span>
-        <a href="#top" className="text-white hover:underline">Back to Top ↑</a>
+        <div className="flex gap-4 items-center">
+          <Link to="/privacy" className="text-gray-400 hover:text-orange-400 transition-colors">Privacy Policy</Link>
+          <Link to="/terms" className="text-gray-400 hover:text-orange-400 transition-colors">Terms of Service</Link>
+          <a href="#top" className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">Back to Top ↑</a>
+        </div>
       </div>
     </footer>
   );

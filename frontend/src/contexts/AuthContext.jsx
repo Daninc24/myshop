@@ -89,7 +89,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const loginWithGoogle = () => {
-            window.location.href = (import.meta.env.VITE_API_URL || 'http://localhost:5002') + '/auth/google';
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const baseUrl = import.meta.env.DEV 
+      ? 'http://localhost:5002' 
+      : apiUrl?.replace('/api', '') || window.location.origin;
+    window.location.href = baseUrl + '/auth/google';
   };
 
   const value = {

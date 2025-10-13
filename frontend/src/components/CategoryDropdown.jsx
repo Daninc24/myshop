@@ -81,18 +81,20 @@ const CategoryDropdown = ({
     }
     
     return (
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white rounded-2xl shadow-2xl border border-indigo-200'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-2xl border-2 border-orange-200'>
         <div className='flex gap-8 min-h-[400px]'>
           {/* Left side - Categories list */}
-          <div className='w-80 flex-shrink-0 border-r border-gray-200 pr-6'>
+          <div className='w-80 flex-shrink-0 border-r-2 border-orange-100 pr-6'>
             <div className='mb-6'>
-              <h3 className='text-xl font-bold text-gray-900 mb-2 flex items-center gap-2'>
-                <Squares2X2Icon className='w-6 h-6 text-orange-500' />
+              <h3 className='text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3'>
+                <div className='p-2 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg'>
+                  <Squares2X2Icon className='w-6 h-6 text-white' />
+                </div>
                 Shop by Category
               </h3>
-              <p className='text-sm text-gray-600'>Discover products in every category</p>
+              <p className='text-sm text-gray-600 font-medium'>Discover products in every category</p>
             </div>
-            <div className='overflow-y-auto max-h-80 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400'>
+            <div className='overflow-y-auto max-h-80 scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100 hover:scrollbar-thumb-orange-400'>
               <ul className='space-y-2 pr-2'>
                 {effectiveCategories.map(cat => (
                   <li key={cat._id || cat.id}>
@@ -101,36 +103,17 @@ const CategoryDropdown = ({
                       onFocus={() => setOpenCategoryId(cat._id || cat.id)}
                       onClick={() => { onClose && onClose(); }}
                       className={`w-full text-left px-4 py-4 rounded-xl transition-all duration-300 flex items-center justify-between group ${
-                        ((openCategoryId || effectiveCategories[0]?._id || effectiveCategories[0]?.id) === (cat._id || cat.id)) 
-                          ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg transform scale-105' 
-                          : 'hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 hover:shadow-md hover:scale-102'
+                        (openCategoryId || effectiveCategories[0]?._id) === (cat._id || cat.id)
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-xl scale-105 border-2 border-orange-400'
+                          : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-100 hover:shadow-lg hover:scale-102 border-2 border-transparent'
                       }`}
                     >
-                      <div className='flex items-center gap-4'>
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg transition-all duration-300 ${
-                          ((openCategoryId || effectiveCategories[0]?._id || effectiveCategories[0]?.id) === (cat._id || cat.id))
-                            ? 'bg-white/20 text-white shadow-inner'
-                            : 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 group-hover:from-orange-100 group-hover:to-red-100 group-hover:shadow-md'
-                        }`}>
-                          {getCategoryIcon(cat.name)}
-                        </div>
-                        <div>
-                          <span className='font-semibold text-base'>{cat.name}</span>
-                          {cat.productCount && (
-                            <p className={`text-xs mt-1 ${
-                              ((openCategoryId || effectiveCategories[0]?._id || effectiveCategories[0]?.id) === (cat._id || cat.id))
-                                ? 'text-white/80'
-                                : 'text-gray-500'
-                            }`}>
-                              {cat.productCount} products
-                            </p>
-                          )}
-                        </div>
+                      <div className='flex items-center gap-3'>
+                        <span className='text-2xl'>{getCategoryIcon(cat.name)}</span>
+                        <span className='font-semibold text-sm'>{cat.name}</span>
                       </div>
-                      <ArrowRightIcon className={`w-5 h-5 transition-transform duration-300 ${
-                        ((openCategoryId || effectiveCategories[0]?._id || effectiveCategories[0]?.id) === (cat._id || cat.id))
-                          ? 'text-white transform rotate-90'
-                          : 'text-gray-400 group-hover:text-orange-500 group-hover:translate-x-1'
+                      <ArrowRightIcon className={`w-5 h-5 transition-transform ${
+                        (openCategoryId || effectiveCategories[0]?._id) === (cat._id || cat.id) ? 'translate-x-1' : ''
                       }`} />
                     </button>
                   </li>

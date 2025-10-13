@@ -166,6 +166,10 @@ export const addResourceHints = () => {
   // Preconnect to API
   const preconnect = document.createElement('link');
   preconnect.rel = 'preconnect';
-  preconnect.href = import.meta.env.VITE_API_URL || 'https://myshop-hhfv.onrender.com';
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (apiUrl) {
+    // Extract base URL without /api path
+    preconnect.href = apiUrl.replace('/api', '');
+  }
   document.head.appendChild(preconnect);
 };

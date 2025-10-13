@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { useToast } from '../contexts/ToastContext';
+import { getSocketUrl, getSocketOptions } from '../utils/socketConfig';
 
 const Events = () => {
   const [upcoming, setUpcoming] = useState([]);
@@ -29,10 +30,7 @@ const Events = () => {
     fetchAndSetEvents();
     // Setup Socket.IO for real-time updates
     if (!socketRef.current) {
-      socketRef.current = io(import.meta.env.VITE_API_URL || 'http://localhost:5002', { 
-        transports: ['websocket'],
-        withCredentials: true
-      });
+      socketRef.current = io(getSocketUrl(), getSocketOptions());
       socketRef.current.on('event_created', (event) => {
         fetchAndSetEvents();
         success(`New event: ${event.title}`);

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { io } from 'socket.io-client';
 import { UserIcon } from '@heroicons/react/24/solid';
+import { getSocketUrl, getSocketOptions } from '../utils/socketConfig';
 
 
 const Profile = () => {
@@ -26,10 +27,7 @@ const Profile = () => {
   useEffect(() => {
     if (!user) return;
     if (socketRef.current) return;
-    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5002', {
-      withCredentials: true,
-      transports: ['websocket'],
-    });
+    const socket = io(getSocketUrl(), getSocketOptions());
     socketRef.current = socket;
     socket.on('online_users', (users) => {
       setOnlineUsers(users);
