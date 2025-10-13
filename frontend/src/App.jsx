@@ -13,6 +13,7 @@ import POSRoute from './components/POSRoute';
 import SuperAdminRoute from './components/SuperAdminRoute';
 import GoogleAnalytics from './components/GoogleAnalytics';
 import PerformanceOptimizer from './components/PerformanceOptimizer';
+import PWAFeatures from './components/PWAFeatures';
 
 // Lazy-loaded components
 import {
@@ -71,6 +72,9 @@ const App = () => {
       
       {/* Performance Optimizer */}
       <PerformanceOptimizer />
+      
+      {/* PWA Features */}
+      <PWAFeatures />
       
       <AppLayout>
         <Suspense fallback={<LoadingSpinner />}>
