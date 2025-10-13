@@ -6,6 +6,7 @@ import { debounce, throttle } from '../utils/performance';
 
 import CategoryDropdown from './CategoryDropdown';
 import MobileMenu from './MobileMenu';
+import BrandLogo from './BrandLogo';
 import SmartNotificationSystem from './SmartNotificationSystem';
 import axios from 'axios';
 import { 
@@ -251,12 +252,7 @@ const Navbar = () => {
           
           {/* Logo and Mobile Categories */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <Link to="/" className="flex items-center space-x-2 group">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                <SparklesIcon className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
-              </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">MyShop</span>
-            </Link>
+            <BrandLogo size="md" variant="full" />
             
             {/* Mobile Categories Button */}
             <button

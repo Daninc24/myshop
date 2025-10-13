@@ -4,6 +4,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 // Components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import MobileBottomNav from './components/MobileBottomNav';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -53,10 +54,11 @@ const AppLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-background text-text-primary flex flex-col">
       <Navbar />
-      <main className="flex-1 pt-16 lg:pt-20">
+      <main className="flex-1 pt-16 lg:pt-20 pb-16 md:pb-0">
         {children}
       </main>
       {!isAuthPage && <Footer />}
+      <MobileBottomNav />
     </div>
   );
 };
