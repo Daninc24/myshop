@@ -19,23 +19,15 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': ['antd', '@ant-design/icons', '@headlessui/react', '@heroicons/react'],
-          'vendor-charts': ['chart.js', 'react-chartjs-2', 'recharts'],
-          'vendor-payment': ['@stripe/react-stripe-js', '@stripe/stripe-js', '@paypal/react-paypal-js'],
-          'vendor-utils': ['axios', 'dayjs', 'framer-motion']
+          'vendor-ui': ['antd', '@ant-design/icons'],
+          'vendor-utils': ['axios', 'framer-motion']
         }
       }
     },
     // Increase chunk size warning limit
     chunkSizeWarningLimit: 1000,
-    // Enable minification
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.logs in production
-        drop_debugger: true
-      }
-    },
+    // Enable minification (using esbuild instead of terser for faster builds)
+    minify: 'esbuild',
     // Enable source maps for debugging (optional, disable for smaller builds)
     sourcemap: false
   },
