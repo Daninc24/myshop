@@ -30,10 +30,11 @@ const AdminUsers = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get('/users');
+      const res = await axios.get('/api/users');
       setUsers(res.data.users || []);
     } catch (err) {
-      setError('Failed to fetch users');
+      console.error('Error fetching users:', err);
+      setError(err.response?.data?.message || 'Failed to fetch users');
     } finally {
       setLoading(false);
     }
@@ -43,7 +44,7 @@ const AdminUsers = () => {
     setError('');
     setSuccess('');
     try {
-      await axios.put(`/users/${id}/role`, { role: newRole });
+      await axios.put(`/api/users/${id}/role`, { role: newRole });
       setSuccess('Role updated successfully');
       fetchUsers();
     } catch (err) {
@@ -59,7 +60,7 @@ const AdminUsers = () => {
     setError('');
     setSuccess('');
     try {
-      await axios.put(`/users/${id}/salary`, { salary: Number(salary) });
+      await axios.put(`/api/users/${id}/salary`, { salary: Number(salary) });
       setSuccess('Salary updated successfully');
       fetchUsers();
     } catch (err) {
@@ -72,7 +73,7 @@ const AdminUsers = () => {
     setError('');
     setSuccess('');
     try {
-      await axios.delete(`/users/${id}`);
+      await axios.delete(`/api/users/${id}`);
       setSuccess('User deleted successfully');
       fetchUsers();
     } catch (err) {

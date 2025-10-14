@@ -8,7 +8,7 @@ import { initializeErrorFixes } from './utils/errorFixes.js'
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ToastProvider } from './contexts/ToastContext.jsx';
 import { CartProvider } from './contexts/CartContext.jsx';
-
+import { NotificationProvider } from './components/WorldClassNotifications.jsx';
 import { AnalyticsProvider } from './contexts/AnalyticsContext.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -49,15 +49,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           algorithm: antdTheme.defaultAlgorithm,
         }}
       >
-        <ToastProvider>
-          <AuthProvider>
-            <CartProvider>
-              <AnalyticsProvider>
-                <App />
-              </AnalyticsProvider>
-            </CartProvider>
-          </AuthProvider>
-        </ToastProvider>
+        <NotificationProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <CartProvider>
+                <AnalyticsProvider>
+                  <App />
+                </AnalyticsProvider>
+              </CartProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </NotificationProvider>
       </ConfigProvider>
     </HelmetProvider>
   </BrowserRouter>,

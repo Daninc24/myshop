@@ -84,14 +84,8 @@
   contain-intrinsic-size: 200px;
 }
 
-/* Optimize font loading */
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/inter-regular.woff2') format('woff2');
-}
+/* Use system fonts for better performance - no custom font loading needed */
+/* Inter is loaded via Tailwind CSS config or use system fonts */
 
 /* Skeleton loading styles */
 .skeleton {
