@@ -17,7 +17,7 @@ const CATEGORY_PLACEHOLDERS = {
   'default': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop'
 };
 
-// Get optimized image URL with Cloudinary transformations
+// Enhanced optimized image URL with Cloudinary transformations
 export const getOptimizedImageUrl = (imageUrl, options = {}) => {
   if (!imageUrl) return null;
 
@@ -27,16 +27,50 @@ export const getOptimizedImageUrl = (imageUrl, options = {}) => {
     quality = 'auto',
     format = 'auto',
     crop = 'fill',
-    gravity = 'auto'
+    gravity = 'auto',
+    progressive = true,
+    dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1
   } = options;
 
   // If it's already a Cloudinary URL, add transformations
   if (imageUrl.includes('cloudinary.com')) {
-    const baseUrl = imageUrl.split('/upload/')[0] + '/upload/';
-    const imagePath = imageUrl.split('/upload/')[1];
+    const transformations = [];
     
-    if (imagePath) {
-      return `${baseUrl}w_${width},h_${height},c_${crop},g_${gravity},q_${quality},f_${format}/${imagePath}`;
+    // Add format optimization
+    if (format === 'auto') {
+      transformations.push('f_auto');
+    } else if (format !== 'original') {
+      transformations.push(`f_${format}`);
+    }
+    
+    // Add quality optimization
+    if (quality === 'auto') {
+      transformations.push('q_auto');
+    } else if (quality !== 'original') {
+      transformations.push(`q_${quality}`);
+    }
+    
+    // Add device pixel ratio for high-DPI displays
+    if (dpr > 1) {
+      transformations.push(`dpr_${Math.min(Math.round(dpr), 3)}`); // Cap at 3x for performance
+    }
+    
+    // Add dimensions
+    if (width && height) {
+      transformations.push(`w_${Math.round(width)}`, `h_${Math.round(height)}`, `c_${crop}`, `g_${gravity}`);
+    } else if (width) {
+      transformations.push(`w_${Math.round(width)}`, 'c_scale');
+    } else if (height) {
+      transformations.push(`h_${Math.round(height)}`, 'c_scale');
+    }
+    
+    // Add progressive JPEG loading
+    if (progressive) {
+      transformations.push('fl_progressive');
+    }
+    
+    if (transformations.length > 0) {
+      return imageUrl.replace('/upload/', `/upload/${transformations.join(',')}/`);
     }
   }
 
@@ -113,15 +147,28 @@ export const getProductImages = (product, options = {}) => {
   return [CATEGORY_PLACEHOLDERS[category] || CATEGORY_PLACEHOLDERS.default];
 };
 
-// Lazy loading props for images
-export const getLazyImageProps = (imageUrl, alt = '') => {
+// Enhanced lazy loading props for images with WebP support
+export const getLazyImageProps = (imageUrl, alt = '', options = {}) => {
+  const { width, height, quality = 'auto' } = options;
+  const optimizedUrl = getOptimizedImageUrl(imageUrl, { width, height, quality });
+  
   return {
-    src: imageUrl,
+    src: optimizedUrl,
     alt,
     loading: 'lazy',
+    decoding: 'async',
     onError: (e) => {
       e.target.src = CATEGORY_PLACEHOLDERS.default;
-    }
+    },
+    // Add srcSet for responsive images if dimensions provided
+    ...(width && {
+      srcSet: [
+        `${getOptimizedImageUrl(imageUrl, { width: Math.round(width * 0.5), height: height ? Math.round(height * 0.5) : undefined, quality })} 0.5x`,
+        `${optimizedUrl} 1x`,
+        `${getOptimizedImageUrl(imageUrl, { width: Math.round(width * 1.5), height: height ? Math.round(height * 1.5) : undefined, quality })} 1.5x`,
+        `${getOptimizedImageUrl(imageUrl, { width: Math.round(width * 2), height: height ? Math.round(height * 2) : undefined, quality })} 2x`
+      ].join(', ')
+    })
   };
 };
 
@@ -166,4 +213,58 @@ export const preloadImage = (imageUrl) => {
 // Get category placeholder
 export const getCategoryPlaceholder = (category) => {
   return CATEGORY_PLACEHOLDERS[category] || CATEGORY_PLACEHOLDERS.default;
+};
+
+// Generate responsive image srcSet
+export const generateSrcSet = (imageUrl, widths = [400, 600, 800, 1200]) => {
+  if (!imageUrl) return '';
+  
+  return widths
+    .map(width => {
+      const optimizedSrc = getOptimizedImageUrl(imageUrl, { width });
+      return `${optimizedSrc} ${width}w`;
+    })
+    .join(', ');
+};
+
+// Get WebP version of image (for modern browsers)
+export const getWebPImageUrl = (imageUrl, options = {}) => {
+  if (!imageUrl || !imageUrl.includes('cloudinary.com')) return null;
+  
+  return getOptimizedImageUrl(imageUrl, { ...options, format: 'webp' });
+};
+
+// Preload multiple images with progress tracking
+export const preloadImages = async (imageUrls, onProgress) => {
+  const results = [];
+  let loaded = 0;
+  
+  for (const url of imageUrls) {
+    try {
+      await preloadImage(url);
+      results.push({ url, success: true });
+    } catch (error) {
+      results.push({ url, success: false, error });
+    }
+    
+    loaded++;
+    if (onProgress) {
+      onProgress(loaded, imageUrls.length, (loaded / imageUrls.length) * 100);
+    }
+  }
+  
+  return results;
+};
+
+// Get image blur placeholder (for progressive loading)
+export const getBlurPlaceholder = (imageUrl, options = {}) => {
+  if (!imageUrl || !imageUrl.includes('cloudinary.com')) return null;
+  
+  return getOptimizedImageUrl(imageUrl, {
+    ...options,
+    width: 40,
+    height: 40,
+    quality: 10,
+    format: 'jpg'
+  });
 };

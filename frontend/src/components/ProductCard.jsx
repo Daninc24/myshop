@@ -20,7 +20,7 @@ import useResponsiveLayout from '../hooks/useResponsiveLayout';
 import CompactProductCard from './CompactProductCard';
 import axios from 'axios';
 
-const ProductCard = ({ product, showQuickView = true, showWishlist = true, compact = false, variant = 'auto' }) => {
+const ProductCard = React.memo(({ product, showQuickView = true, showWishlist = true, compact = false, variant = 'auto' }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -436,5 +436,7 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
     </div>
   );
 };
+
+});
 
 export default ProductCard;

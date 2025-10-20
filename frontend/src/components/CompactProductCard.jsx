@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { getProductImage } from '../utils/imageUtils';
 
-const CompactProductCard = ({ product, showWishlist = true }) => {
+const CompactProductCard = React.memo(({ product, showWishlist = true }) => {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
@@ -293,5 +293,7 @@ const CompactProductCard = ({ product, showWishlist = true }) => {
     </div>
   );
 };
+
+});
 
 export default CompactProductCard;
