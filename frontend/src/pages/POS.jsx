@@ -1,9 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import BarcodeScannerComponent from 'react-qr-barcode-scanner';
-import { useReactToPrint } from 'react-to-print';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import { useAuth } from '../contexts/AuthContext';
 import { PlusIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { getOptimizedImageUrl } from '../utils/imageUtils';

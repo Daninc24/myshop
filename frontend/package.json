@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "build": "vite build --mode production",
+    "build:analyze": "vite build --mode analyze",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx --quiet",
+    "clean": "rm -rf dist node_modules/.vite"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",

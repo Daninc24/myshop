@@ -310,10 +310,10 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
       {/* Image Container */}
       <div className="block relative overflow-hidden">
         <Link to={`/product/${_id}`} className="block">
-          <div className="aspect-square bg-surface-hover relative w-full h-32 sm:h-40 md:h-48 lg:h-56">
+          <div className="aspect-square bg-surface-hover relative w-full h-24 sm:h-32 md:h-40 lg:h-48">
             {/* Main Image */}
             <img
-              src={getProductImage(product, { width: 300, height: 300 })}
+              src={getProductImage(product, { width: 200, height: 200 })}
               alt={title}
               className={`w-full h-full object-cover transition-all duration-500 ${
                 isImageLoaded ? 'opacity-100' : 'opacity-0'
@@ -392,25 +392,25 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
       </div>
 
       {/* Content */}
-      <div className="p-2 sm:p-3 md:p-4">
+      <div className="p-1.5 sm:p-2 md:p-3">
         {/* Category */}
         {category && (
-          <p className="text-xs text-text-muted mb-2 font-medium uppercase tracking-wide">
+          <p className="text-xs text-text-muted mb-1 font-medium uppercase tracking-wide">
             {category}
           </p>
         )}
 
         {/* Title */}
         <Link to={`/product/${_id}`}>
-          <h3 className="font-semibold text-text-primary mb-1 sm:mb-2 line-clamp-2 hover:text-primary transition-colors duration-200 text-xs sm:text-sm md:text-base">
+          <h3 className="font-semibold text-text-primary mb-1 line-clamp-2 hover:text-primary transition-colors duration-200 text-xs sm:text-sm md:text-base">
             {title}
           </h3>
         </Link>
 
         {/* Rating */}
         {rating > 0 && (
-          <div className="flex items-center gap-2 mb-2 sm:mb-3">
-            <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 mb-1.5 sm:mb-2">
+            <div className="flex items-center gap-0.5">
               {renderRatingStars(rating)}
             </div>
             <span className="text-xs text-text-muted">
@@ -420,12 +420,12 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
         )}
 
         {/* Price */}
-        <div className="flex items-center gap-2 mb-2 sm:mb-3">
-          <span className="text-sm sm:text-base md:text-lg font-bold text-primary">
+        <div className="flex items-center gap-1 mb-1.5 sm:mb-2">
+          <span className="text-xs sm:text-sm md:text-base font-bold text-primary">
             {getCurrencySymbol(currency)}{displayPrice}
           </span>
           {displayOriginalPrice && displayOriginalPrice > displayPrice && (
-            <span className="text-xs sm:text-sm text-text-muted line-through">
+            <span className="text-xs text-text-muted line-through">
               {getCurrencySymbol(currency)}{displayOriginalPrice}
             </span>
           )}
@@ -448,21 +448,21 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
           <button
             onClick={handleAddToCart}
             disabled={isAddingToCart || stock <= 0}
-            className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 min-h-[36px] sm:min-h-[44px] ${
+            className={`px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 min-h-[28px] sm:min-h-[36px] ${
               stock <= 0 
                 ? 'bg-surface-hover text-text-muted cursor-not-allowed' 
                 : 'bg-primary text-white hover:bg-primary-dark hover:shadow-glow transform hover:-translate-y-0.5'
             }`}
           >
             {isAddingToCart ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Adding...
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span className="hidden xs:inline">Adding...</span>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <ShoppingCartIcon className="w-4 h-4" />
-                Add to Cart
+              <div className="flex items-center gap-1">
+                <ShoppingCartIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Add</span>
               </div>
             )}
           </button>
