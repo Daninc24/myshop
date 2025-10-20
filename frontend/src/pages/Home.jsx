@@ -380,7 +380,7 @@ const Home = () => {
       setLoading(true);
       
       try {
-        // Phase 1: Load critical data first (products and categories)
+        // Phase 1: Load critical data first (products and categories only)
         await Promise.allSettled([
           fetchProducts(),
           fetchCategories()
@@ -389,14 +389,18 @@ const Home = () => {
         // Show page immediately with critical content
         setLoading(false);
         
-        // Phase 2: Load secondary data in background (non-blocking)
+        // Phase 2: Load secondary data in background (non-blocking) with delay
         setTimeout(() => {
           Promise.allSettled([
             fetchNewArrivals(),
-            fetchBestSelling(),
-            fetchTrendingProducts()
+            fetchBestSelling()
           ]);
-        }, 100);
+        }, 2000); // Delay to prioritize initial load
+        
+        // Phase 3: Load trending products even later if needed
+        setTimeout(() => {
+          fetchTrendingProducts();
+        }, 5000);
         
       } catch (error) {
         console.error('Error loading data:', error);
@@ -624,22 +628,18 @@ const Home = () => {
         </section>
       )}
 
-      {/* AI Recommendation Engine */}
+      {/* AI Recommendation Engine - Only for authenticated users */}
       {user && (
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <ErrorBoundary>
-              <Suspense fallback={null}>
-                <AIRecommendationEngine
-                  userId={user._id}
-                  limit={8}
-                  title="Recommended for You"
-                  subtitle="AI-powered suggestions based on your preferences"
-                />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
-        </section>
+        <ErrorBoundary>
+          <Suspense fallback={null}>
+            <AIRecommendationEngine
+              userId={user._id}
+              limit={6}
+              title="Recommended for You"
+              subtitle="AI-powered suggestions based on your preferences"
+            />
+          </Suspense>
+        </ErrorBoundary>
       )}
 
       {/* New Arrivals */}

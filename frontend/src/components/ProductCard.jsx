@@ -310,10 +310,10 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
       {/* Image Container */}
       <div className="block relative overflow-hidden">
         <Link to={`/product/${_id}`} className="block">
-          <div className="aspect-square bg-surface-hover relative w-full h-48 sm:h-56 md:h-64">
+          <div className="aspect-square bg-surface-hover relative w-full h-32 sm:h-40 md:h-48 lg:h-56">
             {/* Main Image */}
             <img
-              src={getProductImage(product, { width: 400, height: 400 })}
+              src={getProductImage(product, { width: 300, height: 300 })}
               alt={title}
               className={`w-full h-full object-cover transition-all duration-500 ${
                 isImageLoaded ? 'opacity-100' : 'opacity-0'
@@ -392,7 +392,7 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
       </div>
 
       {/* Content */}
-      <div className="p-3 sm:p-4">
+      <div className="p-2 sm:p-3 md:p-4">
         {/* Category */}
         {category && (
           <p className="text-xs text-text-muted mb-2 font-medium uppercase tracking-wide">
@@ -402,14 +402,14 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
 
         {/* Title */}
         <Link to={`/product/${_id}`}>
-          <h3 className="font-semibold text-text-primary mb-2 line-clamp-2 hover:text-primary transition-colors duration-200 text-sm sm:text-base">
+          <h3 className="font-semibold text-text-primary mb-1 sm:mb-2 line-clamp-2 hover:text-primary transition-colors duration-200 text-xs sm:text-sm md:text-base">
             {title}
           </h3>
         </Link>
 
         {/* Rating */}
         {rating > 0 && (
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
             <div className="flex items-center gap-1">
               {renderRatingStars(rating)}
             </div>
@@ -420,8 +420,8 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
         )}
 
         {/* Price */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-base sm:text-lg font-bold text-primary">
+        <div className="flex items-center gap-2 mb-2 sm:mb-3">
+          <span className="text-sm sm:text-base md:text-lg font-bold text-primary">
             {getCurrencySymbol(currency)}{displayPrice}
           </span>
           {displayOriginalPrice && displayOriginalPrice > displayPrice && (
@@ -448,7 +448,7 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
           <button
             onClick={handleAddToCart}
             disabled={isAddingToCart || stock <= 0}
-            className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 min-h-[44px] ${
+            className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 min-h-[36px] sm:min-h-[44px] ${
               stock <= 0 
                 ? 'bg-surface-hover text-text-muted cursor-not-allowed' 
                 : 'bg-primary text-white hover:bg-primary-dark hover:shadow-glow transform hover:-translate-y-0.5'

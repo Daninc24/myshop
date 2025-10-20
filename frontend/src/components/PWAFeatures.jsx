@@ -368,6 +368,19 @@ const UpdateAvailable = () => {
 };
 
 const PWAFeatures = () => {
+  // Register service worker on component mount
+  useEffect(() => {
+    if ('serviceWorker' in navigator && !import.meta.env.DEV) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('Service Worker registered successfully:', registration.scope);
+        })
+        .catch((error) => {
+          console.log('Service Worker registration failed:', error);
+        });
+    }
+  }, []);
+
   return (
     <>
       <InstallPrompt />

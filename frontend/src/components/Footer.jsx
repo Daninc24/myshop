@@ -108,9 +108,9 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-t-4 border-orange-500 mt-12 py-8 sm:py-10 px-4 sm:px-6 text-white transition-colors duration-300">
-      {/* Responsive grid: 1col xs, 2col sm, 3col md, 5col lg */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 sm:gap-8 md:gap-10">
+    <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-t-4 border-orange-500 mt-12 py-4 sm:py-6 md:py-8 px-4 sm:px-6 text-white transition-colors duration-300">
+      {/* Responsive grid: 1col xs, 2col sm, 3col md, 4col lg */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
         
         {/* Brand & Newsletter */}
         <div className="flex flex-col gap-3 col-span-1 items-center sm:items-start">
@@ -271,13 +271,13 @@ const Footer = () => {
             <iframe
               src={mapEmbedUrl}
               width="100%"
-              height="200"
+              height="150"
               style={{ border: 0 }}
               allowFullScreen=""
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               title="Store Location"
-              className="w-full h-48"
+              className="w-full h-32 sm:h-40 md:h-48"
             ></iframe>
           </div>
           <div className="flex items-center gap-2">
@@ -286,7 +286,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="border-t border-white/10 mt-8 pt-6 text-center text-sm text-gray-400 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div className="border-t border-white/10 mt-4 sm:mt-6 pt-4 sm:pt-6 text-center text-sm text-gray-400 flex flex-col sm:flex-row justify-between items-center gap-3">
         <span>&copy; {new Date().getFullYear()} {getBrandName()}. All rights reserved.</span>
         <div className="flex gap-4 items-center">
           <Link to="/privacy" className="text-gray-400 hover:text-orange-400 transition-colors">Privacy Policy</Link>
