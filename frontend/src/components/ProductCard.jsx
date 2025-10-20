@@ -16,9 +16,11 @@ import {
   ShoppingCartIcon as ShoppingCartSolid
 } from '@heroicons/react/24/solid';
 import { getLazyImageProps, getOptimizedImageUrl, getProductImage } from '../utils/imageUtils';
+import useResponsiveLayout from '../hooks/useResponsiveLayout';
+import CompactProductCard from './CompactProductCard';
 import axios from 'axios';
 
-const ProductCard = ({ product, showQuickView = true, showWishlist = true, compact = false }) => {
+const ProductCard = ({ product, showQuickView = true, showWishlist = true, compact = false, variant = 'auto' }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -28,6 +30,7 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
   const { addToCart, currency, convertPrice } = useCart();
   const { success, error } = useToast();
   const { user } = useAuth();
+  const { isMobile } = useResponsiveLayout();
 
   const {
     _id,
@@ -210,50 +213,12 @@ const ProductCard = ({ product, showQuickView = true, showWishlist = true, compa
     return stars;
   };
 
-  // Compact mode render
-  if (compact) {
-    return (
-      <div className="group relative bg-surface rounded-xl border border-border overflow-hidden hover:shadow-medium transition-all duration-300">
-        <Link to={`/product/${_id}`} className="block">
-          <div className="flex gap-3 p-3">
-            {/* Compact Image */}
-            <div className="w-20 h-20 bg-surface-hover rounded-lg overflow-hidden flex-shrink-0">
-                          <img
-              src={getProductImage(product)}
-              alt={title}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                console.log('Compact image failed to load:', e.target.src);
-                // Fallback to a reliable placeholder
-                e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop';
-              }}
-            />
-            </div>
-            
-            {/* Compact Content */}
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-text-primary text-sm line-clamp-2 mb-1">
-                {title}
-              </h3>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-primary font-bold text-sm">
-                  {displayPrice}
-                </span>
-                {displayOriginalPrice && (
-                  <span className="text-text-muted line-through text-xs">
-                    {displayOriginalPrice}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-1">
-                {renderRatingStars(rating)}
-                <span className="text-text-muted text-xs">({reviewCount})</span>
-              </div>
-            </div>
-          </div>
-        </Link>
-      </div>
-    );
+  // Determine which variant to use
+  const shouldUseCompact = variant === 'compact' || (variant === 'auto' && isMobile) || compact;
+  
+  // Use CompactProductCard for mobile or when explicitly requested
+  if (shouldUseCompact) {
+    return <CompactProductCard product={product} showWishlist={showWishlist} />;
   }
 
   // Full mode render

@@ -1,5 +1,6 @@
 @import './styles/performance.css';
 @import './styles/brand.css';
+@import './styles/responsive.css';
 
 @tailwind base;
 @tailwind components;

@@ -49,10 +49,14 @@ const FACETS_TTL_MS = 90 * 1000; // 90 seconds
 const listCache = new Map();
 const LIST_TTL_MS = 60 * 1000; // 60 seconds
 
-// Get all products
+// Get all products with optimized queries
 const getAllProducts = async (req, res) => {
   try {
     let { search, category, subcategory, page = 1, limit = 12, sort = 'createdAt', order = 'desc', minPrice, maxPrice, inStock } = req.query;
+    
+    // Optimize pagination limits
+    page = Math.max(1, parseInt(page));
+    limit = Math.min(50, Math.max(1, parseInt(limit))); // Cap at 50 items per page
     
     // Handle legacy sort parameters
     const sortMapping = {
@@ -133,16 +137,21 @@ const getAllProducts = async (req, res) => {
     const sortOptions = {};
     sortOptions[sortField] = order === 'desc' ? -1 : 1;
     
-    // Execute query with pagination and sorting (optimized with lean)
-    const products = await Product.find(query)
-      .select('title price compareAtPrice images category subcategory stock updatedAt createdAt rating reviewCount')
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(limitNum)
-      .lean(); // Use lean for better performance
-    
-    // Get total count for pagination info
-    const total = await Product.countDocuments(query);
+    // Execute optimized queries in parallel
+    const [products, total] = await Promise.all([
+      Product.find(query)
+        .select('title price compareAtPrice images category subcategory stock updatedAt createdAt rating reviewCount')
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limitNum)
+        .lean() // Use lean for better performance
+        .hint({ [sortField]: order === 'desc' ? -1 : 1 }), // Use index hint for better performance
+      
+      // Use estimatedDocumentCount for better performance on large collections
+      page === 1 && !search && !category && !subcategory && !minPrice && !maxPrice && !inStock
+        ? Product.estimatedDocumentCount()
+        : Product.countDocuments(query)
+    ]);
     
     // Process images and ensure they're properly formatted
     const processedProducts = products.map(product => {

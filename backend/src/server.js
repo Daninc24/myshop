@@ -62,6 +62,7 @@ const wishlistRoutes = require('./routes/wishlist');
 const { credentialCache, loadCredentials } = require('./utils/credentialCache');
 const { createIndexes } = require('./utils/databaseIndexes');
 const compressionMiddleware = require('./middleware/compression');
+const { setCacheHeaders, setETagHeaders, setVaryHeaders } = require('./middleware/caching');
 
 const app = express();
 
@@ -253,6 +254,10 @@ function throttle(func, delay) {
 app.use(securityHeaders);
 app.use(requestId);
 app.use(logger);
+// Performance optimizations
+app.use(setCacheHeaders);
+app.use(setETagHeaders);
+app.use(setVaryHeaders);
 // Enable compression for better performance
 app.use(compressionMiddleware);
 

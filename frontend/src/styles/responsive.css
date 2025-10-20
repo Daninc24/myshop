@@ -1,0 +1,139 @@
+/* Responsive utility classes for consistent mobile-first design */
+
+/* Mobile-first typography */
+.text-mobile-xs { 
+  font-size: 0.75rem; 
+  line-height: 1rem; 
+}
+
+.text-mobile-sm { 
+  font-size: 0.875rem; 
+  line-height: 1.25rem; 
+}
+
+.text-mobile-base { 
+  font-size: 1rem; 
+  line-height: 1.5rem; 
+}
+
+/* Compact spacing for mobile */
+.space-mobile-1 { 
+  margin: 0.25rem; 
+}
+
+.space-mobile-2 { 
+  margin: 0.5rem; 
+}
+
+.space-mobile-3 { 
+  margin: 0.75rem; 
+}
+
+/* Touch-friendly interactive elements */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.touch-target-sm {
+  min-height: 32px;
+  min-width: 32px;
+}
+
+/* Responsive grid utilities */
+.grid-mobile-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-mobile-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Compact card layouts */
+.card-compact {
+  @apply flex items-center gap-3 p-3 bg-white rounded-lg border;
+  height: 120px;
+}
+
+.card-compact-image {
+  @apply w-20 h-20 rounded-lg object-cover flex-shrink-0;
+}
+
+.card-compact-content {
+  @apply flex-1 min-w-0 flex flex-col justify-between h-full py-1;
+}
+
+/* Footer responsive utilities */
+.footer-mobile {
+  @apply py-4 px-3;
+}
+
+.footer-tablet {
+  @apply py-6 px-4;
+}
+
+.footer-desktop {
+  @apply py-8 px-6 max-h-96;
+}
+
+.footer-grid-mobile {
+  @apply grid grid-cols-1 gap-2;
+}
+
+.footer-grid-tablet {
+  @apply grid grid-cols-2 gap-4;
+}
+
+.footer-grid-desktop {
+  @apply grid grid-cols-4 gap-6;
+}
+
+/* Responsive text utilities */
+@screen sm {
+  .text-mobile-xs { 
+    font-size: 0.875rem; 
+    line-height: 1.25rem; 
+  }
+  
+  .text-mobile-sm { 
+    font-size: 1rem; 
+    line-height: 1.5rem; 
+  }
+  
+  .space-mobile-2 { 
+    margin: 0.75rem; 
+  }
+  
+  .space-mobile-3 { 
+    margin: 1rem; 
+  }
+}
+
+@screen lg {
+  .text-mobile-sm { 
+    font-size: 1.125rem; 
+    line-height: 1.75rem; 
+  }
+  
+  .space-mobile-3 { 
+    margin: 1.5rem; 
+  }
+}
+
+/* Performance optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

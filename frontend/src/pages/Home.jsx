@@ -14,6 +14,7 @@ import {
   getViewAllLink
 } from '../config/sections';
 import ProductCard from '../components/ProductCard';
+import useResponsiveLayout from '../hooks/useResponsiveLayout';
 import LoadingSpinner from '../components/LoadingSpinner';
 const PremiumFeatures = lazy(() => import('../components/PremiumFeatures'));
 const PremiumHero = lazy(() => import('../components/PremiumHero'));
@@ -46,6 +47,7 @@ import {
 const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isMobile } = useResponsiveLayout();
   const { error: showError } = useToast();
   
   // State management
@@ -609,9 +611,9 @@ const Home = () => {
               <p className="text-gray-600">Handpicked products just for you</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className={`grid ${isMobile ? 'grid-cols-2 gap-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'}`}>
               {safeProducts.map((product) => (
-                <ProductCard key={product._id} product={product} />
+                <ProductCard key={product._id} product={product} variant={isMobile ? 'compact' : 'default'} />
               ))}
             </div>
             
@@ -651,9 +653,9 @@ const Home = () => {
               <p className="text-gray-600">Latest products added to our collection</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className={`grid ${isMobile ? 'grid-cols-2 gap-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'}`}>
               {safeNewArrivals.map((product) => (
-                <ProductCard key={product._id} product={product} />
+                <ProductCard key={product._id} product={product} variant={isMobile ? 'compact' : 'default'} />
               ))}
             </div>
           </div>
@@ -671,9 +673,9 @@ const Home = () => {
               <p className="text-gray-600">Most popular products our customers love</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className={`grid ${isMobile ? 'grid-cols-2 gap-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'}`}>
               {safeBestSelling.map((product) => (
-                <ProductCard key={product._id} product={product} />
+                <ProductCard key={product._id} product={product} variant={isMobile ? 'compact' : 'default'} />
               ))}
             </div>
           </div>
