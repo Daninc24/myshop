@@ -57,7 +57,7 @@ const AppLayout = ({ children }) => {
     <div className="min-h-screen bg-background text-text-primary flex flex-col">
       <QuickLinks />
       <Navbar />
-      <main className="flex-1 pt-28 lg:pt-32 pb-16 md:pb-0">
+      <main className="flex-1 pt-28 lg:pt-32 pb-16 md:pb-4">
         {children}
       </main>
       {!isAuthPage && <Footer />}

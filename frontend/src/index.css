@@ -435,6 +435,22 @@
   color: white;
 }
 
+/* Footer spacing fixes */
+.min-h-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+/* Ensure footer sticks to bottom without extra space */
+footer {
+  margin-top: auto;
+}
+
 /* Print styles */
 @media print {
   .no-print {

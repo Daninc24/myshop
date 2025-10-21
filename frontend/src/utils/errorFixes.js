@@ -53,9 +53,37 @@ export const suppressGoogleMapsErrors = () => {
   }
 };
 
+// Fix for React createContext errors in production
+export const ensureReactGlobals = () => {
+  if (typeof window !== 'undefined') {
+    // Ensure React is available globally
+    import('react').then((React) => {
+      window.React = React.default || React;
+      globalThis.React = React.default || React;
+      
+      // Ensure createContext is available
+      if (React.createContext) {
+        window.createContext = React.createContext;
+        globalThis.createContext = React.createContext;
+      }
+    }).catch(() => {
+      console.warn('Failed to load React globally');
+    });
+    
+    // Ensure ReactDOM is available globally
+    import('react-dom').then((ReactDOM) => {
+      window.ReactDOM = ReactDOM.default || ReactDOM;
+      globalThis.ReactDOM = ReactDOM.default || ReactDOM;
+    }).catch(() => {
+      console.warn('Failed to load ReactDOM globally');
+    });
+  }
+};
+
 // Initialize error fixes
 export const initializeErrorFixes = () => {
   suppressGoogleMapsErrors();
+  ensureReactGlobals();
   
   // Handle unhandled promise rejections
   if (typeof window !== 'undefined') {

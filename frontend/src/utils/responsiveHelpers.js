@@ -75,18 +75,16 @@ export const getFooterLayout = (screenSize) => {
       gap: 'gap-6',
       padding: 'py-6 px-6',
       textSize: 'text-sm',
-      titleSize: 'text-base',
-      maxHeight: 'max-h-80'
+      titleSize: 'text-base'
     };
   } else {
-    // Large screens (lg, xl, 2xl) - very compact
+    // Large screens (lg, xl, 2xl) - compact but not constrained
     return {
       columns: 4,
       gap: 'gap-6',
-      padding: 'py-4 px-8',
+      padding: 'py-6 px-8',
       textSize: 'text-sm',
-      titleSize: 'text-base',
-      maxHeight: 'max-h-56'
+      titleSize: 'text-base'
     };
   }
 };

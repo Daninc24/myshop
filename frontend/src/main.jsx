@@ -5,6 +5,10 @@ import ReactTest from './ReactTest.jsx'
 import './index.css'
 import { setupGlobalErrorHandling } from './utils/errorHandler.js'
 import { initializeErrorFixes } from './utils/errorFixes.js'
+
+// Ensure React is available immediately
+window.React = React;
+globalThis.React = React;
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ToastProvider } from './contexts/ToastContext.jsx';
 import { SimpleToastProvider } from './contexts/SimpleToastContext.jsx';
@@ -36,10 +40,14 @@ import { ConfigProvider, theme as antdTheme } from 'antd';
 // Initialize error fixes for production
 initializeErrorFixes();
 
-// Ensure React is available for antd and other libraries
+// Ensure React is available globally for all libraries
 if (typeof window !== 'undefined') {
   window.React = React;
+  window.ReactDOM = ReactDOM;
 }
+
+// Ensure React is available in global scope for bundled libraries
+globalThis.React = React;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>

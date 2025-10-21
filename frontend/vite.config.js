@@ -35,7 +35,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // React ecosystem
+          // React ecosystem - keep together to avoid context issues
           if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
             return 'vendor-react';
           }
@@ -132,5 +132,11 @@ export default defineConfig({
       'react-chartjs-2',
       'recharts'
     ]
+  },
+  
+  // Ensure proper external handling
+  external: (id) => {
+    // Don't externalize React in production builds
+    return false;
   }
 })

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { getBrandName, getBrandEmail, getBrandPhone, getSocialLinks } from '../config/branding';
-import { 
+import {
   StarIcon,
-  MapPinIcon, 
-  PhoneIcon, 
+  MapPinIcon,
+  PhoneIcon,
   EnvelopeIcon,
   GlobeAltIcon
 } from '@heroicons/react/24/outline';
@@ -74,7 +74,7 @@ const Footer = React.memo(() => {
   // Responsive layout hook
   const { screenSize, isMobile, isTablet } = useResponsiveLayout();
   const footerLayout = getFooterLayout(screenSize);
-  
+
   // Service rating state
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -114,10 +114,10 @@ const Footer = React.memo(() => {
   };
 
   return (
-    <footer className={`bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-t-4 border-orange-500 mt-8 text-white transition-colors duration-300 ${footerLayout.padding} ${footerLayout.maxHeight || ''}`}>
+    <footer className={`bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-t-4 border-orange-500 mt-auto text-white transition-colors duration-300 ${footerLayout.padding}`}>
       {/* Responsive grid with dynamic columns */}
       <div className={`max-w-7xl mx-auto grid ${footerLayout.gap}`} style={{ gridTemplateColumns: `repeat(${footerLayout.columns}, minmax(0, 1fr))` }}>
-        
+
         {/* Brand & Newsletter */}
         <div className={`flex flex-col ${isMobile ? 'gap-1' : screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'gap-1' : 'gap-2'} col-span-1 items-center sm:items-start`}>
           <div className={`flex ${isMobile ? 'flex-col' : 'flex-col sm:flex-row'} items-center ${isMobile ? 'gap-1' : 'gap-1 sm:gap-2'} ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mb-0' : 'mb-1'} w-full`}>
@@ -129,48 +129,48 @@ const Footer = React.memo(() => {
           {!isMobile && <p className={`text-gray-300 ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mb-0 text-xs' : 'mb-1 text-xs sm:text-sm'} leading-relaxed hidden xs:block`}>Your one-stop shop for everything awesome.</p>}
           <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'} ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mt-0' : 'mt-1'} justify-center sm:justify-start`}>
             {/* Facebook */}
-            <a 
-              href={socialLinks.facebook} 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href={socialLinks.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
               className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} flex items-center justify-center bg-white/10 hover:bg-blue-600 rounded-full transition-all duration-200 hover:scale-110 touch-target-sm`}
               aria-label="Facebook"
             >
               <svg className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-white`} fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
             </a>
-            
+
             {/* Twitter/X */}
-            <a 
-              href={socialLinks.twitter} 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href={socialLinks.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
               className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} flex items-center justify-center bg-white/10 hover:bg-black rounded-full transition-all duration-200 hover:scale-110 touch-target-sm`}
               aria-label="Twitter"
             >
               <svg className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-white`} fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
             </a>
-            
+
             {/* WhatsApp */}
-            <a 
-              href={whatsappLink} 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
               className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} flex items-center justify-center bg-white/10 hover:bg-green-500 rounded-full transition-all duration-200 hover:scale-110 touch-target-sm`}
               aria-label="WhatsApp"
             >
               <svg className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-white`} fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
               </svg>
             </a>
           </div>
-          
+
         </div>
 
-        
+
         {/* Contact Info */}
         <div className={`flex flex-col ${isMobile ? 'gap-1' : screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'gap-1' : 'gap-2'}`}>
           <h3 className={`${footerLayout.titleSize} font-heading font-bold ${isMobile ? 'mb-0.5' : 'mb-1'} text-white`}>Contact Us</h3>
@@ -203,13 +203,13 @@ const Footer = React.memo(() => {
             </div>
           )}
         </div>
-        
+
         {/* Rate Our Service - Hidden on mobile to save space, more compact on large screens */}
         {!isMobile && (
           <div className={`flex flex-col ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'gap-0.5' : 'gap-1'} items-center sm:items-start`}>
             <h3 className={`${footerLayout.titleSize} font-heading font-bold ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mb-0' : 'mb-1'} text-white`}>Rate Our Service</h3>
             <div className="flex items-center gap-1 mb-1">
-              {[1,2,3,4,5].map(star => (
+              {[1, 2, 3, 4, 5].map(star => (
                 <button
                   key={star}
                   onClick={() => handleRate(star)}
@@ -236,8 +236,8 @@ const Footer = React.memo(() => {
               className={`w-full max-w-xs px-2 py-1 rounded-md bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${footerLayout.textSize}`}
               rows={1}
             />
-            <button 
-              onClick={handleSubmit} 
+            <button
+              onClick={handleSubmit}
               disabled={!userRating}
               className={`w-full max-w-xs px-3 py-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-md transition-all duration-200 shadow-lg hover:shadow-xl ${footerLayout.textSize} touch-target-sm`}
             >
@@ -251,7 +251,7 @@ const Footer = React.memo(() => {
             )}
           </div>
         )}
-        
+
         {/* Store Location Map - Simplified on mobile */}
         {isMobile ? (
           <div className="flex flex-col gap-1">
@@ -284,20 +284,7 @@ const Footer = React.memo(() => {
           </div>
         )}
 
-        {/* Quick Links - Only show on large screens to fill the 4th column */}
-        {(screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl') && (
-          <div className="flex flex-col gap-1">
-            <h3 className={`${footerLayout.titleSize} font-heading font-bold mb-0 text-white`}>Quick Links</h3>
-            <div className="flex flex-col gap-0.5">
-              <Link to="/" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>Home</Link>
-              <Link to="/products" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>Products</Link>
-              <Link to="/about" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>About Us</Link>
-              <Link to="/contact" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>Contact</Link>
-              <Link to="/faq" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>FAQ</Link>
-              <Link to="/events" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>Events</Link>
-            </div>
-          </div>
-        )}
+        
       </div>
       <div className={`border-t border-white/10 ${isMobile ? 'mt-2 pt-2' : screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mt-1 pt-1' : 'mt-2 sm:mt-4 pt-2 sm:pt-4'} text-center text-xs text-gray-400 flex flex-col sm:flex-row justify-between items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
         <span className={isMobile ? 'text-xs' : 'text-xs'}>&copy; {new Date().getFullYear()} {getBrandName()}. All rights reserved.</span>
