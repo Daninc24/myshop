@@ -435,8 +435,6 @@ const ProductCard = React.memo(({ product, showQuickView = true, showWishlist = 
       </div>
     </div>
   );
-};
-
 });
 
 export default ProductCard;

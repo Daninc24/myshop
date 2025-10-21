@@ -292,8 +292,6 @@ const CompactProductCard = React.memo(({ product, showWishlist = true }) => {
       </Link>
     </div>
   );
-};
-
 });
 
 export default CompactProductCard;

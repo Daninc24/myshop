@@ -303,8 +303,6 @@ const Footer = React.memo(() => {
       </div>
     </footer>
   );
-};
-
 });
 
 export default Footer;

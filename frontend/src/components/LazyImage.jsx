@@ -210,8 +210,6 @@ const LazyImage = React.memo(({
       )}
     </div>
   );
-};
-
 });
 
 export default LazyImage;
