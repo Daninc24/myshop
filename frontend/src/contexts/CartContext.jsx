@@ -1,11 +1,11 @@
-import React, { useContext, useState, useEffect } from 'react';
+import * as React from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 
 const CartContext = React.createContext();
 
 export const useCart = () => {
-  const context = useContext(CartContext);
+  const context = React.useContext(CartContext);
   if (!context) {
     throw new Error('useCart must be used within a CartProvider');
   }
@@ -13,10 +13,10 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const { isAuthenticated, user } = useContext(AuthContext);
-  const [currency, setCurrency] = useState(() => localStorage.getItem('currency') || 'USD');
+  const [cart, setCart] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const { isAuthenticated, user } = React.useContext(AuthContext);
+  const [currency, setCurrency] = React.useState(() => localStorage.getItem('currency') || 'USD');
   const [rates, setRates] = useState({ 
     USD: 1,
     EUR: 0.85,
@@ -59,12 +59,12 @@ export const CartProvider = ({ children }) => {
   });
 
   // Persist currency to localStorage
-  useEffect(() => {
+  React.useEffect(() => {
     localStorage.setItem('currency', currency);
   }, [currency]);
 
   // Load cart from server when user is authenticated, or from localStorage when not
-  useEffect(() => {
+  React.useEffect(() => {
     if (isAuthenticated) {
       loadCart();
     } else {
@@ -73,13 +73,13 @@ export const CartProvider = ({ children }) => {
   }, [isAuthenticated]);
 
   // Sync guest cart to server when user logs in
-  useEffect(() => {
+  React.useEffect(() => {
     if (isAuthenticated && user) {
       syncGuestCartToServer();
     }
   }, [isAuthenticated, user]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     axios.get('/payment/currency/rates')
       .then(res => {
         const ratesData = res.data.rates || res.data;

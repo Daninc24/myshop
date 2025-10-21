@@ -14,6 +14,10 @@ export default defineConfig({
     },
     dedupe: ['react', 'react-dom']
   },
+  esbuild: {
+    jsxFactory: 'React.createElement',
+    jsxFragment: 'React.Fragment'
+  },
   server: {
     proxy: {
       '/api': {
@@ -114,6 +118,7 @@ export default defineConfig({
       '@heroicons/react',
       'framer-motion'
     ],
+    force: true
     exclude: [
       'jspdf',
       'jspdf-autotable',
