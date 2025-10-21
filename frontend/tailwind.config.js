@@ -12,9 +12,9 @@ export default {
       'md': '768px',
       'lg': '1024px',
       'xl': '1280px',
-      '2xl': '1x',
+      '2xl': '1536px',
     },
-    extend: {536p
+    extend: {
       colors: {
         primary: {
           50: '#eef2ff',

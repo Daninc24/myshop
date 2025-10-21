@@ -15,7 +15,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import axios from 'axios';
 import { getApiBaseUrl, logApiConfig, testApiConnection } from './utils/apiConfig';
-import 'antd/dist/reset.css';
+// Antd v5 doesn't need explicit CSS imports - styles are handled automatically
 import { ConfigProvider, theme as antdTheme } from 'antd';
 
 // Configure axios to work with Vite proxy
