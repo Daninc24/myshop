@@ -12,11 +12,10 @@ export default function AdminCategories() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_BASE}/api/categories`);
+      const { data } = await axios.get('/categories');
       setCategories(data.categories || []);
     } catch (err) {
       setError('Failed to fetch categories');
@@ -72,9 +71,9 @@ export default function AdminCategories() {
     try {
       const submitData = { ...form, subcategories: filteredSubs };
       if (editingId) {
-        await axios.put(`${API_BASE}/api/categories/${editingId}`, submitData);
+        await axios.put(`/categories/${editingId}`, submitData);
       } else {
-        await axios.post(`${API_BASE}/api/categories`, submitData);
+        await axios.post('/categories', submitData);
       }
       fetchCategories();
       resetForm();
@@ -95,7 +94,7 @@ export default function AdminCategories() {
     if (!window.confirm('Delete this category?')) return;
     setLoading(true);
     try {
-      await axios.delete(`${API_BASE}/api/categories/${id}`);
+      await axios.delete(`/categories/${id}`);
       fetchCategories();
       resetForm();
     } catch (err) {
