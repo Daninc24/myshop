@@ -24,6 +24,9 @@ const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   trustProxy: process.env.NODE_ENV === 'production',
+  // Add progressive delays for repeated attempts
+  skipSuccessfulRequests: true,
+  skipFailedRequests: false,
 });
 
 // Order placement rate limiter

@@ -43,7 +43,9 @@ import {
   Messages,
   POS,
   Events,
-  Wishlist
+  Wishlist,
+  Terms,
+  Privacy
 } from './components/LazyComponents';
 
 // Import CSS
@@ -93,6 +95,8 @@ const App = () => {
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/events" element={<Events />} />
+                      <Route path="/terms" element={<Terms />} />
+                      <Route path="/privacy" element={<Privacy />} />
 
                       {/* Protected Routes */}
                       <Route path="/checkout" element={

@@ -11,15 +11,29 @@ const auth = async (req, res, next) => {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      // Add token expiration check
+      if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+        return res.status(401).json({ message: 'Token expired.' });
+      }
+      
       const user = await User.findById(decoded.userId).select('-password');
       
       if (!user) {
         return res.status(401).json({ message: 'Invalid token.' });
       }
 
+      // Add user status check
+      if (user.status === 'suspended' || user.status === 'banned') {
+        return res.status(403).json({ message: 'Account suspended.' });
+      }
+
       req.user = user;
       next();
     } catch (jwtError) {
+      if (jwtError.name === 'TokenExpiredError') {
+        return res.status(401).json({ message: 'Token expired.' });
+      }
       return res.status(401).json({ message: 'Invalid token.' });
     }
   } catch (error) {

@@ -27,6 +27,8 @@ const Messages = React.lazy(() => import('../pages/Messages'));
 const POS = React.lazy(() => import('../pages/POS'));
 const Events = React.lazy(() => import('../pages/Events'));
 const Wishlist = React.lazy(() => import('../pages/Wishlist'));
+const Terms = React.lazy(() => import('../pages/Terms'));
+const Privacy = React.lazy(() => import('../pages/Privacy'));
 
 // Higher-order component for consistent Suspense fallback
 export const withSuspense = (Component) => {
@@ -74,5 +76,7 @@ export {
   Messages,
   POS,
   Events,
-  Wishlist
+  Wishlist,
+  Terms,
+  Privacy
 };

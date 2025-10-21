@@ -7,8 +7,12 @@ const securityHeaders = helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "http:", "*"],
-      scriptSrc: ["'self'", "https://maps.googleapis.com", "https://maps.gstatic.com"],
-      connectSrc: ["'self'", "https://maps.googleapis.com"],
+      scriptSrc: ["'self'", "https://maps.googleapis.com", "https://maps.gstatic.com", "https://js.stripe.com", "https://www.paypal.com"],
+      connectSrc: ["'self'", "https://maps.googleapis.com", "https://api.stripe.com", "https://www.paypal.com"],
+      frameSrc: ["'self'", "https://js.stripe.com", "https://www.paypal.com"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
     },
   },
   hsts: {
@@ -17,7 +21,14 @@ const securityHeaders = helmet({
     preload: true
   },
   noSniff: true,
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  crossOriginEmbedderPolicy: false, // Disable for payment integrations
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  // Add additional security headers
+  frameguard: { action: 'deny' },
+  hidePoweredBy: true,
+  ieNoOpen: true,
+  xssFilter: true
 });
 
 module.exports = securityHeaders; 
