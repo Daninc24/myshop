@@ -118,7 +118,7 @@ export default defineConfig({
       '@heroicons/react',
       'framer-motion'
     ],
-    force: true
+    force: true,
     exclude: [
       'jspdf',
       'jspdf-autotable',
