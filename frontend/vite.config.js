@@ -101,7 +101,8 @@ export default defineConfig({
       'axios',
       'antd',
       '@ant-design/icons',
-      '@heroicons/react'
+      '@heroicons/react',
+      'framer-motion'
     ],
     exclude: [
       'jspdf',
