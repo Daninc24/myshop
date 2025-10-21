@@ -71,7 +71,7 @@ export const getFooterLayout = (screenSize) => {
     };
   } else {
     return {
-      columns: 4,
+      columns: 3,
       gap: 'gap-6',
       padding: 'py-8 px-6',
       textSize: 'text-sm',

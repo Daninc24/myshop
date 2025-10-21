@@ -40,6 +40,25 @@
   min-width: 32px;
 }
 
+/* Extra small screen utilities */
+@media (max-width: 475px) {
+  .xs\:hidden {
+    display: none;
+  }
+  
+  .xs\:inline {
+    display: inline;
+  }
+  
+  .xs\:flex {
+    display: flex;
+  }
+  
+  .xs\:block {
+    display: block;
+  }
+}
+
 /* Responsive grid utilities */
 .grid-mobile-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));

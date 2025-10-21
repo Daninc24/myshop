@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { 
   trackEvent, 
   trackPurchase, 
@@ -26,7 +26,7 @@ import {
   trackTimeOnPage
 } from '../components/GoogleAnalytics';
 
-const AnalyticsContext = React.createContext();
+const AnalyticsContext = createContext();
 
 export const useAnalytics = () => {
   const context = useContext(AnalyticsContext);

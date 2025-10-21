@@ -1,13 +1,12 @@
-import * as React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import axios from 'axios';
 import { useToast } from './ToastContext';
 import { handleApiError } from '../utils/errorHandler.js';
 
-export const AuthContext = React.createContext();
+export const AuthContext = createContext();
 
 export const useAuth = () => {
-  const context = React.useContext(AuthContext);
+  const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }

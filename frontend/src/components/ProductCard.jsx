@@ -275,7 +275,7 @@ const ProductCard = React.memo(({ product, showQuickView = true, showWishlist = 
       {/* Image Container */}
       <div className="block relative overflow-hidden">
         <Link to={`/product/${_id}`} className="block">
-          <div className="aspect-square bg-surface-hover relative w-full h-24 sm:h-32 md:h-40 lg:h-48">
+          <div className="aspect-square bg-surface-hover relative w-full h-32 sm:h-40 md:h-48 lg:h-56">
             {/* Main Image */}
             <img
               src={getProductImage(product, { width: 200, height: 200 })}
@@ -357,24 +357,24 @@ const ProductCard = React.memo(({ product, showQuickView = true, showWishlist = 
       </div>
 
       {/* Content */}
-      <div className="p-1.5 sm:p-2 md:p-3">
+      <div className="p-2 sm:p-3 md:p-4">
         {/* Category */}
         {category && (
-          <p className="text-xs text-text-muted mb-1 font-medium uppercase tracking-wide">
+          <p className="text-xs text-text-muted mb-1 font-medium uppercase tracking-wide truncate">
             {category}
           </p>
         )}
 
         {/* Title */}
         <Link to={`/product/${_id}`}>
-          <h3 className="font-semibold text-text-primary mb-1 line-clamp-2 hover:text-primary transition-colors duration-200 text-xs sm:text-sm md:text-base">
+          <h3 className="font-semibold text-text-primary mb-1 line-clamp-2 hover:text-primary transition-colors duration-200 text-sm sm:text-base md:text-lg leading-tight">
             {title}
           </h3>
         </Link>
 
-        {/* Rating */}
+        {/* Rating - Hide on very small screens */}
         {rating > 0 && (
-          <div className="flex items-center gap-1 mb-1.5 sm:mb-2">
+          <div className="hidden xs:flex items-center gap-1 mb-2">
             <div className="flex items-center gap-0.5">
               {renderRatingStars(rating)}
             </div>
@@ -385,12 +385,12 @@ const ProductCard = React.memo(({ product, showQuickView = true, showWishlist = 
         )}
 
         {/* Price */}
-        <div className="flex items-center gap-1 mb-1.5 sm:mb-2">
-          <span className="text-xs sm:text-sm md:text-base font-bold text-primary">
+        <div className="flex items-center gap-1 mb-2">
+          <span className="text-sm sm:text-base md:text-lg font-bold text-primary">
             {getCurrencySymbol(currency)}{displayPrice}
           </span>
           {displayOriginalPrice && displayOriginalPrice > displayPrice && (
-            <span className="text-xs text-text-muted line-through">
+            <span className="text-xs sm:text-sm text-text-muted line-through">
               {getCurrencySymbol(currency)}{displayOriginalPrice}
             </span>
           )}
@@ -398,8 +398,8 @@ const ProductCard = React.memo(({ product, showQuickView = true, showWishlist = 
 
         {/* Stock Status */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${
+          <div className="flex items-center gap-1 sm:gap-2">
+            <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
               stock > 10 ? 'bg-success' : stock > 0 ? 'bg-warning' : 'bg-error'
             }`} />
             <span className={`text-xs font-medium ${
@@ -413,7 +413,7 @@ const ProductCard = React.memo(({ product, showQuickView = true, showWishlist = 
           <button
             onClick={handleAddToCart}
             disabled={isAddingToCart || stock <= 0}
-            className={`px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 min-h-[28px] sm:min-h-[36px] ${
+            className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 min-h-[32px] sm:min-h-[40px] touch-target ${
               stock <= 0 
                 ? 'bg-surface-hover text-text-muted cursor-not-allowed' 
                 : 'bg-primary text-white hover:bg-primary-dark hover:shadow-glow transform hover:-translate-y-0.5'
@@ -422,12 +422,12 @@ const ProductCard = React.memo(({ product, showQuickView = true, showWishlist = 
             {isAddingToCart ? (
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span className="hidden xs:inline">Adding...</span>
+                <span className="hidden sm:inline">Adding...</span>
               </div>
             ) : (
               <div className="flex items-center gap-1">
                 <ShoppingCartIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Add</span>
+                <span className="hidden sm:inline">Add</span>
               </div>
             )}
           </button>

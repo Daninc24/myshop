@@ -178,10 +178,10 @@ const CompactProductCard = React.memo(({ product, showWishlist = true }) => {
   };
 
   return (
-    <div className="card-compact group relative bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-300">
-      <Link to={`/product/${_id}`} className="flex items-center gap-3 p-3 h-full">
+    <div className="group relative bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-300 h-24 sm:h-28">
+      <Link to={`/product/${_id}`} className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 h-full">
         {/* Product Image */}
-        <div className="card-compact-image relative">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden flex-shrink-0">
           <img
             src={getProductImage(product, { width: 80, height: 80 })}
             alt={title}
@@ -193,29 +193,29 @@ const CompactProductCard = React.memo(({ product, showWishlist = true }) => {
           
           {/* Discount Badge */}
           {discountPercentage > 0 && (
-            <span className="absolute -top-1 -left-1 bg-red-500 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full">
+            <span className="absolute -top-1 -left-1 bg-red-500 text-white text-xs font-semibold px-1 py-0.5 rounded-full leading-none">
               -{discountPercentage}%
             </span>
           )}
         </div>
         
         {/* Product Content */}
-        <div className="card-compact-content">
+        <div className="flex-1 min-w-0 flex flex-col justify-between h-full py-0.5">
           {/* Category */}
           {category && (
-            <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
+            <p className="text-xs text-gray-500 mb-0.5 uppercase tracking-wide truncate">
               {category}
             </p>
           )}
           
           {/* Title */}
-          <h3 className="font-medium text-gray-900 text-sm line-clamp-2 mb-1 leading-tight">
+          <h3 className="font-medium text-gray-900 text-xs sm:text-sm line-clamp-2 mb-0.5 leading-tight">
             {title}
           </h3>
           
-          {/* Rating */}
+          {/* Rating - Hide on very small screens */}
           {rating > 0 && (
-            <div className="flex items-center gap-1 mb-2">
+            <div className="hidden xs:flex items-center gap-1 mb-1">
               <div className="flex items-center gap-0.5">
                 {renderRatingStars(rating)}
               </div>
@@ -226,8 +226,8 @@ const CompactProductCard = React.memo(({ product, showWishlist = true }) => {
           )}
           
           {/* Price */}
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-bold text-red-600">
+          <div className="flex items-center gap-1 sm:gap-2 mb-1">
+            <span className="text-xs sm:text-sm font-bold text-red-600">
               {getCurrencySymbol(currency)}{displayPrice}
             </span>
             {displayOriginalPrice && displayOriginalPrice > displayPrice && (
@@ -251,12 +251,12 @@ const CompactProductCard = React.memo(({ product, showWishlist = true }) => {
             </div>
             
             {/* Action Buttons */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               {/* Wishlist Button */}
               {showWishlist && (
                 <button
                   onClick={handleWishlistToggle}
-                  className={`p-1.5 rounded-full transition-all duration-300 touch-target-sm ${
+                  className={`p-1 sm:p-1.5 rounded-full transition-all duration-300 touch-target-sm ${
                     isInWishlist 
                       ? 'bg-red-100 text-red-600' 
                       : 'bg-gray-100 text-gray-600 hover:text-red-600 hover:bg-red-50'
@@ -274,7 +274,7 @@ const CompactProductCard = React.memo(({ product, showWishlist = true }) => {
               <button
                 onClick={handleAddToCart}
                 disabled={isAddingToCart || stock <= 0}
-                className={`p-1.5 rounded-full transition-all duration-300 touch-target-sm ${
+                className={`p-1 sm:p-1.5 rounded-full transition-all duration-300 touch-target-sm ${
                   stock <= 0 
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
                     : 'bg-blue-100 text-blue-600 hover:bg-blue-200'

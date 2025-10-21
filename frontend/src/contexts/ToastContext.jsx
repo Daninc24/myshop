@@ -1,11 +1,10 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState, createContext, useContext } from 'react';
 import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-const ToastContext = React.createContext();
+const ToastContext = createContext();
 
 export const useToast = () => {
-  const context = React.useContext(ToastContext);
+  const context = useContext(ToastContext);
   if (!context) {
     throw new Error('useToast must be used within a ToastProvider');
   }

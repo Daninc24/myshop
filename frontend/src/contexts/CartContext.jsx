@@ -1,12 +1,11 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState, createContext, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 
-const CartContext = React.createContext();
+const CartContext = createContext();
 
 export const useCart = () => {
-  const context = React.useContext(CartContext);
+  const context = useContext(CartContext);
   if (!context) {
     throw new Error('useCart must be used within a CartProvider');
   }
@@ -14,10 +13,10 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
-  const { isAuthenticated, user } = React.useContext(AuthContext);
-  const [currency, setCurrency] = React.useState(() => localStorage.getItem('currency') || 'USD');
+  const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { isAuthenticated, user } = useContext(AuthContext);
+  const [currency, setCurrency] = useState(() => localStorage.getItem('currency') || 'USD');
   const [rates, setRates] = useState({ 
     USD: 1,
     EUR: 0.85,

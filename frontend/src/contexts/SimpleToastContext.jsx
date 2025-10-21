@@ -1,7 +1,7 @@
 // Minimal toast context for testing
-import * as React from 'react';
+import React, { createContext, useContext } from 'react';
 
-const SimpleToastContext = React.createContext({
+const SimpleToastContext = createContext({
   success: () => {},
   error: () => {},
   showToast: () => {}
@@ -34,7 +34,7 @@ export const SimpleToastProvider = ({ children }) => {
 };
 
 export const useSimpleToast = () => {
-  const context = React.useContext(SimpleToastContext);
+  const context = useContext(SimpleToastContext);
   if (!context) {
     throw new Error('useSimpleToast must be used within SimpleToastProvider');
   }

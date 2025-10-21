@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [
     react({
-      jsxRuntime: 'classic'
+      jsxRuntime: 'automatic'
     })
   ],
   define: {
@@ -19,10 +19,7 @@ export default defineConfig({
     },
     dedupe: ['react', 'react-dom']
   },
-  esbuild: {
-    jsxFactory: 'React.createElement',
-    jsxFragment: 'React.Fragment'
-  },
+
   server: {
     proxy: {
       '/api': {

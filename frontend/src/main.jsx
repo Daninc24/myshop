@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom/client';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import App from './App.jsx'
 import ReactTest from './ReactTest.jsx'
 import './index.css'
@@ -53,9 +53,19 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           algorithm: antdTheme.defaultAlgorithm,
         }}
       >
-        <SimpleToastProvider>
-          <ReactTest />
-        </SimpleToastProvider>
+        <ToastProvider>
+          <SimpleToastProvider>
+            <AuthProvider>
+              <CartProvider>
+                <NotificationProvider>
+                  <AnalyticsProvider>
+                    <App />
+                  </AnalyticsProvider>
+                </NotificationProvider>
+              </CartProvider>
+            </AuthProvider>
+          </SimpleToastProvider>
+        </ToastProvider>
       </ConfigProvider>
     </HelmetProvider>
   </BrowserRouter>,

@@ -243,7 +243,7 @@ const Navbar = () => {
   const cartItemCount = cart.reduce((total, item) => total + (item.quantity || 1), 0);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <nav className={`fixed top-10 left-0 right-0 z-40 transition-all duration-300 ${
       isScrolled 
         ? 'bg-white border-b border-slate-200 shadow-lg' 
         : 'bg-white shadow-sm'

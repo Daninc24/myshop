@@ -169,16 +169,7 @@ const Footer = React.memo(() => {
           </div>
           
         </div>
-        {/* Quick Links */}
-        <div className={`flex flex-col ${isMobile ? 'gap-1' : 'gap-2'}`}>
-          <h3 className={`${footerLayout.titleSize} font-heading font-bold ${isMobile ? 'mb-0.5' : 'mb-1'} text-white`}>Quick Links</h3>
-          <Link to="/" className={`text-gray-300 hover:text-orange-400 transition-colors ${footerLayout.textSize} font-medium touch-target-sm`}>Home</Link>
-          <Link to="/products" className={`text-gray-300 hover:text-orange-400 transition-colors ${footerLayout.textSize} font-medium touch-target-sm`}>Products</Link>
-          <Link to="/about" className={`text-gray-300 hover:text-orange-400 transition-colors ${footerLayout.textSize} font-medium touch-target-sm`}>About Us</Link>
-          <Link to="/contact" className={`text-gray-300 hover:text-orange-400 transition-colors ${footerLayout.textSize} font-medium touch-target-sm`}>Contact</Link>
-          <Link to="/faq" className={`text-gray-300 hover:text-orange-400 transition-colors ${footerLayout.textSize} font-medium touch-target-sm`}>FAQ</Link>
-          <Link to="/events" className={`text-gray-300 hover:text-orange-400 transition-colors ${footerLayout.textSize} font-medium touch-target-sm`}>Events</Link>
-        </div>
+
         
         {/* Contact Info */}
         <div className={`flex flex-col ${isMobile ? 'gap-1' : 'gap-2'}`}>

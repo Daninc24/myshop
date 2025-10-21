@@ -1,5 +1,5 @@
 // Simple React test component
-import * as React from 'react';
+import React from 'react';
 
 const ReactTest = () => {
   const [test, setTest] = React.useState('React is working!');
