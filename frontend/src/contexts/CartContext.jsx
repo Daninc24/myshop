@@ -1,9 +1,8 @@
 import React, { useState, createContext, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
-import { safeCreateContext } from '../utils/reactContextFix.js';
 
-const CartContext = safeCreateContext();
+const CartContext = createContext();
 
 export const useCart = () => {
   const context = useContext(CartContext);

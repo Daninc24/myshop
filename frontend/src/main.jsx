@@ -1,6 +1,3 @@
-// CRITICAL: Initialize React globals FIRST
-import './init-react.js';
-import './utils/reactContextFix.js';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 

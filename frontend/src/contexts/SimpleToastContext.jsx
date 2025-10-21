@@ -1,8 +1,7 @@
 // Minimal toast context for testing
 import React, { createContext, useContext } from 'react';
-import { safeCreateContext } from '../utils/reactContextFix.js';
 
-const SimpleToastContext = safeCreateContext({
+const SimpleToastContext = createContext({
   success: () => {},
   error: () => {},
   showToast: () => {}

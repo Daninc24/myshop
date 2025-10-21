@@ -34,35 +34,19 @@ export default defineConfig({
     // Enable code splitting for better performance
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Don't split React - keep it in the main bundle
-          if (id.includes('react') || id.includes('react-dom')) {
-            return undefined; // This keeps it in the main bundle
-          }
+        manualChunks: {
+          // Keep React together in vendor chunk
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           // UI libraries
-          if (id.includes('antd') || id.includes('@ant-design') || id.includes('@heroicons')) {
-            return 'vendor-ui';
-          }
+          'vendor-ui': ['antd', '@ant-design/icons', '@heroicons/react'],
           // Utility libraries
-          if (id.includes('axios') || id.includes('framer-motion') || id.includes('dayjs')) {
-            return 'vendor-utils';
-          }
+          'vendor-utils': ['axios', 'framer-motion', 'dayjs'],
           // Chart libraries
-          if (id.includes('chart.js') || id.includes('recharts')) {
-            return 'vendor-charts';
-          }
+          'vendor-charts': ['chart.js', 'react-chartjs-2', 'recharts'],
           // PDF libraries
-          if (id.includes('jspdf')) {
-            return 'vendor-pdf';
-          }
+          'vendor-pdf': ['jspdf', 'jspdf-autotable'],
           // Payment libraries
-          if (id.includes('stripe') || id.includes('paypal')) {
-            return 'vendor-payments';
-          }
-          // Other vendor libraries
-          if (id.includes('node_modules')) {
-            return 'vendor-others';
-          }
+          'vendor-payments': ['@stripe/stripe-js', '@stripe/react-stripe-js', '@paypal/react-paypal-js']
         },
         // Optimize chunk names
         chunkFileNames: (chunkInfo) => {

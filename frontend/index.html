@@ -53,75 +53,7 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- React polyfill for production builds -->
-    <script>
-      // Safe React polyfill to prevent createContext errors
-      (function() {
-        const createMockContext = function() { 
-          console.warn('React createContext not yet loaded, using mock'); 
-          return {
-            Provider: function(props) { return props.children; },
-            Consumer: function(props) { return props.children({}); },
-            displayName: 'MockContext'
-          }; 
-        };
-        
-        // Set up window globals safely
-        try {
-          window.React = window.React || {
-            createContext: createMockContext,
-            useState: function() { return [null, function() {}]; },
-            useEffect: function() {},
-            useContext: function() { return {}; }
-          };
-          
-          // Only set createContext if it doesn't exist or isn't read-only
-          if (!window.hasOwnProperty('createContext')) {
-            try {
-              window.createContext = createMockContext;
-            } catch (e) {
-              // If we can't set it directly, use defineProperty
-              try {
-                Object.defineProperty(window, 'createContext', {
-                  get: function() {
-                    return window.React && window.React.createContext ? window.React.createContext : createMockContext;
-                  },
-                  configurable: true
-                });
-              } catch (e2) {
-                console.warn('Could not set window.createContext polyfill');
-              }
-            }
-          }
-        } catch (error) {
-          console.warn('Error setting up window React polyfill:', error);
-        }
-        
-        // Set up globalThis safely
-        try {
-          globalThis.React = globalThis.React || window.React;
-          
-          if (!globalThis.hasOwnProperty('createContext')) {
-            try {
-              globalThis.createContext = createMockContext;
-            } catch (e) {
-              try {
-                Object.defineProperty(globalThis, 'createContext', {
-                  get: function() {
-                    return globalThis.React && globalThis.React.createContext ? globalThis.React.createContext : createMockContext;
-                  },
-                  configurable: true
-                });
-              } catch (e2) {
-                console.warn('Could not set globalThis.createContext polyfill');
-              }
-            }
-          }
-        } catch (error) {
-          console.warn('Error setting up globalThis React polyfill:', error);
-        }
-      })();
-    </script>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
