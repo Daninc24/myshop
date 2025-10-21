@@ -15,7 +15,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import axios from 'axios';
 import { getApiBaseUrl, logApiConfig, testApiConnection } from './utils/apiConfig';
-// Antd v5 doesn't need explicit CSS imports - styles are handled automatically
 import { ConfigProvider, theme as antdTheme } from 'antd';
 
 // Configure axios to work with Vite proxy
@@ -37,8 +36,10 @@ import { ConfigProvider, theme as antdTheme } from 'antd';
 // Initialize error fixes for production
 initializeErrorFixes();
 
-// Ensure React is available globally
-window.React = React;
+// Ensure React is available for antd and other libraries
+if (typeof window !== 'undefined') {
+  window.React = React;
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>

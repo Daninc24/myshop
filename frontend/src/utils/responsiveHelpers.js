@@ -69,14 +69,24 @@ export const getFooterLayout = (screenSize) => {
       textSize: 'text-sm',
       titleSize: 'text-base'
     };
-  } else {
+  } else if (screenSize === 'md') {
     return {
       columns: 3,
       gap: 'gap-6',
-      padding: 'py-8 px-6',
+      padding: 'py-6 px-6',
       textSize: 'text-sm',
-      titleSize: 'text-lg',
-      maxHeight: 'max-h-96'
+      titleSize: 'text-base',
+      maxHeight: 'max-h-80'
+    };
+  } else {
+    // Large screens (lg, xl, 2xl) - very compact
+    return {
+      columns: 4,
+      gap: 'gap-6',
+      padding: 'py-4 px-8',
+      textSize: 'text-sm',
+      titleSize: 'text-base',
+      maxHeight: 'max-h-56'
     };
   }
 };

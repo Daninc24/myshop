@@ -119,15 +119,15 @@ const Footer = React.memo(() => {
       <div className={`max-w-7xl mx-auto grid ${footerLayout.gap}`} style={{ gridTemplateColumns: `repeat(${footerLayout.columns}, minmax(0, 1fr))` }}>
         
         {/* Brand & Newsletter */}
-        <div className={`flex flex-col ${isMobile ? 'gap-1' : 'gap-2'} col-span-1 items-center sm:items-start`}>
-          <div className={`flex ${isMobile ? 'flex-col' : 'flex-col sm:flex-row'} items-center ${isMobile ? 'gap-1' : 'gap-1 sm:gap-2'} mb-1 w-full`}>
-            <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10 sm:w-12 sm:h-12'} bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-lg flex items-center justify-center mx-auto sm:mx-0`}>
-              <span className={`font-heading ${isMobile ? 'text-sm' : 'text-lg sm:text-xl'} font-bold text-white`}>LC</span>
+        <div className={`flex flex-col ${isMobile ? 'gap-1' : screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'gap-1' : 'gap-2'} col-span-1 items-center sm:items-start`}>
+          <div className={`flex ${isMobile ? 'flex-col' : 'flex-col sm:flex-row'} items-center ${isMobile ? 'gap-1' : 'gap-1 sm:gap-2'} ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mb-0' : 'mb-1'} w-full`}>
+            <div className={`${isMobile ? 'w-8 h-8' : screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'w-8 h-8' : 'w-10 h-10 sm:w-12 sm:h-12'} bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-lg flex items-center justify-center mx-auto sm:mx-0`}>
+              <span className={`font-heading ${isMobile ? 'text-sm' : screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'text-sm' : 'text-lg sm:text-xl'} font-bold text-white`}>LC</span>
             </div>
-            <span className={`font-heading ${isMobile ? 'text-sm' : 'text-lg sm:text-xl md:text-2xl'} font-bold text-white drop-shadow-lg text-center sm:text-left`}>{getBrandName()}</span>
+            <span className={`font-heading ${isMobile ? 'text-sm' : screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'text-base' : 'text-lg sm:text-xl md:text-2xl'} font-bold text-white drop-shadow-lg text-center sm:text-left`}>{getBrandName()}</span>
           </div>
-          {!isMobile && <p className="text-gray-300 mb-2 text-xs sm:text-sm leading-relaxed hidden xs:block">Your one-stop shop for everything awesome.</p>}
-          <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'} mt-2 justify-center sm:justify-start`}>
+          {!isMobile && <p className={`text-gray-300 ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mb-0 text-xs' : 'mb-1 text-xs sm:text-sm'} leading-relaxed hidden xs:block`}>Your one-stop shop for everything awesome.</p>}
+          <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'} ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mt-0' : 'mt-1'} justify-center sm:justify-start`}>
             {/* Facebook */}
             <a 
               href={socialLinks.facebook} 
@@ -172,7 +172,7 @@ const Footer = React.memo(() => {
 
         
         {/* Contact Info */}
-        <div className={`flex flex-col ${isMobile ? 'gap-1' : 'gap-2'}`}>
+        <div className={`flex flex-col ${isMobile ? 'gap-1' : screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'gap-1' : 'gap-2'}`}>
           <h3 className={`${footerLayout.titleSize} font-heading font-bold ${isMobile ? 'mb-0.5' : 'mb-1'} text-white`}>Contact Us</h3>
           <div className={`flex items-start ${isMobile ? 'gap-1' : 'gap-2'}`}>
             <PhoneIcon className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4 sm:w-5 sm:h-5'} text-orange-400 flex-shrink-0 mt-0.5`} />
@@ -204,10 +204,10 @@ const Footer = React.memo(() => {
           )}
         </div>
         
-        {/* Rate Our Service - Hidden on mobile to save space */}
+        {/* Rate Our Service - Hidden on mobile to save space, more compact on large screens */}
         {!isMobile && (
-          <div className="flex flex-col gap-2 md:col-span-1 items-center sm:items-start">
-            <h3 className={`${footerLayout.titleSize} font-heading font-bold mb-1 text-white`}>Rate Our Service</h3>
+          <div className={`flex flex-col ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'gap-0.5' : 'gap-1'} items-center sm:items-start`}>
+            <h3 className={`${footerLayout.titleSize} font-heading font-bold ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mb-0' : 'mb-1'} text-white`}>Rate Our Service</h3>
             <div className="flex items-center gap-1 mb-1">
               {[1,2,3,4,5].map(star => (
                 <button
@@ -215,7 +215,7 @@ const Footer = React.memo(() => {
                   onClick={() => handleRate(star)}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
-                  className={`${isTablet ? 'text-lg' : 'text-2xl sm:text-3xl'} ${(hoverRating || userRating) >= star ? 'text-yellow-400' : 'text-gray-600'} focus:outline-none transition-all duration-200 hover:scale-110 touch-target-sm`}
+                  className={`${isTablet || screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'text-lg' : 'text-2xl'} ${(hoverRating || userRating) >= star ? 'text-yellow-400' : 'text-gray-600'} focus:outline-none transition-all duration-200 hover:scale-110 touch-target-sm`}
                   aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
                 >
                   ★
@@ -227,19 +227,19 @@ const Footer = React.memo(() => {
               placeholder="Your name (optional)"
               value={userName}
               onChange={e => setUserName(e.target.value)}
-              className={`w-full max-w-xs px-3 py-1 rounded-md bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${footerLayout.textSize} touch-target-sm`}
+              className={`w-full max-w-xs px-2 py-1 rounded-md bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${footerLayout.textSize} touch-target-sm`}
             />
             <textarea
               placeholder="Leave a message..."
               value={userMessage}
               onChange={e => setUserMessage(e.target.value)}
-              className={`w-full max-w-xs px-3 py-1 rounded-md bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${footerLayout.textSize}`}
-              rows={isTablet ? 1 : 2}
+              className={`w-full max-w-xs px-2 py-1 rounded-md bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${footerLayout.textSize}`}
+              rows={1}
             />
             <button 
               onClick={handleSubmit} 
               disabled={!userRating}
-              className={`w-full max-w-xs px-4 py-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-md transition-all duration-200 shadow-lg hover:shadow-xl ${footerLayout.textSize} touch-target-sm`}
+              className={`w-full max-w-xs px-3 py-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-md transition-all duration-200 shadow-lg hover:shadow-xl ${footerLayout.textSize} touch-target-sm`}
             >
               Submit Rating
             </button>
@@ -262,8 +262,8 @@ const Footer = React.memo(() => {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-2 md:col-span-1">
-            <h3 className={`${footerLayout.titleSize} font-heading font-bold mb-1 text-white`}>Our Location</h3>
+          <div className={`flex flex-col ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'gap-1' : 'gap-2'}`}>
+            <h3 className={`${footerLayout.titleSize} font-heading font-bold ${screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mb-0' : 'mb-1'} text-white`}>Our Location</h3>
             <div className="rounded-lg overflow-hidden shadow-2xl border-2 border-white/10">
               <iframe
                 src={mapEmbedUrl}
@@ -274,7 +274,7 @@ const Footer = React.memo(() => {
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Store Location"
-                className={`w-full ${isTablet ? 'h-20' : 'h-24 sm:h-32 md:h-36'}`}
+                className={`w-full ${isTablet ? 'h-16' : screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'h-16' : 'h-24 sm:h-28'}`}
               ></iframe>
             </div>
             <div className="flex items-center gap-1">
@@ -283,8 +283,23 @@ const Footer = React.memo(() => {
             </div>
           </div>
         )}
+
+        {/* Quick Links - Only show on large screens to fill the 4th column */}
+        {(screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl') && (
+          <div className="flex flex-col gap-1">
+            <h3 className={`${footerLayout.titleSize} font-heading font-bold mb-0 text-white`}>Quick Links</h3>
+            <div className="flex flex-col gap-0.5">
+              <Link to="/" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>Home</Link>
+              <Link to="/products" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>Products</Link>
+              <Link to="/about" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>About Us</Link>
+              <Link to="/contact" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>Contact</Link>
+              <Link to="/faq" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>FAQ</Link>
+              <Link to="/events" className={`${footerLayout.textSize} text-gray-300 hover:text-orange-400 transition-colors touch-target-sm`}>Events</Link>
+            </div>
+          </div>
+        )}
       </div>
-      <div className={`border-t border-white/10 ${isMobile ? 'mt-2 pt-2' : 'mt-2 sm:mt-4 pt-2 sm:pt-4'} text-center text-xs text-gray-400 flex flex-col sm:flex-row justify-between items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
+      <div className={`border-t border-white/10 ${isMobile ? 'mt-2 pt-2' : screenSize === 'lg' || screenSize === 'xl' || screenSize === '2xl' ? 'mt-1 pt-1' : 'mt-2 sm:mt-4 pt-2 sm:pt-4'} text-center text-xs text-gray-400 flex flex-col sm:flex-row justify-between items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
         <span className={isMobile ? 'text-xs' : 'text-xs'}>&copy; {new Date().getFullYear()} {getBrandName()}. All rights reserved.</span>
         <div className={`flex ${isMobile ? 'gap-2' : 'gap-3'} items-center text-xs`}>
           <Link to="/privacy" className="text-gray-400 hover:text-orange-400 transition-colors touch-target-sm">Privacy</Link>
