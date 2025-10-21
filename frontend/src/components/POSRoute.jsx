@@ -16,11 +16,31 @@ const POSRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Check if user has POS access (shopkeeper, warehouse manager, or admin)
-  const hasPOSAccess = isAdmin || isShopkeeper || isWarehouseManager;
+  // Check if user has POS access (admin, shopkeeper, warehouse manager, store manager, manager, staff, cashier)
+  const allowedRoles = ['admin', 'shopkeeper', 'warehouse_manager', 'store_manager', 'manager', 'staff', 'cashier', 'employee'];
+  const hasPOSAccess = user && allowedRoles.includes(user.role);
   
   if (!hasPOSAccess) {
-    return <Navigate to="/" replace />;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h1>
+          <p className="text-gray-600 mb-4">
+            You don't have permission to access the POS system.
+          </p>
+          <p className="text-sm text-gray-500 mb-6">
+            Current role: {user?.role || 'None'}<br/>
+            Required roles: Admin, Shopkeeper, Manager, Staff, or Cashier
+          </p>
+          <button 
+            onClick={() => window.history.back()} 
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return children;

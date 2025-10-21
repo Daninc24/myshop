@@ -1,8 +1,23 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { PlusIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PhotoIcon, XMarkIcon, ShoppingCartIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { getOptimizedImageUrl } from '../utils/imageUtils';
+
+// Mock components for missing dependencies
+const BarcodeScannerComponent = ({ width, height, onUpdate }) => (
+  <div className="bg-gray-200 flex items-center justify-center" style={{ width, height }}>
+    <p className="text-gray-500">Barcode Scanner (Install react-qr-barcode-scanner for full functionality)</p>
+  </div>
+);
+
+const useReactToPrint = ({ content, documentTitle }) => {
+  return () => {
+    if (content && content()) {
+      window.print();
+    }
+  };
+};
 
 const paymentMethods = [
   { value: 'cash', label: 'Cash' },
@@ -96,24 +111,38 @@ const POS = () => {
   useEffect(() => {
     if (user && user.role === 'admin') {
       setUsersLoading(true);
-              axios.get('/users')
-        .then(res => setAllUsers(res.data.users || []))
-        .catch((error) => {
-    
+      const fetchUsers = async () => {
+        try {
+          const response = await axios.get('/users');
+          setAllUsers(response.data.users || []);
+        } catch (error) {
+          console.error('Error fetching users:', error);
           setAllUsers([]);
-        })
-        .finally(() => setUsersLoading(false));
+        } finally {
+          setUsersLoading(false);
+        }
+      };
+      
+      fetchUsers();
     }
   }, [user]);
 
   useEffect(() => {
     // Fetch products - this is a public endpoint
-            axios.get('/products')
-      .then(res => setProducts(res.data.products || res.data || []))
-      .catch((error) => {
-  
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('/products');
+        const productsData = response.data.products || response.data || [];
+        setProducts(productsData);
+        setError(''); // Clear any previous errors
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setError('Failed to load products. Please refresh the page.');
         setProducts([]);
-      });
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   const filteredProducts = products.filter(p =>
@@ -231,34 +260,51 @@ const POS = () => {
   const totalAfterDiscount = Math.max(0, total - itemDiscountTotal - couponDiscount);
 
   const handleCheckout = async () => {
+    if (cart.length === 0) {
+      setError('Cart is empty. Please add items before checkout.');
+      return;
+    }
+    
     if (!selectedCustomer) {
       setError('Please select a customer before checkout.');
       return;
     }
+    
     setLoading(true);
     setError('');
+    
     try {
-      const res = await axios.post('/pos/sales', {
+      const checkoutData = {
         items: cartWithDiscounts.map(item => ({
           product: item.product,
           quantity: item.quantity,
+          name: item.name,
+          price: item.price,
           discountType: item.discountType,
           discountValue: item.discountValue,
         })),
-        total,
+        total: totalAfterDiscount,
         paymentMethod,
         customer: selectedCustomer._id,
         coupon: appliedCoupon ? appliedCoupon.code : undefined,
         discount: itemDiscountTotal + couponDiscount,
         totalAfterDiscount,
-      });
-      setReceipt(res.data.sale);
+      };
+
+      console.log('Checkout data:', checkoutData);
+      
+      const response = await axios.post('/pos/sales', checkoutData);
+      
+      setReceipt(response.data.sale);
       setCart([]);
       setSelectedCustomer(null);
       setAppliedCoupon(null);
       setCouponCode('');
+      setError('');
     } catch (err) {
-      setError(err.response?.data?.message || 'Checkout failed');
+      console.error('Checkout error:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Checkout failed';
+      setError(`Checkout failed: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -282,21 +328,11 @@ const POS = () => {
     documentTitle: 'POS Receipt',
   });
 
-  // Download receipt as PDF
+  // Download receipt as PDF (simplified version)
   const handleDownloadPDF = () => {
     if (!receipt) return;
-    const doc = new jsPDF();
-    doc.text('Receipt', 14, 14);
-    doc.text(`Sale ID: ${receipt._id}`, 14, 22);
-    doc.text(`Date: ${new Date(receipt.createdAt).toLocaleString()}`, 14, 30);
-    doc.text(`Payment: ${receipt.paymentMethod}`, 14, 38);
-    doc.autoTable({
-      startY: 44,
-      head: [['Product', 'Qty', 'Price', 'Subtotal']],
-      body: receipt.items.map(item => [item.name, item.quantity, item.price, item.subtotal]),
-    });
-    doc.text(`Total: ${receipt.total}`, 14, doc.lastAutoTable.finalY + 10);
-    doc.save('receipt.pdf');
+    // For now, just print - PDF generation requires jsPDF library
+    window.print();
   };
 
   // Fetch sale for return
@@ -582,16 +618,57 @@ const POS = () => {
 }
 
 
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Show error if there's a critical error
+  if (error && products.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow mt-8">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">POS System Error</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-2 sm:p-4 md:p-6 bg-white rounded shadow mt-4 sm:mt-8">
-      
-      {/* <div className="mb-4 p-2 bg-yellow-100 text-yellow-800 rounded text-xs">
-        <strong>Debug:</strong> User: {user ? user.name : 'None'} | Role: {user ? user.role : 'None'}
+      {/* POS Header */}
+      <div className="mb-6 border-b pb-4">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Point of Sale System</h1>
+        <div className="flex justify-between items-center text-sm text-gray-600">
+          <div>
+            Welcome, <span className="font-medium">{user?.name || 'User'}</span> 
+            <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+              {user?.role || 'No Role'}
+            </span>
+          </div>
+          <div className="text-xs">
+            Products: {products.length} | Cart: {cart.length} items
+          </div>
+        </div>
       </div>
-      <div className="mb-2 p-2 bg-blue-100 text-blue-800 rounded text-xs">
-        <strong>Possible Roles:</strong> user, admin, shopkeeper, delivery, moderator, employee, store_manager, warehouse_manager, manager<br />
-        <strong>Current Role:</strong> {user ? user.role : 'None'}
-      </div> */}
+
+      {/* Error Display */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
       {/* Returns/Refunds Modal */}
       {returnModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-2 sm:p-0">
@@ -706,44 +783,211 @@ const POS = () => {
           </div>
         </div>
       )}
-      {/* Barcode Scanner Controls */}
-      <div className="mb-4 flex gap-4 items-center">
-        <button
-          className="btn-secondary"
-          onClick={() => setShowScanner(s => !s)}
-        >
-          {showScanner ? 'Close Scanner' : 'Scan Barcode (Webcam)'}
-        </button>
-        <span className="text-xs text-gray-500">or use USB barcode scanner and scan into the field below</span>
-        <input
-          type="text"
-          className="input-field"
-          placeholder="Scan barcode here..."
-          value={barcodeScan}
-          onChange={e => setBarcodeScan(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter' && barcodeScan) {
-              addByBarcode(barcodeScan);
-              setBarcodeScan('');
-            }
-          }}
-        />
-      </div>
-      {/* Webcam Barcode Scanner */}
-      {showScanner && (
-        <div className="mb-4">
-          <BarcodeScannerComponent
-            width={400}
-            height={200}
-            onUpdate={(err, result) => {
-              if (result) {
-                addByBarcode(result.text);
-                setShowScanner(false);
+      {/* Search and Controls */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Product Search */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Search Products</label>
+          <input
+            type="text"
+            className="input-field"
+            placeholder="Search products..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+
+        {/* Barcode Scanner */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Barcode Scanner</label>
+          <input
+            type="text"
+            className="input-field"
+            placeholder="Scan barcode here..."
+            value={barcodeScan}
+            onChange={e => setBarcodeScan(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && barcodeScan) {
+                addByBarcode(barcodeScan);
+                setBarcodeScan('');
               }
             }}
           />
         </div>
-      )}
+
+        {/* Quick Actions */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Quick Actions</label>
+          <div className="flex gap-2">
+            <button
+              className="btn-secondary text-sm"
+              onClick={() => setCustomerModal(true)}
+            >
+              Select Customer
+            </button>
+            <button
+              className="btn-secondary text-sm"
+              onClick={() => setZReportModal(true)}
+            >
+              Z-Report
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* Main POS Interface */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Products Section */}
+        <div className="lg:col-span-2">
+          <h3 className="text-lg font-semibold mb-4">Products ({filteredProducts.length})</h3>
+          
+          {products.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p>Loading products...</p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p>No products found matching "{search}"</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
+              {filteredProducts.map(product => (
+                <div key={product._id} className="border rounded-lg p-3 hover:shadow-md transition-shadow">
+                  {product.images && product.images[0] && (
+                    <img 
+                      src={getOptimizedImageUrl(product.images[0])} 
+                      alt={product.title || product.name}
+                      className="w-full h-20 object-cover rounded mb-2"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  )}
+                  <h4 className="text-sm font-medium truncate" title={product.title || product.name}>
+                    {product.title || product.name}
+                  </h4>
+                  <p className="text-sm text-gray-600">Ksh {product.price}</p>
+                  <p className="text-xs text-gray-500">Stock: {product.stock || 0}</p>
+                  <button
+                    onClick={() => addToCart(product)}
+                    disabled={!product.stock || product.stock <= 0}
+                    className="w-full mt-2 bg-blue-600 text-white text-xs py-1 px-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Cart Section */}
+        <div className="lg:col-span-1">
+          <h3 className="text-lg font-semibold mb-4">Cart ({cart.length})</h3>
+          
+          {/* Selected Customer */}
+          {selectedCustomer && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-medium text-green-800">{selectedCustomer.name}</p>
+                  <p className="text-sm text-green-600">{selectedCustomer.phone}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedCustomer(null)}
+                  className="text-green-600 hover:text-green-800"
+                >
+                  <XMarkIcon className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Cart Items */}
+          <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
+            {cart.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">Cart is empty</p>
+            ) : (
+              cart.map(item => (
+                <div key={item.product} className="flex items-center justify-between p-2 border rounded">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium truncate">{item.name}</p>
+                    <p className="text-xs text-gray-600">Ksh {item.price} each</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max={item.stock}
+                      value={item.quantity}
+                      onChange={e => updateQuantity(item.product, parseInt(e.target.value) || 1)}
+                      className="w-16 px-1 py-1 text-xs border rounded text-center"
+                    />
+                    <button
+                      onClick={() => removeFromCart(item.product)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Cart Summary */}
+          {cart.length > 0 && (
+            <div className="border-t pt-4">
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Subtotal:</span>
+                  <span>Ksh {total.toFixed(2)}</span>
+                </div>
+                {(itemDiscountTotal + couponDiscount) > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount:</span>
+                    <span>-Ksh {(itemDiscountTotal + couponDiscount).toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-bold text-lg border-t pt-2">
+                  <span>Total:</span>
+                  <span>Ksh {totalAfterDiscount.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Payment Method */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                <select
+                  value={paymentMethod}
+                  onChange={e => setPaymentMethod(e.target.value)}
+                  className="input-field"
+                >
+                  {paymentMethods.map(method => (
+                    <option key={method.value} value={method.value}>
+                      {method.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Checkout Button */}
+              <button
+                onClick={handleCheckout}
+                disabled={loading || cart.length === 0 || !selectedCustomer}
+                className="w-full mt-4 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Processing...' : `Checkout (Ksh ${totalAfterDiscount.toFixed(2)})`}
+              </button>
+
+              {!selectedCustomer && cart.length > 0 && (
+                <p className="text-xs text-red-600 mt-2 text-center">
+                  Please select a customer to proceed
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
       {/* Product Details Modal */}
       {modalProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-2 sm:p-0">
