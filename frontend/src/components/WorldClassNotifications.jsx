@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircleIcon,
@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 // Notification Context
-const NotificationContext = createContext();
+const NotificationContext = React.createContext();
 
 export const useNotifications = () => {
   const context = useContext(NotificationContext);

@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useToast } from './ToastContext';
 import { handleApiError } from '../utils/errorHandler.js';
 
-export const AuthContext = createContext();
+export const AuthContext = React.createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

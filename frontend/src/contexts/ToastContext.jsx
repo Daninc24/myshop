@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-const ToastContext = createContext();
+const ToastContext = React.createContext();
 
 export const useToast = () => {
   const context = useContext(ToastContext);
