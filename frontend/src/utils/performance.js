@@ -99,7 +99,7 @@ export const apiCache = new CacheManager();
 // Optimize bundle loading
 export const loadChunk = async (chunkName) => {
   try {
-    const module = await import(/* webpackChunkName: "[request]" */ `../components/${chunkName}`);
+    const module = await import(/* webpackChunkName: "[request]" */ `../components/${chunkName}.jsx`);
     return module.default;
   } catch (error) {
     console.error(`Failed to load chunk: ${chunkName}`, error);

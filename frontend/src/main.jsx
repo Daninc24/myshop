@@ -1,11 +1,13 @@
-import React, { StrictMode } from 'react';
-import ReactDOM from 'react-dom/client'
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
 import App from './App.jsx'
+import ReactTest from './ReactTest.jsx'
 import './index.css'
 import { setupGlobalErrorHandling } from './utils/errorHandler.js'
 import { initializeErrorFixes } from './utils/errorFixes.js'
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ToastProvider } from './contexts/ToastContext.jsx';
+import { SimpleToastProvider } from './contexts/SimpleToastContext.jsx';
 import { CartProvider } from './contexts/CartContext.jsx';
 import { NotificationProvider } from './components/WorldClassNotifications.jsx';
 import { AnalyticsProvider } from './contexts/AnalyticsContext.jsx';
@@ -35,6 +37,9 @@ import { ConfigProvider, theme as antdTheme } from 'antd';
 // Initialize error fixes for production
 initializeErrorFixes();
 
+// Ensure React is available globally
+window.React = React;
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <HelmetProvider>
@@ -48,17 +53,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           algorithm: antdTheme.defaultAlgorithm,
         }}
       >
-        <NotificationProvider>
-          <ToastProvider>
-            <AuthProvider>
-              <CartProvider>
-                <AnalyticsProvider>
-                  <App />
-                </AnalyticsProvider>
-              </CartProvider>
-            </AuthProvider>
-          </ToastProvider>
-        </NotificationProvider>
+        <SimpleToastProvider>
+          <ReactTest />
+        </SimpleToastProvider>
       </ConfigProvider>
     </HelmetProvider>
   </BrowserRouter>,

@@ -12,7 +12,7 @@ import {
   FireIcon,
   TagIcon,
   ShareIcon,
-  CompareArrowsIcon
+  ArrowsRightLeftIcon
 } from '@heroicons/react/24/outline';
 import { 
   HeartIcon as HeartSolid,
@@ -338,7 +338,7 @@ const EnhancedProductCard = ({
               onClick={handleCompare}
               className="p-2 rounded-full bg-white/80 backdrop-blur-sm text-slate-600 hover:text-brand-primary hover:bg-white transition-all duration-300"
             >
-              <CompareArrowsIcon className="w-5 h-5" />
+              <ArrowsRightLeftIcon className="w-5 h-5" />
             </motion.button>
           )}
         </div>

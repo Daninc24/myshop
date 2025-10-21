@@ -3,5 +3,8 @@
     "cloudinary": "^1.41.3",
     "multer-storage-cloudinary": "^4.0.0",
     "react-helmet-async": "^2.0.5"
+  },
+  "devDependencies": {
+    "terser": "^5.44.0"
   }
 }
