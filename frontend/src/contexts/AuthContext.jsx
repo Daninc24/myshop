@@ -2,8 +2,9 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import axios from 'axios';
 import { useToast } from './ToastContext';
 import { handleApiError } from '../utils/errorHandler.js';
+import { safeCreateContext } from '../utils/reactContextFix.js';
 
-export const AuthContext = createContext();
+export const AuthContext = safeCreateContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

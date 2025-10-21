@@ -7,9 +7,10 @@ import {
   XCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
+import { safeCreateContext } from '../utils/reactContextFix.js';
 
 // Notification Context
-const NotificationContext = createContext();
+const NotificationContext = safeCreateContext();
 
 export const useNotifications = () => {
   const context = useContext(NotificationContext);

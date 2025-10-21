@@ -96,15 +96,10 @@ export class CacheManager {
 // Create global cache instance
 export const apiCache = new CacheManager();
 
-// Optimize bundle loading
+// Optimize bundle loading - disabled to prevent React context issues
 export const loadChunk = async (chunkName) => {
-  try {
-    const module = await import(/* webpackChunkName: "[request]" */ `../components/${chunkName}.jsx`);
-    return module.default;
-  } catch (error) {
-    console.error(`Failed to load chunk: ${chunkName}`, error);
-    return null;
-  }
+  console.warn('Dynamic chunk loading disabled to prevent React context issues');
+  return null;
 };
 
 // Memory usage monitoring (development only)

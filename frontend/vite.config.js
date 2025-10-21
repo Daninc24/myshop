@@ -35,9 +35,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // React ecosystem - keep together to avoid context issues
-          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-            return 'vendor-react';
+          // Don't split React - keep it in the main bundle
+          if (id.includes('react') || id.includes('react-dom')) {
+            return undefined; // This keeps it in the main bundle
           }
           // UI libraries
           if (id.includes('antd') || id.includes('@ant-design') || id.includes('@heroicons')) {
@@ -47,15 +47,15 @@ export default defineConfig({
           if (id.includes('axios') || id.includes('framer-motion') || id.includes('dayjs')) {
             return 'vendor-utils';
           }
-          // Chart libraries (lazy loaded)
+          // Chart libraries
           if (id.includes('chart.js') || id.includes('recharts')) {
             return 'vendor-charts';
           }
-          // PDF libraries (lazy loaded)
+          // PDF libraries
           if (id.includes('jspdf')) {
             return 'vendor-pdf';
           }
-          // Payment libraries (lazy loaded)
+          // Payment libraries
           if (id.includes('stripe') || id.includes('paypal')) {
             return 'vendor-payments';
           }
@@ -114,6 +114,7 @@ export default defineConfig({
     include: [
       'react',
       'react-dom',
+      'react-dom/client',
       'react-router-dom',
       'axios',
       'antd',
@@ -131,7 +132,13 @@ export default defineConfig({
       'chart.js',
       'react-chartjs-2',
       'recharts'
-    ]
+    ],
+    // Ensure React is pre-bundled correctly
+    esbuildOptions: {
+      define: {
+        global: 'globalThis'
+      }
+    }
   },
   
   // Ensure proper external handling
