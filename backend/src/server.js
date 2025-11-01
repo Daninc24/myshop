@@ -73,27 +73,21 @@ const ALLOWED_ORIGINS = [
   'http://localhost:5173',
   'http://localhost:5174',
   'https://myshop-1-ezhz.onrender.com',
-  // Add your actual production frontend URL here
+].filter(Boolean);  // Add your actual production frontend URL here
   // Example: 'https://myshop-production.vercel.app'
 ];
 
 // Reusable CORS origin checker
-const corsOriginChecker = (origin, callback) => {
-  console.log('CORS Check: Origin', origin, 'Allowed Origins:', ALLOWED_ORIGINS);
-  // Allow requests with no origin (mobile apps, Postman, etc.)
-  if (!origin) return callback(null, true);
-  
-  // Check if origin is in allowed list or ends with .vercel.app
-  if (ALLOWED_ORIGINS.includes(origin) || origin.endsWith('.vercel.app')) {
-    return callback(null, true);
-  }
-  
-  return callback(new Error('Not allowed by CORS'));
-};
 
 // Consolidated CORS options object
 const corsOptions = {
-  origin: corsOriginChecker,
+  origin: (origin, callback) => {
+    if (ALLOWED_ORIGINS.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
