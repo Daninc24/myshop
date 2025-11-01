@@ -1,4 +1,13 @@
 services:
+  # Frontend Service
+  - type: web
+    name: myshop-frontend
+    env: static
+    region: oregon
+    buildCommand: npm install && npm run build
+    startCommand: serve -s dist
+    rootDirectory: frontend
+    publishPath: dist
   # Backend API Service
   - type: web
     name: myshop-backend
@@ -6,7 +15,7 @@ services:
     region: oregon
     plan: free
     buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    startCommand: cd backend && npm run dev
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
