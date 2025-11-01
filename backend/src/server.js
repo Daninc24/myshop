@@ -80,6 +80,7 @@ const ALLOWED_ORIGINS = [
 // Consolidated CORS options object
 const corsOptions = {
   origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
     if (ALLOWED_ORIGINS.includes(origin) || origin.endsWith('.vercel.app')) {
       callback(null, true);
     } else {
