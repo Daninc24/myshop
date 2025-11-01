@@ -92,7 +92,7 @@ const corsOriginChecker = (origin, callback) => {
 
 // Consolidated CORS options object
 const corsOptions = {
-  origin: corsOriginChecker,
+  origin: process.env.NODE_ENV === 'production' ? 'https://myshop-1-ezhz.onrender.com' : corsOriginChecker,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
