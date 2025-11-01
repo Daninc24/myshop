@@ -69,7 +69,7 @@ const { setCacheHeaders, setETagHeaders, setVaryHeaders } = require('./middlewar
 // ========================================
 // Single source of truth for all CORS settings
 const ALLOWED_ORIGINS = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
+  process.env.FRONTEND_URL,
   'http://localhost:5173',
   'http://localhost:5174',
   'https://myshop-1-ezhz.onrender.com',
@@ -79,6 +79,7 @@ const ALLOWED_ORIGINS = [
 
 // Reusable CORS origin checker
 const corsOriginChecker = (origin, callback) => {
+  console.log('CORS Check: Origin', origin, 'Allowed Origins:', ALLOWED_ORIGINS);
   // Allow requests with no origin (mobile apps, Postman, etc.)
   if (!origin) return callback(null, true);
   
@@ -92,7 +93,7 @@ const corsOriginChecker = (origin, callback) => {
 
 // Consolidated CORS options object
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? 'https://myshop-1-ezhz.onrender.com' : corsOriginChecker,
+  origin: corsOriginChecker,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
