@@ -8,6 +8,7 @@ services:
     startCommand: serve -s dist
     rootDirectory: frontend
     publishPath: dist
+    baseDirectory: frontend
   # Backend API Service
   - type: web
     name: myshop-backend
