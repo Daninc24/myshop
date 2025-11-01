@@ -4,7 +4,7 @@ services:
     name: myshop-frontend
     env: static
     region: oregon
-    buildCommand: npm install && npm run build
+    buildCommand: cd frontend && npm install && npm run build
     startCommand: serve -s dist
     rootDirectory: frontend
     publishPath: dist
