@@ -64,14 +64,12 @@ const { createIndexes } = require('./utils/databaseIndexes');
 const compressionMiddleware = require('./middleware/compression');
 const { setCacheHeaders, setETagHeaders, setVaryHeaders } = require('./middleware/caching');
 
-const app = express();
-
-// Configure trust proxy for production deployment (Render, Heroku, etc.)
-if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
-
-const server = http.createServer(app);
+const http = require('http');
+const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
+const User = require('./models/User');
+const Message = require('./models/Message');
+const { setSocketIO } = require('./utils/socket');
 
 // ========================================
 // CONSOLIDATED CORS CONFIGURATION
@@ -107,6 +105,17 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   exposedHeaders: ['Content-Length', 'Content-Type'],
 };
+
+const app = express();
+
+// Configure trust proxy for production deployment (Render, Heroku, etc.)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
+app.use(cors(corsOptions));
+
+const server = http.createServer(app);
 
 // Socket.IO with consolidated CORS
 const io = new Server(server, {
@@ -252,60 +261,7 @@ function throttle(func, delay) {
   };
 }
 
-app.use(securityHeaders);
-app.use(requestId);
-app.use(logger);
-// Performance optimizations
-app.use(setCacheHeaders);
-app.use(setETagHeaders);
-app.use(setVaryHeaders);
-// Enable compression for better performance
-app.use(compressionMiddleware);
 
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(cookieParser());
-
-
-// Security headers via Helmet (optional)
-try {
-  const helmet = require('helmet');
-  app.use(helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://maps.googleapis.com", "https://maps.gstatic.com"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-        fontSrc: ["'self'", "https://fonts.gstatic.com"],
-        imgSrc: ["'self'", "data:", "https:", "blob:"],
-        connectSrc: ["'self'", "https://maps.googleapis.com"],
-        frameSrc: ["'self'", "https://maps.google.com"],
-      },
-    },
-  }));
-  console.log('✅ Helmet enabled with CSP for Google Maps');
-} catch (e) {
-  console.log('ℹ️ helmet package not installed; skipping security headers');
-}
-
-// Basic rate limiting for public APIs
-try {
-  const rateLimit = require('express-rate-limit');
-  const limiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 300, // per IP per window
-    standardHeaders: true,
-    legacyHeaders: false,
-  });
-  app.use('/api/', limiter);
-  console.log('✅ Rate limiting enabled');
-} catch (e) {
-  console.log('ℹ️ express-rate-limit not installed; skipping rate limit');
-}
-
-// Use the consolidated CORS configuration defined at the top
-app.use(cors(corsOptions));
 
 // === ROUTES ===
 app.use('/api/auth', authRoutes);
