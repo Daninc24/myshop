@@ -31,46 +31,6 @@ const Product = require('./models/Product');
 const Message = require('./models/Message');
 const { setSocketIO } = require('./utils/socketManager');
 
-const errorHandler = require('./middleware/errorHandler');
-const { apiLimiter, authLimiter, orderLimiter, productLimiter, adminLimiter } = require('./middleware/rateLimiter');
-const logger = require('./middleware/logger');
-const requestId = require('./middleware/requestId');
-const securityHeaders = require('./middleware/security');
-const { uploadMultiple } = require('./middleware/upload');
-
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/productRoutes');
-const orderRoutes = require('./routes/orders');
-const cartRoutes = require('./routes/cart');
-const paymentRoutes = require('./routes/payment');
-const usersRoutes = require('./routes/users');
-const analyticsRoutes = require('./routes/analytics');
-const paymentCredentialRoutes = require('./routes/paymentCredential');
-const eventRoutes = require('./routes/events');
-const posRoutes = require('./routes/pos');
-const customerRoutes = require('./routes/customers');
-const couponRoutes = require('./routes/coupons');
-const advertsRoutes = require('./routes/adverts');
-const testimonialsRoutes = require('./routes/testimonials');
-const pageViewRoutes = require('./routes/pageViews');
-const categoryRoutes = require('./routes/categoryRoutes');
-const siteRoutes = require('./routes/site');
-const recommendationsRoutes = require('./routes/recommendations');
-const wishlistRoutes = require('./routes/wishlist');
-
-
-const { credentialCache, loadCredentials } = require('./utils/credentialCache');
-const { createIndexes } = require('./utils/databaseIndexes');
-const compressionMiddleware = require('./middleware/compression');
-const { setCacheHeaders, setETagHeaders, setVaryHeaders } = require('./middleware/caching');
-
-const http = require('http');
-const { Server } = require('socket.io');
-const jwt = require('jsonwebtoken');
-const User = require('./models/User');
-const Message = require('./models/Message');
-const { setSocketIO } = require('./utils/socket');
-
 // ========================================
 // CONSOLIDATED CORS CONFIGURATION
 // ========================================
